@@ -1,9 +1,9 @@
-# [Name of the Project] : [Team Number]
+# [LSU CS DS] : [34]
 # Members
-Project Manager: [Name] ([GitHub Name])\
+Project Manager: [Felix] ([fschaf2])\
 Communications Lead: [Name] ([GitHub Name])\
-Git Master: [Name] ([GitHub Name])\
-Design Lead: [Name] ([GitHub Name])\
+Git Master: [Baron] ([bdogdavis])\
+Design Lead: [Jason] ([JasonGonzo123])\
 Quality Assurance Tester: [Name] ([GitHub Name])
 
 # About Our Software
