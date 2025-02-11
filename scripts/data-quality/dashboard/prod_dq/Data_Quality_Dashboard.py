@@ -4,19 +4,29 @@ import datetime
 import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.dirname(__file__) + "/.."))  # Ensure utils is found
-from utils import load_data
+# Ensure utils.py is found
+sys.path.append(os.path.abspath(os.path.dirname(__file__) + "/.."))
 
+# ✅ `set_page_config` MUST be the first Streamlit command
 st.set_page_config(page_title="📊 Data Quality Dashboard", layout="wide")
 
 st.title("📊 Data Quality Dashboard")
-st.write("Navigate to the job listings using the sidebar.")
+st.write("Navigate to the listings using the sidebar.")
 
-st.sidebar.title("Job Listings")
+st.sidebar.title("Computer Science")
+
+# Use Streamlit's session state to track the selected page
+if "current_page" not in st.session_state:
+    st.session_state.current_page = "📈 Datastore Status"
 
 # Sidebar Navigation
-page = st.sidebar.radio("Select a Major:", 
-    ["☁️ Cloud Computing", "📊 Data Science", "💻 Software Engineering"])
+page = st.sidebar.radio("Select a Page:", 
+    ["☁️ Cloud Computing", "📊 Data Science", "💻 Software Engineering", "📈 Datastore Status"])
+
+# If the page selection has changed, rerun Streamlit
+if st.session_state.current_page != page:
+    st.session_state.current_page = page
+    st.rerun()
 
 # Calendar Filter (Excludes Weekends)
 today = datetime.date.today()
@@ -42,18 +52,15 @@ if is_weekend(date_selected):
     st.sidebar.warning("⚠️ Weekends are excluded. Please select a weekday.")
     st.stop()
 
-# Convert selected date to string format for file search
-formatted_date = date_selected.strftime("%Y-%m-%d")
-
 # Route to the Correct Page
 if page == "☁️ Cloud Computing":
-    import pages.Cloud_Computing as cloud
+    import Cloud_Computing as cloud
     cloud.show(date_selected)
 
 elif page == "📊 Data Science":
-    import pages.Data_Science as data
+    import Data_Science as data
     data.show(date_selected)
 
 elif page == "💻 Software Engineering":
-    import pages.Software_Engineering as software
+    import Software_Engineering as software
     software.show(date_selected)
