@@ -1,0 +1,50 @@
+slug,company_name,title,description,remote,url,tags,job_types,location,created_at
+tech-lead-data-engineering-azure-und-databricks-frechen-432539,SkelTech  GmbH,Tech Lead - Data Engineering (m/w/d) Azure und Databricks,"<p><strong>Warum wir?</strong></p>
+<ul>
+<li><strong>Fachliche Spezialisierung &#x26; Weiterentwicklung:</strong> Arbeiten an spannenden Projekten im Bereich Data Ingestion &#x26; Data Preparation; gezielte Zertifizierungen und Weiterbildungsmöglichkeiten</li>
+<li><strong>Starke Partnerschaften &#x26; Innovation:</strong> Zusammenarbeit mit führenden Technologiepartnern wie Databricks, Microsoft und Dataiku</li>
+<li><strong>Karriere &#x26; Vergütung:</strong> Möglichkeit, aktiv die Unternehmenszukunft mitzugestalten; attraktives Festgehalt plus leistungsbezogene Gehalts-Upgrades (bis zu 200 %)</li>
+<li><strong>Modernes Arbeitsumfeld &#x26; Flexibilität:</strong> Modern ausgestattetes Office und individuelles Wunsch-Setup; kostenloses Job-Ticket und flexible Hybrid-Work-Optionen</li>
+<li><strong>Team &#x26; Unternehmenskultur:</strong> Kleines, engagiertes Team mit flachen Hierarchien; regelmäßige Team-Events, Betriebsausflüge (auch mit Familie/Partnern) und gemeinsame Aktionen</li>
+<li><strong>Netzwerken &#x26; Fachveranstaltungen:</strong> Teilnahme an Meetups und Messen zur Erweiterung deines beruflichen Netzwerks</li>
+<li><strong>Sozialleistungen &#x26; Zukunftssicherung:</strong> Betriebliche Altersvorsorge; Urban Sports Club-Mitgliedschaft zur Förderung deiner Gesundheit</li>
+</ul>
+<h2>Aufgaben</h2>
+<p><strong>Was dich erwartet</strong></p>
+<ul>
+<li>Du konzipierst und implementierst <strong>End-to-End-Lösungen auf Basis von Databricks und Azure</strong> oder in Kombination mit einem der anderen führenden Hyperscaler (AWS &#x26; GCP). Du entwickelst Best Practices sowie Standards für unsere Kunden.</li>
+<li>Du führst ein Team aus Data Engineers, förderst deren Weiterentwicklung und agierst als Mentor, um Exzellenz im Data Engineering zu etablieren.</li>
+<li>Du spielst eine <strong>zentrale Rolle neben der Geschäftsführung</strong>, mit der Möglichkeit, Personen zu entwickeln, Geschäftsfelder zu erweitern und Kundenbeziehungen aufzubauen. Dein Einfluss reicht über das Tagesgeschäft hinaus – du prägst aktiv unsere strategische Ausrichtung.</li>
+<li>Du übernimmst eine zentrale Rolle in unserer internen Produktentwicklung mit <strong>Schwerpunkt Data Ingestion und Data Preparation</strong> und treibst Innovationen in diesem Bereich voran.</li>
+</ul>
+<h2>Qualifikation</h2>
+<p><strong>Dein Profil</strong></p>
+<ul>
+<li><strong>Analytisches Denkvermögen &#x26; technologische Neugier:</strong> Du hast ein abgeschlossenes Studium im MINT-Bereich oder in Wirtschaftsinformatik – oder eine vergleichbare Qualifikation. Neue Technologien und Geschäftsmodelle erschließt du dir schnell und mit Begeisterung.</li>
+<li><strong>Erfahrung:</strong> Du bringst mindestens fünf Jahre Berufserfahrung mit, insbesondere im Bereich Data Engineering.</li>
+<li><strong>Expertise in Data Engineering &#x26; Architektur:</strong> Du hast bereits End-to-End-Lösungen konzipiert und umgesetzt, idealerweise mit Databricks und mindestens einem Hyperscaler (Azure, AWS oder GCP). Data-Lakehouse-Architekturen, ETL/ELT-Pipelines, Streaming-Technologien und verteiltes Rechnen sind für dich vertraute Konzepte.</li>
+<li><strong>Effiziente technische Umsetzung:</strong> Die Anbindung von Quellsystemen, die Gestaltung einer Medallion-Architektur oder die Versorgung unterschiedlicher Nutzergruppen meisterst du mit Leichtigkeit. Dein Code ist nicht nur funktional, sondern auch nachhaltig und wartbar.</li>
+<li><strong>Programmier- &#x26; Datenverarbeitungsexpertise:</strong> Du verfügst über fundierte Kenntnisse in Python, SQL und gängigen Frameworks für Data Pipelines (Apache Spark, Delta Lake, dbt) und entwickelst robuste, skalierbare Lösungen.</li>
+<li><strong>DevOps &#x26; Automatisierung:</strong> Infrastructure as Code (z. B. Terraform) sowie die Implementierung von CI/CD-Pipelines für Data Workloads sind für nicht unbekannt und du kannst die Kollegen bei DataOps-Themen unterstützen.</li>
+<li><strong>Produktentwicklung &#x26; Innovation:</strong> Du entwickelst skalierbare Data-Engineering-Lösungen und setzt Standards für Data Ingestion und Pipeline-Automatisierung. Stetige Optimierung und Automatisierung sind für dich selbstverständlich.</li>
+<li><strong>Kommunikationsstärke &#x26; Teamgeist:</strong> Du vermittelst komplexe Sachverhalte verständlich und überzeugend – sowohl für technische als auch für nicht-technische Stakeholder. Dein sicheres Auftreten ermöglicht es dir, Kunden und Teams zu gewinnen. Zusammenarbeit und Wissenstransfer sind für dich essenziell.</li>
+<li><strong>Lernbereitschaft &#x26; Weiterentwicklung:</strong> Du bildest dich kontinuierlich weiter – sei es durch Zertifizierungen, den Austausch mit Experten oder eigene Projekte. Deine Begeisterung für Technologie zeigt sich in deinem Drang, neue Frameworks oder Tools auszuprobieren und dein Wissen stetig zu erweitern.</li>
+<li><strong>Effektives Zeitmanagement:</strong> Du weißt, wann fokussierte Arbeit ausreicht und wann es sich lohnt, mehr zu investieren, um ein Projekt erfolgreich abzuschließen. Dein vorausschauendes Planen ermöglicht dir einen effizienten Umgang mit deiner Zeit.</li>
+</ul>
+<h2>Benefits</h2>
+<ul>
+<li>Betriebliche Altersvorsorge</li>
+<li>Betriebliche Weiterbildung</li>
+<li>Empfehlungsprogramm</li>
+<li>Erfolgsbeteiligung</li>
+<li>Firmenevents</li>
+<li>Firmenhandy</li>
+<li>Firmenwagen</li>
+<li>Flexible Arbeitszeiten</li>
+<li>Homeoffice-Möglichkeit</li>
+<li>Kostenlose Getränke</li>
+<li>Kostenloser Parkplatz</li>
+<li>Zusatzzahlungen</li>
+</ul>
+<p>Klingt nach Dir? Dann freuen wir uns auf Deine Bewerbung!</p>
+<p>Find <a href=""https://www.arbeitnow.com/"">Jobs in Germany</a> on Arbeitnow</a>",False,https://www.arbeitnow.com/jobs/companies/skeltech-gmbh/tech-lead-data-engineering-azure-und-databricks-frechen-432539,['IT'],['teamleitung'],Frechen,1740163743
