@@ -1,0 +1,51 @@
+slug,company_name,title,description,remote,url,tags,job_types,location,created_at
+senior-backend-developer-munich-490341,Peter Park System GmbH,Senior Backend Developer (m/f/d),"<p>Get ready to embark on an exhilarating journey in the world of mobility technology! This job opportunity invites you to shape the future of car parking systems, where you'll be at the forefront of developing a cutting-edge backend, optimizing CI pipelines, and enhancing monitoring with Datadog, all while ensuring the seamless operation of thousands of parking lots. If you're a passionate engineer with a hunger for continuous improvement and proficiency in a variety of programming languages, this is your chance to revolutionize the industry and make a direct impact on our dynamic, tech-driven team.</p>
+<h2>Tasks</h2>
+<ul>
+<li>Work on an amazing product with b2b and b2c aspects at the intersection of mobility and property technology</li>
+<li>Develop and enhance our backend, serving as the operating system for car parking</li>
+<li>Contribute to the improvement of our CI pipelines for both backend and IoT deployments</li>
+<li>Improve our monitoring system for our services with Datadog</li>
+<li>Assist in scaling up our systems for managing thousands of parking lots</li>
+<li>Shape our engineering culture by employing modern software engineering practices, focusing on writing clean, well-tested, and efficient code</li>
+<li>Continuously deploy code into production</li>
+</ul>
+<h2>Requirements</h2>
+<ul>
+<li>Real seniority. Not defined by years of experience but by strive for continuous improvement, direct impact on the business, and ownership</li>
+<li>Be a pro in more than one field (Python, C++, Node.js and more)</li>
+<li>Strong experience in real production projects with high throughput</li>
+<li>Proficient in backend frameworks such as NestJS, Flask, Fastify, FastAPI</li>
+<li>Excellent written and spoken English skills (level C1). German language proficiency is not required</li>
+</ul>
+<p><strong>Technologies We Work With:</strong></p>
+<ul>
+<li>Event-driven backend development in Python and NestJS, following a microservice architecture</li>
+<li>Frontend monorepo with Turbo, pnpm, changesets, and storybook, primarily using Vue.js</li>
+<li>Adoption of TypeScript, NestJS, BullMQ, and Prisma for backends in an opinionated monorepo approach</li>
+<li>Amazon RDS, DynamoDB, S3</li>
+<li>Container orchestration with Kubernetes and CI/CD using GitLab</li>
+<li>Infrastructure provisioning on AWS using Terraform</li>
+<li>Leveraging the serverless framework on AWS Lambda for high-throughput endpoints</li>
+</ul>
+<h2>Benefits</h2>
+<ul>
+<li>MacBook or ThinkPad and a 37-inch curved screen for your work setup</li>
+<li>Startup atmosphere with flat hierarchies and agile team structures</li>
+<li>Flexible working hours and the option to work from home or our state-of-the-art office in Munich, equipped with standing desks</li>
+<li>Competitive salary</li>
+<li>Company pension plan</li>
+<li>Daily meal allowance, free team lunch once a week, cereal bar, and free drinks</li>
+<li>Job bike and access to sports and fitness facilities through EGYM Wellpass or Urban Sports Club membership across Germany</li>
+<li>Professional development opportunities</li>
+<li>German language course</li>
+<li>Discounts on various branded products through our partner Corporate Benefits</li>
+</ul>
+<p><strong>Our Recruiting Process:</strong></p>
+<p>1. Initial contact within 48h<br>
+2. Interview with you and a member of our team<br>
+3. Live Assessment<br>
+4. Interview with our CTO<br>
+5. In person meeting in Munich  </p>
+<p>Ready to take the next step? Apply now! We look forward to hearing from you!</p>
+<p>Find more <a href=""https://www.arbeitnow.com/english-speaking-jobs"">English Speaking Jobs in Germany</a> on Arbeitnow</a>",False,https://www.arbeitnow.com/jobs/companies/peter-park-system-gmbh/senior-backend-developer-munich-490341,['IT'],[],Munich,1740156544
