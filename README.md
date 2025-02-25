@@ -195,13 +195,4 @@ docker-compose up -d
 
 ---
 
-## **8. Summary of Improvements & Fixes**
-✅ PostgreSQL setup replacing SQLite for persistence.
-✅ Ensured DAG correctly references `run_research_fetching.py`.
-✅ Set correct file paths and working directory for Airflow execution.
-✅ Mounted `scripts/research` to ensure all dependencies load.
-✅ Added troubleshooting steps for common issues.
-✅ Included LSU CS DS Project 34 documentation roles and structure.
-
-Now, **Airflow should run properly with PostgreSQL**, and DAGs should execute external scripts seamlessly! 🚀
 
