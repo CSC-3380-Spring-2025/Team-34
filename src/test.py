@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 import streamlit as st
 import pandas as pd
-from datastore.connector import load_data
+from datastore.connector import Connector
 from datastore.processor import process_data
 
 
@@ -20,7 +20,7 @@ st.write("Load, process, and analyze data interactively.")
 uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
 
 if uploaded_file:
-    df = load_data(uploaded_file)
+    df = Connector.load_data(uploaded_file)
     st.write("📂 **Raw Data Preview:**")
     st.dataframe(df.head())
 
