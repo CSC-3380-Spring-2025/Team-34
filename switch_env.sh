@@ -1,14 +1,15 @@
 #!/bin/bash
 
+# Ensure Conda is initialized
+source ~/anaconda3/etc/profile.d/conda.sh
+
+# Select environment
 if [ "$1" == "dev" ]; then
-    conda activate dev-env
-    echo "Switched to Development Environment (dev-env)"
+    exec bash -c "conda activate dev-env && bash"
 elif [ "$1" == "prod" ]; then
-    conda activate prod-env
-    echo "Switched to Production Environment (prod-env)"
+    exec bash -c "conda activate prod-env && bash"
 elif [ "$1" == "test" ]; then
-    conda activate test-env
-    echo "Switched to Testing Environment (test-env)"
+    exec bash -c "conda activate test-env && bash"
 else
-    echo "Usage: ./switch_env.sh [dev|prod|test]"
+    echo "Usage: sh switch_env.sh [dev|prod|test]"
 fi
