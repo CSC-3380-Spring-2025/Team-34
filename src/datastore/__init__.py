@@ -1,7 +1,10 @@
 """Datastore package initialization - handles logging, environment setup, and clean imports."""
-
 import logging
 import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from dotenv import load_dotenv
 
 # Load environment variables from a .env file (if exists)
@@ -14,7 +17,7 @@ logging.basicConfig(
 )
 
 # Expose key modules at the package level for cleaner imports
-from .connector import Connector
+from .connector import load_data
 from .processor import Processor
 
 # Optional: Define package metadata
