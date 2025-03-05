@@ -1,8 +1,15 @@
 # src/test.py
+import sys
+import os
+
+# Ensure Python can find the datastore package
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+
 import streamlit as st
 import pandas as pd
 from datastore.connector import load_data
 from datastore.processor import process_data
+
 
 st.set_page_config(page_title="Datastore Dev Environment", layout="wide")
 
