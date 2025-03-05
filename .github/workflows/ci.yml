@@ -1,1 +1,51 @@
-name: hello
+name: Dev Branch CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python & Conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: 3.10
+          environment-file: environments/test.yml
+          activate-environment: test-env
+          auto-activate-base: false
+
+      - name: 📦 Install Additional Dependencies
+        shell: bash -l {0}
+        run: |
+          conda activate test-env
+          pip install -r requirements.txt || true
+          pip install pytest black pylint
+
+      - name: 🔍 Run Code Linting (pylint)
+        shell: bash -l {0}
+        run: |
+          conda activate test-env
+          pylint src/ tests/
+
+      - name: 🧪 Run Unit Tests (pytest)
+        shell: bash -l {0}
+        run: |
+          conda activate test-env
+          pytest tests/
+
+      - name: 🚀 Validate Streamlit Deployment
+        shell: bash -l {0}
+        run: |
+          conda activate test-env
+          streamlit run src/test.py --server.headless true & sleep 10
+          curl -I http://localhost:8501 || exit 1

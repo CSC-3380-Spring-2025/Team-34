@@ -1,0 +1,22 @@
+name: prod-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pandas
+  - numpy
+  - matplotlib
+  - seaborn
+  - requests
+  - flask  # For API development
+  - fastapi  # Alternative API framework
+  - gunicorn  # Production WSGI server
+  - uvicorn  # FastAPI server
+  - psycopg2  # PostgreSQL database adapter
+  - pymysql  # MySQL adapter
+  - streamlit  # Dashboard support
+  - pyarrow  # High-performance data processing
+  - scikit-learn  # Machine learning utilities
+  - tqdm  # Progress bars for large data processing
+  - boto3  # AWS SDK for cloud interactions
