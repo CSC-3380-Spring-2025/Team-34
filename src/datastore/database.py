@@ -85,6 +85,26 @@ def save_csv_data(filename, content, file_size, file_format, user_id):
     finally:
         conn.close()
 
+def search_csv_data(query):
+    """Search all CSV data for a given keyword."""
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            "SELECT file_id, row_number, column_name, value FROM csv_data WHERE value LIKE ?",
+            (f"%{query}%",)
+        )
+        results = cursor.fetchall()
+        return results
+
+    except sqlite3.Error as e:
+        print(f"❌ Error searching CSV data: {e}")
+        return []
+
+    finally:
+        conn.close()
+
 
 def get_files():
     """Retrieve stored files metadata from the database."""
@@ -102,6 +122,24 @@ def get_files():
 
     finally:
         conn.close()
+
+def delete_file(file_id):
+    """Deletes a file and its associated CSV data."""
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("DELETE FROM csv_data WHERE file_id = ?", (file_id,))
+        cursor.execute("DELETE FROM files WHERE id = ?", (file_id,))
+        conn.commit()
+        print(f"✅ File {file_id} deleted successfully!")
+
+    except sqlite3.Error as e:
+        print(f"❌ Error deleting file {file_id}: {e}")
+
+    finally:
+        conn.close()
+
 
 
 def get_csv_preview(file_id):
