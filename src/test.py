@@ -2,10 +2,24 @@ import streamlit as st
 import pandas as pd
 import io
 import time
-from datastore.database import save_csv_data, get_files, get_csv_preview, delete_file, search_csv_data
+import plotly.express as px
+from datastore.database import (
+    save_csv_data, get_files, get_csv_preview, delete_file, search_csv_data, update_csv_data, authenticate_user
+)
 
 st.set_page_config(page_title="📊 Datastore CSV Dashboard", layout="wide")
 st.title("📊 Datastore CSV Management")
+
+# 🔹 User Authentication
+st.sidebar.subheader("🔐 User Login")
+username = st.sidebar.text_input("👤 Username")
+password = st.sidebar.text_input("🔑 Password", type="password")
+
+if st.sidebar.button("🔓 Login"):
+    if authenticate_user(username, password):
+        st.sidebar.success("✅ Logged in!")
+    else:
+        st.sidebar.error("❌ Invalid credentials")
 
 # 🔹 File Uploader
 uploaded_file = st.file_uploader("📂 Upload CSV file", type=["csv"])
@@ -43,13 +57,41 @@ if files:
             st.write(f"📊 **Preview of {file_options[selected_file_id]}:**")
             st.dataframe(df)
 
-            # 🔹 File Download as Excel
+            # 🔹 Data Visualization
+            st.subheader("📊 Data Insights")
+            numerical_cols = df.select_dtypes(include=["number"]).columns
+            if len(numerical_cols) > 0:
+                x_axis = st.selectbox("📏 Select X-Axis:", numerical_cols)
+                y_axis = st.selectbox("📐 Select Y-Axis:", numerical_cols)
+
+                fig = px.scatter(df, x=x_axis, y=y_axis, title=f"{x_axis} vs {y_axis}")
+                st.plotly_chart(fig)
+            else:
+                st.warning("No numerical columns found for visualization.")
+
+            # 🔹 CSV Editing
+            st.subheader("✏️ Edit Data")
+            edited_df = st.data_editor(df)
+
+            if st.button("💾 Save Changes"):
+                update_csv_data(selected_file_id, edited_df)
+                st.success("✅ Changes saved!")
+
+            # 🔹 File Download Options
+            csv_data = df.to_csv(index=False).encode("utf-8")
+            json_data = df.to_json(orient="records")
             output = io.BytesIO()
             with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
                 df.to_excel(writer, index=False)
             excel_data = output.getvalue()
 
-            st.download_button(label="📥 Download as Excel", data=excel_data, file_name=f"{file_options[selected_file_id]}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.download_button("📥 Download CSV", data=csv_data, file_name=f"{file_options[selected_file_id]}.csv", mime="text/csv")
+            with col2:
+                st.download_button("📥 Download JSON", data=json_data, file_name=f"{file_options[selected_file_id]}.json", mime="application/json")
+            with col3:
+                st.download_button("📥 Download Excel", data=excel_data, file_name=f"{file_options[selected_file_id]}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
             # 🔹 Delete File Option
             if st.button("🗑 Delete This File"):
@@ -63,7 +105,7 @@ if files:
 else:
     st.warning("⚠️ No files uploaded yet.")
 
-# 🔹 Global CSV Search Across All Files
+# 🔹 Global CSV Search
 st.subheader("🔍 Global Search Across All Stored CSVs")
 search_query = st.text_input("🔎 Search CSV Data Across All Files")
 
