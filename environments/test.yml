@@ -6,6 +6,8 @@ dependencies:
   - python=3.10
   - pandas
   - numpy
+  - sympy
+  - scipy
   - matplotlib
   - seaborn
   - requests
