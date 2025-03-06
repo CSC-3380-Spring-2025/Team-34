@@ -51,16 +51,17 @@ def init_db():
     print("✅ Database initialized successfully!")
 
 def authenticate_user(username, password):
-    """Authenticate user login."""
+    """Authenticate user login by checking hashed password."""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
+
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+
     cursor.execute("SELECT password FROM users WHERE username = ?", (username,))
     result = cursor.fetchone()
     conn.close()
 
-    if result and hashlib.sha256(password.encode()).hexdigest() == result[0]:
-        return True
-    return False
+    return result and result[0] == hashed_password
 
 def save_csv_data(filename, content, file_size, file_format, user_id):
     """Save a CSV file and store its data in the database."""
@@ -159,5 +160,20 @@ def update_csv_data(file_id, df):
     finally:
         conn.close()
 
+def reset_password(username, new_password):
+    """Update a user's password with SHA-256 hashing."""
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
+
+    cursor.execute("UPDATE users SET password = ? WHERE username = ?", (hashed_password, username))
+    conn.commit()
+    conn.close()
+
+    print(f"✅ Password for '{username}' updated successfully!")
+
+# Reset the admin password
+reset_password("admin", "NewSecurePassword123")
 if __name__ == "__main__":
     init_db()  # Initialize the database when running the script directly
