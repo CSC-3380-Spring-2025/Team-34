@@ -8,3 +8,4 @@ dependencies:
   - pandas
   - sqlite3
   - sqlalchemy
+  - plotly
