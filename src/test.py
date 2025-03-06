@@ -1,85 +1,33 @@
-# src/test.py
-import sys
-import os
-import sqlite3
-
-from database import DB_NAME
-
-# Ensure Python can find the datastore package
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-
 import streamlit as st
-import pandas as pd
-from datastore.connector import Connector
-from datastore.processor import process_data
+from datastore.database import save_csv_data, get_files, get_csv_preview
 
-# Initialize Streamlit app
-st.set_page_config(page_title="📊 Datastore Dev Environment", layout="wide")
-st.title("📊 Datastore Testing Dashboard")
-st.write("Load, process, and analyze data interactively.")
+st.title("📊 Datastore CSV Preview")
 
-# Initialize Database
-def init_db():
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS files (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            filename TEXT,
-            content BLOB
-        )
-    """)
-    conn.commit()
-    conn.close()
-
-init_db()
-
-# Function to save file to the database
-def save_file_to_db(filename, content):
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO files (filename, content) VALUES (?, ?)", (filename, content))
-    conn.commit()
-    conn.close()
-
-# Function to retrieve files from the database
-def get_saved_files():
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-    cursor.execute("SELECT filename FROM files")
-    files = cursor.fetchall()
-    conn.close()
-    return [file[0] for file in files]
-
-# File uploader for testing
+# Upload File
 uploaded_file = st.file_uploader("📂 Upload CSV file", type=["csv"])
 
 if uploaded_file:
-    df = Connector.load_data(uploaded_file)
-    st.write("📂 **Raw Data Preview:**")
-    st.dataframe(df.head())
-
-    # Process Data
-    processed_df = process_data(df)
-    st.write("🛠 **Processed Data Preview:**")
-    st.dataframe(processed_df.head())
-
-    # Summary Statistics
-    st.write("📈 **Summary Statistics:**")
-    st.write(processed_df.describe())
-
     # Save file to database
-    save_file_to_db(uploaded_file.name, uploaded_file.getvalue())
+    file_size = len(uploaded_file.getvalue())
+    file_format = "csv"
+    user_id = 1  # Simulated User ID
+    save_csv_data(uploaded_file.name, uploaded_file.getvalue(), file_size, file_format, user_id)
+
     st.success(f"✅ {uploaded_file.name} saved to the database!")
 
-# Display stored files
+# Display Files
 st.subheader("📁 Stored Files in Database")
-saved_files = get_saved_files()
+files = get_files()
 
-if saved_files:
-    for file in saved_files:
-        st.write(f"- {file}")
-else:
-    st.write("No files saved in the database yet.")
+if files:
+    for file_id, filename, file_size, file_format, uploaded_at in files:
+        st.write(f"📄 **{filename}** ({file_size} bytes) - Uploaded: {uploaded_at}")
 
-st.success("✅ Datastore dev environment is ready!")
+        if file_format == "csv":
+            if st.button(f"👀 Preview {filename}", key=f"preview_{file_id}"):
+                df = get_csv_preview(file_id)
+                if df is not None:
+                    st.write(f"📊 **Preview of {filename}:**")
+                    st.dataframe(df)
+                else:
+                    st.error("❌ Could not retrieve CSV content.")
