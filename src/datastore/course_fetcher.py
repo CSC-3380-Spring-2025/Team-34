@@ -64,16 +64,16 @@ def parse_data(course_page):
             course_data.append(current_course)
     return course_data
 
-def parse_normal_page():
-    page=requests.get('https://appl101.lsu.edu/booklet2.nsf/All/67FD57ECBF3676C486258BAC002C42AB?OpenDocument',verify=False)
-    create_parquet(parse_data(page.text))
-
-def create_parquet(data):
+def parse_page(url,name):
+    page = requests.get(url,verify=False)
+    create_parquet(parse_data(page.text), name)
+def create_parquet(data,name):
     df:pd.DataFrame=pd.DataFrame(data)
-    df.to_parquet("courses.parquet", engine="pyarrow")
+    df.to_parquet("{}.parquet".format(name), engine="pyarrow")
+
 
 
 if __name__ == '__main__':
-    parse_normal_page()
+    parse_page('https://appl101.lsu.edu/booklet2.nsf/All/67FD57ECBF3676C486258BAC002C42AB?OpenDocument','csc_courses')
 
 
