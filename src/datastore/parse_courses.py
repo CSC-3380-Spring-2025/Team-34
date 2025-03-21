@@ -64,16 +64,15 @@ def parse_data(course_page):
             course_data.append(current_course)
     return course_data
 
-def parse_page(url,name):
+def parse_page(url):
     page = requests.get(url,verify=False)
-    create_parquet(parse_data(page.text), name)
+    return parse_data(page.text)
 def create_parquet(data,name):
     df:pd.DataFrame=pd.DataFrame(data)
     df.to_parquet("{}.parquet".format(name), engine="pyarrow")
-
-
+def create_csv(data,name):
+    df:pd.DataFrame=pd.DataFrame(data)
+    df.to_csv("{}.csv".format(name),index=False)
 
 if __name__ == '__main__':
-    parse_page('https://appl101.lsu.edu/booklet2.nsf/All/67FD57ECBF3676C486258BAC002C42AB?OpenDocument','csc_courses')
-
-
+    create_parquet(parse_page('https://appl101.lsu.edu/booklet2.nsf/All/67FD57ECBF3676C486258BAC002C42AB?OpenDocument'), 'csc_courses')
