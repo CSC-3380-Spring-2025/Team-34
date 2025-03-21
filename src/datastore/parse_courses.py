@@ -70,7 +70,9 @@ def parse_page(url):
 def create_parquet(data,name):
     df:pd.DataFrame=pd.DataFrame(data)
     df.to_parquet("{}.parquet".format(name), engine="pyarrow")
-
+def create_csv(data,name):
+    df:pd.DataFrame=pd.DataFrame(data)
+    df.to_csv("{}.csv".format(name),index=False)
 
 if __name__ == '__main__':
     create_parquet(parse_page('https://appl101.lsu.edu/booklet2.nsf/All/67FD57ECBF3676C486258BAC002C42AB?OpenDocument'), 'csc_courses')
