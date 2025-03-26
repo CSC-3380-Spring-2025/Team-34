@@ -1199,3 +1199,24 @@
 [2025-03-26T23:52:46.291+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:52:46.290+0000] {dag.py:2726} INFO - Sync 1 DAGs
 [2025-03-26T23:52:46.309+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:52:46.309+0000] {dag.py:3486} INFO - Setting next_dagrun for example_sensor_decorator to None, run_after=None
 [2025-03-26T23:52:46.325+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py took 0.056 seconds
+[2025-03-26T23:53:34.921+0000] {processor.py:156} INFO - Started process (PID=117302) to work on /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py
+[2025-03-26T23:53:34.922+0000] {processor.py:799} INFO - Processing file /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py for tasks to queue
+[2025-03-26T23:53:34.922+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:53:34.922+0000] {dagbag.py:541} INFO - Filling up the DagBag from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py
+[2025-03-26T23:53:34.926+0000] {processor.py:809} INFO - DAG(s) dict_keys(['example_sensor_decorator']) retrieved from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py
+[2025-03-26T23:53:34.941+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:53:34.941+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-26T23:53:34.956+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:53:34.956+0000] {dag.py:3486} INFO - Setting next_dagrun for example_sensor_decorator to None, run_after=None
+[2025-03-26T23:53:34.980+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py took 0.062 seconds
+[2025-03-26T23:54:16.649+0000] {processor.py:156} INFO - Started process (PID=117641) to work on /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py
+[2025-03-26T23:54:16.650+0000] {processor.py:799} INFO - Processing file /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py for tasks to queue
+[2025-03-26T23:54:16.651+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:16.650+0000] {dagbag.py:541} INFO - Filling up the DagBag from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py
+[2025-03-26T23:54:16.655+0000] {processor.py:809} INFO - DAG(s) dict_keys(['example_sensor_decorator']) retrieved from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py
+[2025-03-26T23:54:16.669+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:16.669+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-26T23:54:16.683+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:16.683+0000] {dag.py:3486} INFO - Setting next_dagrun for example_sensor_decorator to None, run_after=None
+[2025-03-26T23:54:16.700+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py took 0.053 seconds
+[2025-03-26T23:55:01.204+0000] {processor.py:156} INFO - Started process (PID=117984) to work on /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py
+[2025-03-26T23:55:01.205+0000] {processor.py:799} INFO - Processing file /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py for tasks to queue
+[2025-03-26T23:55:01.205+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:55:01.205+0000] {dagbag.py:541} INFO - Filling up the DagBag from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py
+[2025-03-26T23:55:01.209+0000] {processor.py:809} INFO - DAG(s) dict_keys(['example_sensor_decorator']) retrieved from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py
+[2025-03-26T23:55:01.243+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:55:01.241+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-26T23:55:01.262+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:55:01.262+0000] {dag.py:3486} INFO - Setting next_dagrun for example_sensor_decorator to None, run_after=None
+[2025-03-26T23:55:01.288+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py took 0.086 seconds

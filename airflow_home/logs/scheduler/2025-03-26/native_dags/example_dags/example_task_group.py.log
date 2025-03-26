@@ -1220,3 +1220,17 @@
 [2025-03-26T23:53:15.572+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:53:15.572+0000] {dag.py:2726} INFO - Sync 1 DAGs
 [2025-03-26T23:53:15.586+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:53:15.586+0000] {dag.py:3486} INFO - Setting next_dagrun for example_task_group to 2025-03-25T23:53:15.586603+00:00, run_after=2025-03-26T23:53:15.586603+00:00
 [2025-03-26T23:53:15.603+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group.py took 0.060 seconds
+[2025-03-26T23:54:02.370+0000] {processor.py:156} INFO - Started process (PID=117534) to work on /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group.py
+[2025-03-26T23:54:02.370+0000] {processor.py:799} INFO - Processing file /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group.py for tasks to queue
+[2025-03-26T23:54:02.371+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:02.371+0000] {dagbag.py:541} INFO - Filling up the DagBag from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group.py
+[2025-03-26T23:54:02.376+0000] {processor.py:809} INFO - DAG(s) dict_keys(['example_task_group']) retrieved from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group.py
+[2025-03-26T23:54:02.391+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:02.391+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-26T23:54:02.405+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:02.405+0000] {dag.py:3486} INFO - Setting next_dagrun for example_task_group to 2025-03-25T23:54:02.405550+00:00, run_after=2025-03-26T23:54:02.405550+00:00
+[2025-03-26T23:54:02.422+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group.py took 0.055 seconds
+[2025-03-26T23:54:44.551+0000] {processor.py:156} INFO - Started process (PID=117872) to work on /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group.py
+[2025-03-26T23:54:44.552+0000] {processor.py:799} INFO - Processing file /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group.py for tasks to queue
+[2025-03-26T23:54:44.553+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:44.552+0000] {dagbag.py:541} INFO - Filling up the DagBag from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group.py
+[2025-03-26T23:54:44.558+0000] {processor.py:809} INFO - DAG(s) dict_keys(['example_task_group']) retrieved from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group.py
+[2025-03-26T23:54:44.573+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:44.573+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-26T23:54:44.587+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:44.587+0000] {dag.py:3486} INFO - Setting next_dagrun for example_task_group to 2025-03-25T23:54:44.587553+00:00, run_after=2025-03-26T23:54:44.587553+00:00
+[2025-03-26T23:54:44.603+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group.py took 0.054 seconds

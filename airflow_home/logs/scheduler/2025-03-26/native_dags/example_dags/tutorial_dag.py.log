@@ -1248,3 +1248,17 @@
 [2025-03-26T23:53:01.711+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:53:01.710+0000] {dag.py:2726} INFO - Sync 1 DAGs
 [2025-03-26T23:53:01.725+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:53:01.725+0000] {dag.py:3486} INFO - Setting next_dagrun for tutorial_dag to None, run_after=None
 [2025-03-26T23:53:01.742+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py took 0.053 seconds
+[2025-03-26T23:53:47.692+0000] {processor.py:156} INFO - Started process (PID=117438) to work on /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py
+[2025-03-26T23:53:47.693+0000] {processor.py:799} INFO - Processing file /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py for tasks to queue
+[2025-03-26T23:53:47.693+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:53:47.693+0000] {dagbag.py:541} INFO - Filling up the DagBag from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py
+[2025-03-26T23:53:47.697+0000] {processor.py:809} INFO - DAG(s) dict_keys(['tutorial_dag']) retrieved from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py
+[2025-03-26T23:53:47.715+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:53:47.715+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-26T23:53:47.737+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:53:47.737+0000] {dag.py:3486} INFO - Setting next_dagrun for tutorial_dag to None, run_after=None
+[2025-03-26T23:53:47.758+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py took 0.068 seconds
+[2025-03-26T23:54:32.055+0000] {processor.py:156} INFO - Started process (PID=117742) to work on /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py
+[2025-03-26T23:54:32.056+0000] {processor.py:799} INFO - Processing file /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py for tasks to queue
+[2025-03-26T23:54:32.056+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:32.056+0000] {dagbag.py:541} INFO - Filling up the DagBag from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py
+[2025-03-26T23:54:32.059+0000] {processor.py:809} INFO - DAG(s) dict_keys(['tutorial_dag']) retrieved from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py
+[2025-03-26T23:54:32.074+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:32.073+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-26T23:54:32.088+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:32.088+0000] {dag.py:3486} INFO - Setting next_dagrun for tutorial_dag to None, run_after=None
+[2025-03-26T23:54:32.103+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py took 0.050 seconds
