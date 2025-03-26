@@ -1460,3 +1460,21 @@
 [2025-03-26T23:54:40.675+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:40.675+0000] {dag.py:2726} INFO - Sync 1 DAGs
 [2025-03-26T23:54:40.691+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:40.691+0000] {dag.py:3486} INFO - Setting next_dagrun for example_dag_decorator to None, run_after=None
 [2025-03-26T23:54:40.712+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dag_decorator.py took 0.087 seconds
+[2025-03-26T23:55:37.588+0000] {processor.py:156} INFO - Started process (PID=118373) to work on /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dag_decorator.py
+[2025-03-26T23:55:37.589+0000] {processor.py:799} INFO - Processing file /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dag_decorator.py for tasks to queue
+[2025-03-26T23:55:37.589+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:55:37.589+0000] {dagbag.py:541} INFO - Filling up the DagBag from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dag_decorator.py
+[2025-03-26T23:55:37.593+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:55:37.593+0000] {taskmixin.py:211} WARNING - Dependency <Task(_PythonDecoratedOperator): prepare_email>, send_email already registered for DAG: example_dag_decorator
+[2025-03-26T23:55:37.593+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:55:37.593+0000] {taskmixin.py:211} WARNING - Dependency <Task(EmailOperator): send_email>, prepare_email already registered for DAG: example_dag_decorator
+[2025-03-26T23:55:37.600+0000] {processor.py:809} INFO - DAG(s) dict_keys(['example_dag_decorator']) retrieved from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dag_decorator.py
+[2025-03-26T23:55:37.636+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:55:37.636+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-26T23:55:37.649+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:55:37.648+0000] {dag.py:3486} INFO - Setting next_dagrun for example_dag_decorator to None, run_after=None
+[2025-03-26T23:55:37.665+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dag_decorator.py took 0.079 seconds
+[2025-03-26T23:56:32.616+0000] {processor.py:156} INFO - Started process (PID=118833) to work on /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dag_decorator.py
+[2025-03-26T23:56:32.617+0000] {processor.py:799} INFO - Processing file /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dag_decorator.py for tasks to queue
+[2025-03-26T23:56:32.617+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:56:32.617+0000] {dagbag.py:541} INFO - Filling up the DagBag from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dag_decorator.py
+[2025-03-26T23:56:32.622+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:56:32.622+0000] {taskmixin.py:211} WARNING - Dependency <Task(_PythonDecoratedOperator): prepare_email>, send_email already registered for DAG: example_dag_decorator
+[2025-03-26T23:56:32.622+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:56:32.622+0000] {taskmixin.py:211} WARNING - Dependency <Task(EmailOperator): send_email>, prepare_email already registered for DAG: example_dag_decorator
+[2025-03-26T23:56:32.629+0000] {processor.py:809} INFO - DAG(s) dict_keys(['example_dag_decorator']) retrieved from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dag_decorator.py
+[2025-03-26T23:56:32.665+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:56:32.665+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-26T23:56:32.679+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:56:32.679+0000] {dag.py:3486} INFO - Setting next_dagrun for example_dag_decorator to None, run_after=None
+[2025-03-26T23:56:32.695+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dag_decorator.py took 0.081 seconds

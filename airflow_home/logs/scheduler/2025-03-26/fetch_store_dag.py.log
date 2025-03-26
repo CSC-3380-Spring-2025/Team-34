@@ -1500,3 +1500,24 @@
 [2025-03-26T23:54:26.514+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:26.514+0000] {dag.py:2726} INFO - Sync 1 DAGs
 [2025-03-26T23:54:26.530+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:26.530+0000] {dag.py:3486} INFO - Setting next_dagrun for fetch_store_dag to 2025-03-26T00:00:00+00:00, run_after=2025-03-27T00:00:00+00:00
 [2025-03-26T23:54:26.548+0000] {processor.py:178} INFO - Processing /workspaces/Team-34/airflow_home/dags/fetch_store_dag.py took 0.057 seconds
+[2025-03-26T23:55:10.353+0000] {processor.py:156} INFO - Started process (PID=118137) to work on /workspaces/Team-34/airflow_home/dags/fetch_store_dag.py
+[2025-03-26T23:55:10.353+0000] {processor.py:799} INFO - Processing file /workspaces/Team-34/airflow_home/dags/fetch_store_dag.py for tasks to queue
+[2025-03-26T23:55:10.354+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:55:10.354+0000] {dagbag.py:541} INFO - Filling up the DagBag from /workspaces/Team-34/airflow_home/dags/fetch_store_dag.py
+[2025-03-26T23:55:10.360+0000] {processor.py:809} INFO - DAG(s) dict_keys(['fetch_store_dag']) retrieved from /workspaces/Team-34/airflow_home/dags/fetch_store_dag.py
+[2025-03-26T23:55:10.374+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:55:10.374+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-26T23:55:10.389+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:55:10.389+0000] {dag.py:3486} INFO - Setting next_dagrun for fetch_store_dag to 2025-03-26T00:00:00+00:00, run_after=2025-03-27T00:00:00+00:00
+[2025-03-26T23:55:10.406+0000] {processor.py:178} INFO - Processing /workspaces/Team-34/airflow_home/dags/fetch_store_dag.py took 0.056 seconds
+[2025-03-26T23:55:52.516+0000] {processor.py:156} INFO - Started process (PID=118470) to work on /workspaces/Team-34/airflow_home/dags/fetch_store_dag.py
+[2025-03-26T23:55:52.517+0000] {processor.py:799} INFO - Processing file /workspaces/Team-34/airflow_home/dags/fetch_store_dag.py for tasks to queue
+[2025-03-26T23:55:52.518+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:55:52.517+0000] {dagbag.py:541} INFO - Filling up the DagBag from /workspaces/Team-34/airflow_home/dags/fetch_store_dag.py
+[2025-03-26T23:55:52.525+0000] {processor.py:809} INFO - DAG(s) dict_keys(['fetch_store_dag']) retrieved from /workspaces/Team-34/airflow_home/dags/fetch_store_dag.py
+[2025-03-26T23:55:52.538+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:55:52.538+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-26T23:55:52.554+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:55:52.554+0000] {dag.py:3486} INFO - Setting next_dagrun for fetch_store_dag to 2025-03-26T00:00:00+00:00, run_after=2025-03-27T00:00:00+00:00
+[2025-03-26T23:55:52.569+0000] {processor.py:178} INFO - Processing /workspaces/Team-34/airflow_home/dags/fetch_store_dag.py took 0.055 seconds
+[2025-03-26T23:56:34.882+0000] {processor.py:156} INFO - Started process (PID=118846) to work on /workspaces/Team-34/airflow_home/dags/fetch_store_dag.py
+[2025-03-26T23:56:34.883+0000] {processor.py:799} INFO - Processing file /workspaces/Team-34/airflow_home/dags/fetch_store_dag.py for tasks to queue
+[2025-03-26T23:56:34.883+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:56:34.883+0000] {dagbag.py:541} INFO - Filling up the DagBag from /workspaces/Team-34/airflow_home/dags/fetch_store_dag.py
+[2025-03-26T23:56:34.889+0000] {processor.py:809} INFO - DAG(s) dict_keys(['fetch_store_dag']) retrieved from /workspaces/Team-34/airflow_home/dags/fetch_store_dag.py
+[2025-03-26T23:56:34.903+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:56:34.903+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-26T23:56:34.918+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:56:34.918+0000] {dag.py:3486} INFO - Setting next_dagrun for fetch_store_dag to 2025-03-26T00:00:00+00:00, run_after=2025-03-27T00:00:00+00:00
+[2025-03-26T23:56:34.934+0000] {processor.py:178} INFO - Processing /workspaces/Team-34/airflow_home/dags/fetch_store_dag.py took 0.055 seconds

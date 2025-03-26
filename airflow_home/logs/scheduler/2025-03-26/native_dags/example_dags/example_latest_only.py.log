@@ -1178,3 +1178,24 @@
 [2025-03-26T23:54:38.380+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:38.379+0000] {dag.py:2726} INFO - Sync 1 DAGs
 [2025-03-26T23:54:38.395+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:54:38.395+0000] {dag.py:3486} INFO - Setting next_dagrun for latest_only to 2025-03-26T19:54:38.395378+00:00, run_after=2025-03-26T23:54:38.395378+00:00
 [2025-03-26T23:54:38.412+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py took 0.054 seconds
+[2025-03-26T23:55:21.870+0000] {processor.py:156} INFO - Started process (PID=118267) to work on /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py
+[2025-03-26T23:55:21.871+0000] {processor.py:799} INFO - Processing file /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py for tasks to queue
+[2025-03-26T23:55:21.871+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:55:21.871+0000] {dagbag.py:541} INFO - Filling up the DagBag from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py
+[2025-03-26T23:55:21.875+0000] {processor.py:809} INFO - DAG(s) dict_keys(['latest_only']) retrieved from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py
+[2025-03-26T23:55:21.890+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:55:21.890+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-26T23:55:21.905+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:55:21.905+0000] {dag.py:3486} INFO - Setting next_dagrun for latest_only to 2025-03-26T19:55:21.905341+00:00, run_after=2025-03-26T23:55:21.905341+00:00
+[2025-03-26T23:55:21.923+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py took 0.056 seconds
+[2025-03-26T23:56:04.137+0000] {processor.py:156} INFO - Started process (PID=118553) to work on /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py
+[2025-03-26T23:56:04.138+0000] {processor.py:799} INFO - Processing file /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py for tasks to queue
+[2025-03-26T23:56:04.139+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:56:04.139+0000] {dagbag.py:541} INFO - Filling up the DagBag from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py
+[2025-03-26T23:56:04.144+0000] {processor.py:809} INFO - DAG(s) dict_keys(['latest_only']) retrieved from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py
+[2025-03-26T23:56:04.160+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:56:04.160+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-26T23:56:04.174+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:56:04.174+0000] {dag.py:3486} INFO - Setting next_dagrun for latest_only to 2025-03-26T19:56:04.174434+00:00, run_after=2025-03-26T23:56:04.174434+00:00
+[2025-03-26T23:56:04.190+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py took 0.055 seconds
+[2025-03-26T23:56:45.765+0000] {processor.py:156} INFO - Started process (PID=118963) to work on /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py
+[2025-03-26T23:56:45.766+0000] {processor.py:799} INFO - Processing file /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py for tasks to queue
+[2025-03-26T23:56:45.766+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:56:45.766+0000] {dagbag.py:541} INFO - Filling up the DagBag from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py
+[2025-03-26T23:56:45.770+0000] {processor.py:809} INFO - DAG(s) dict_keys(['latest_only']) retrieved from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py
+[2025-03-26T23:56:45.784+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:56:45.784+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-26T23:56:45.799+0000] {logging_mixin.py:149} INFO - [2025-03-26T23:56:45.799+0000] {dag.py:3486} INFO - Setting next_dagrun for latest_only to 2025-03-26T19:56:45.799579+00:00, run_after=2025-03-26T23:56:45.799579+00:00
+[2025-03-26T23:56:45.816+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py took 0.054 seconds
