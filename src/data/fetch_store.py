@@ -163,4 +163,8 @@ if __name__ == "__main__":
     fetch_and_store_data()
 
     # Uncomment the line below to enable daily scheduling
+<<<<<<< HEAD
     # schedule_daily_fetch()
+=======
+    # schedule_daily_fetch()
+>>>>>>> a0198f0 (Push latest changes from Codespace to airflow branch)

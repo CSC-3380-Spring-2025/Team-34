@@ -26,4 +26,7 @@ with DAG(
     )
 
     run_fetch_store
+<<<<<<< HEAD
 
+=======
+>>>>>>> a0198f0 (Push latest changes from Codespace to airflow branch)

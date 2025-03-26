@@ -1,0 +1,66 @@
+[2025-03-26T21:58:32.358+0000] {taskinstance.py:1125} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: fetch_store_dag.run_fetch_store_script scheduled__2025-03-25T00:00:00+00:00 [queued]>
+[2025-03-26T21:58:32.362+0000] {taskinstance.py:1125} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: fetch_store_dag.run_fetch_store_script scheduled__2025-03-25T00:00:00+00:00 [queued]>
+[2025-03-26T21:58:32.362+0000] {taskinstance.py:1331} INFO - Starting attempt 1 of 2
+[2025-03-26T21:58:32.374+0000] {taskinstance.py:1350} INFO - Executing <Task(BashOperator): run_fetch_store_script> on 2025-03-25 00:00:00+00:00
+[2025-03-26T21:58:32.379+0000] {standard_task_runner.py:57} INFO - Started process 61322 to run task
+[2025-03-26T21:58:32.381+0000] {standard_task_runner.py:84} INFO - Running: ['airflow', 'tasks', 'run', 'fetch_store_dag', 'run_fetch_store_script', 'scheduled__2025-03-25T00:00:00+00:00', '--job-id', '10', '--raw', '--subdir', 'DAGS_FOLDER/fetch_store_dag.py', '--cfg-path', '/tmp/tmpwkr7p_tp']
+[2025-03-26T21:58:32.382+0000] {standard_task_runner.py:85} INFO - Job 10: Subtask run_fetch_store_script
+[2025-03-26T21:58:32.408+0000] {task_command.py:410} INFO - Running <TaskInstance: fetch_store_dag.run_fetch_store_script scheduled__2025-03-25T00:00:00+00:00 [running]> on host codespaces-d2646d
+[2025-03-26T21:58:32.435+0000] {abstractoperator.py:578} ERROR - Exception rendering Jinja template for task 'run_fetch_store_script', field 'bash_command'. Template: '{{ var.value.PYTHON_PATH }} /workspaces/Team-34/src/data/fetch_store.py'
+Traceback (most recent call last):
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/models/abstractoperator.py", line 570, in _do_render_template_fields
+    rendered_content = self.render_template(
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/template/templater.py", line 156, in render_template
+    return self._render(template, context)
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/models/abstractoperator.py", line 539, in _render
+    return super()._render(template, context, dag=dag)
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/template/templater.py", line 113, in _render
+    return render_template_to_string(template, context)
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/utils/helpers.py", line 288, in render_template_to_string
+    return render_template(template, cast(MutableMapping[str, Any], context), native=False)
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/utils/helpers.py", line 283, in render_template
+    return "".join(nodes)
+  File "<template>", line 12, in root
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/jinja2/sandbox.py", line 326, in getattr
+    value = getattr(obj, attribute)
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/utils/context.py", line 103, in __getattr__
+    self.var = Variable.get(key, deserialize_json=self._deserialize_json)
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/models/variable.py", line 142, in get
+    raise KeyError(f"Variable {key} does not exist")
+KeyError: 'Variable PYTHON_PATH does not exist'
+[2025-03-26T21:58:32.438+0000] {taskinstance.py:1847} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/models/taskinstance.py", line 1430, in _run_raw_task
+    self._execute_task_with_callbacks(context, test_mode)
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/models/taskinstance.py", line 1554, in _execute_task_with_callbacks
+    task_orig = self.render_templates(context=context)
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/models/taskinstance.py", line 2202, in render_templates
+    original_task.render_template_fields(context)
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/models/baseoperator.py", line 1254, in render_template_fields
+    self._do_render_template_fields(self, self.template_fields, context, jinja_env, set())
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/utils/session.py", line 76, in wrapper
+    return func(*args, session=session, **kwargs)
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/models/abstractoperator.py", line 570, in _do_render_template_fields
+    rendered_content = self.render_template(
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/template/templater.py", line 156, in render_template
+    return self._render(template, context)
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/models/abstractoperator.py", line 539, in _render
+    return super()._render(template, context, dag=dag)
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/template/templater.py", line 113, in _render
+    return render_template_to_string(template, context)
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/utils/helpers.py", line 288, in render_template_to_string
+    return render_template(template, cast(MutableMapping[str, Any], context), native=False)
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/utils/helpers.py", line 283, in render_template
+    return "".join(nodes)
+  File "<template>", line 12, in root
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/jinja2/sandbox.py", line 326, in getattr
+    value = getattr(obj, attribute)
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/utils/context.py", line 103, in __getattr__
+    self.var = Variable.get(key, deserialize_json=self._deserialize_json)
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/models/variable.py", line 142, in get
+    raise KeyError(f"Variable {key} does not exist")
+KeyError: 'Variable PYTHON_PATH does not exist'
+[2025-03-26T21:58:32.442+0000] {taskinstance.py:1368} INFO - Marking task as UP_FOR_RETRY. dag_id=fetch_store_dag, task_id=run_fetch_store_script, execution_date=20250325T000000, start_date=20250326T215832, end_date=20250326T215832
+[2025-03-26T21:58:32.452+0000] {standard_task_runner.py:104} ERROR - Failed to execute job 10 for task run_fetch_store_script ('Variable PYTHON_PATH does not exist'; 61322)
+[2025-03-26T21:58:32.473+0000] {local_task_job_runner.py:232} INFO - Task exited with return code 1
+[2025-03-26T21:58:32.481+0000] {taskinstance.py:2674} INFO - 0 downstream tasks scheduled from follow-on schedule check

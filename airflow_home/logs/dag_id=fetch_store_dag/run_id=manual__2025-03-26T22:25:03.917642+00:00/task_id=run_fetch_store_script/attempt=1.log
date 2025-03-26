@@ -1,0 +1,27 @@
+[2025-03-26T22:25:06.644+0000] {taskinstance.py:1125} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: fetch_store_dag.run_fetch_store_script manual__2025-03-26T22:25:03.917642+00:00 [queued]>
+[2025-03-26T22:25:06.648+0000] {taskinstance.py:1125} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: fetch_store_dag.run_fetch_store_script manual__2025-03-26T22:25:03.917642+00:00 [queued]>
+[2025-03-26T22:25:06.648+0000] {taskinstance.py:1331} INFO - Starting attempt 1 of 2
+[2025-03-26T22:25:06.659+0000] {taskinstance.py:1350} INFO - Executing <Task(BashOperator): run_fetch_store_script> on 2025-03-26 22:25:03.917642+00:00
+[2025-03-26T22:25:06.663+0000] {standard_task_runner.py:57} INFO - Started process 77489 to run task
+[2025-03-26T22:25:06.666+0000] {standard_task_runner.py:84} INFO - Running: ['airflow', 'tasks', 'run', 'fetch_store_dag', 'run_fetch_store_script', 'manual__2025-03-26T22:25:03.917642+00:00', '--job-id', '23', '--raw', '--subdir', 'DAGS_FOLDER/fetch_store_dag.py', '--cfg-path', '/tmp/tmpgym77r1c']
+[2025-03-26T22:25:06.667+0000] {standard_task_runner.py:85} INFO - Job 23: Subtask run_fetch_store_script
+[2025-03-26T22:25:06.692+0000] {task_command.py:410} INFO - Running <TaskInstance: fetch_store_dag.run_fetch_store_script manual__2025-03-26T22:25:03.917642+00:00 [running]> on host codespaces-d2646d
+[2025-03-26T22:25:06.734+0000] {taskinstance.py:1568} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='fetch_store_dag' AIRFLOW_CTX_TASK_ID='run_fetch_store_script' AIRFLOW_CTX_EXECUTION_DATE='2025-03-26T22:25:03.917642+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-03-26T22:25:03.917642+00:00'
+[2025-03-26T22:25:06.735+0000] {subprocess.py:63} INFO - Tmp dir root location: 
+ /tmp
+[2025-03-26T22:25:06.735+0000] {subprocess.py:75} INFO - Running command: ['/bin/bash', '-c', '/home/vscode/miniconda/envs/airflow-env/bin/python /workspaces/Team-34/src/data/fetch_store.py']
+[2025-03-26T22:25:06.743+0000] {subprocess.py:86} INFO - Output:
+[2025-03-26T22:25:07.102+0000] {subprocess.py:93} INFO - Traceback (most recent call last):
+[2025-03-26T22:25:07.102+0000] {subprocess.py:93} INFO -   File "/workspaces/Team-34/src/data/fetch_store.py", line 11, in <module>
+[2025-03-26T22:25:07.102+0000] {subprocess.py:93} INFO -     from dotenv import load_dotenv
+[2025-03-26T22:25:07.102+0000] {subprocess.py:93} INFO - ModuleNotFoundError: No module named 'dotenv'
+[2025-03-26T22:25:07.139+0000] {subprocess.py:97} INFO - Command exited with return code 1
+[2025-03-26T22:25:07.144+0000] {taskinstance.py:1847} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/operators/bash.py", line 210, in execute
+    raise AirflowException(
+airflow.exceptions.AirflowException: Bash command failed. The command returned a non-zero exit code 1.
+[2025-03-26T22:25:07.146+0000] {taskinstance.py:1368} INFO - Marking task as UP_FOR_RETRY. dag_id=fetch_store_dag, task_id=run_fetch_store_script, execution_date=20250326T222503, start_date=20250326T222506, end_date=20250326T222507
+[2025-03-26T22:25:07.157+0000] {standard_task_runner.py:104} ERROR - Failed to execute job 23 for task run_fetch_store_script (Bash command failed. The command returned a non-zero exit code 1.; 77489)
+[2025-03-26T22:25:07.200+0000] {local_task_job_runner.py:232} INFO - Task exited with return code 1
+[2025-03-26T22:25:07.209+0000] {taskinstance.py:2674} INFO - 0 downstream tasks scheduled from follow-on schedule check
