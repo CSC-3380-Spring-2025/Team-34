@@ -347,8 +347,7 @@ else:
 
                     col1, col2, col3 = st.columns(3)
                     with col1:
-                        st.download_button("📥 Download CSV", data=csv_data, file_name=f"{file_options[selected_file_id madrugada
-}.csv", mime="text/csv")
+                        st.download_button("📥 Download CSV", data=csv_data, file_name=f"{file_options[selected_file_id]}.csv", mime="text/csv")
                     with col2:
                         st.download_button("📥 Download JSON", data=json_data, file_name=f"{file_options[selected_file_id]}.json", mime="application/json")
                     with col3:
