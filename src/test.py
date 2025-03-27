@@ -17,7 +17,7 @@ from datetime import datetime
 # Rest of the script...
 
 
-st.set_page_config(page_title="📊 Datastore CSV Dashboard", layout="wide")
+st.set_page_config(page_title="📊DDDDatastore CSV Dashboard", layout="wide")
 
 
 # Global session state to track login and page
