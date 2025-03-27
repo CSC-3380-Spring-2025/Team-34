@@ -1,0 +1,21 @@
+[2025-03-27T08:51:30.252+0000] {processor.py:156} INFO - Started process (PID=83846) to work on /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py
+[2025-03-27T08:51:30.253+0000] {processor.py:799} INFO - Processing file /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py for tasks to queue
+[2025-03-27T08:51:30.253+0000] {logging_mixin.py:149} INFO - [2025-03-27T08:51:30.253+0000] {dagbag.py:541} INFO - Filling up the DagBag from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py
+[2025-03-27T08:51:30.259+0000] {processor.py:809} INFO - DAG(s) dict_keys(['tutorial_dag']) retrieved from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py
+[2025-03-27T08:51:30.275+0000] {logging_mixin.py:149} INFO - [2025-03-27T08:51:30.275+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-27T08:51:30.289+0000] {logging_mixin.py:149} INFO - [2025-03-27T08:51:30.289+0000] {dag.py:3486} INFO - Setting next_dagrun for tutorial_dag to None, run_after=None
+[2025-03-27T08:51:30.304+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py took 0.054 seconds
+[2025-03-27T08:52:20.992+0000] {processor.py:156} INFO - Started process (PID=84384) to work on /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py
+[2025-03-27T08:52:20.993+0000] {processor.py:799} INFO - Processing file /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py for tasks to queue
+[2025-03-27T08:52:20.993+0000] {logging_mixin.py:149} INFO - [2025-03-27T08:52:20.993+0000] {dagbag.py:541} INFO - Filling up the DagBag from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py
+[2025-03-27T08:52:20.997+0000] {processor.py:809} INFO - DAG(s) dict_keys(['tutorial_dag']) retrieved from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py
+[2025-03-27T08:52:21.010+0000] {logging_mixin.py:149} INFO - [2025-03-27T08:52:21.010+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-27T08:52:21.023+0000] {logging_mixin.py:149} INFO - [2025-03-27T08:52:21.023+0000] {dag.py:3486} INFO - Setting next_dagrun for tutorial_dag to None, run_after=None
+[2025-03-27T08:52:21.040+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py took 0.049 seconds
+[2025-03-27T08:53:04.704+0000] {processor.py:156} INFO - Started process (PID=84873) to work on /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py
+[2025-03-27T08:53:04.704+0000] {processor.py:799} INFO - Processing file /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py for tasks to queue
+[2025-03-27T08:53:04.705+0000] {logging_mixin.py:149} INFO - [2025-03-27T08:53:04.705+0000] {dagbag.py:541} INFO - Filling up the DagBag from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py
+[2025-03-27T08:53:04.709+0000] {processor.py:809} INFO - DAG(s) dict_keys(['tutorial_dag']) retrieved from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py
+[2025-03-27T08:53:04.723+0000] {logging_mixin.py:149} INFO - [2025-03-27T08:53:04.723+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-27T08:53:04.736+0000] {logging_mixin.py:149} INFO - [2025-03-27T08:53:04.736+0000] {dag.py:3486} INFO - Setting next_dagrun for tutorial_dag to None, run_after=None
+[2025-03-27T08:53:04.753+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py took 0.051 seconds

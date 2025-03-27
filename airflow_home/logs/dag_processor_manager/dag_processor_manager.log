@@ -14454,3 +14454,273 @@ File Path                                                                       
 /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_subdag_operator.py                                           3           0  0.10s           2025-03-26T23:56:56
 /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_datasets.py                                                  6           0  0.10s           2025-03-26T23:56:27
 ================================================================================
+[2025-03-27T08:51:10.018+0000] {manager.py:487} INFO - Processing files using up to 1 processes at a time 
+[2025-03-27T08:51:10.021+0000] {manager.py:488} INFO - Process each file at most once every 30 seconds
+[2025-03-27T08:51:10.021+0000] {manager.py:489} INFO - Checking for new files in /workspaces/Team-34/airflow_home/dags every 300 seconds
+[2025-03-27T08:51:10.021+0000] {manager.py:758} INFO - Searching for files in /workspaces/Team-34/airflow_home/dags
+[2025-03-27T08:51:10.039+0000] {manager.py:761} INFO - There are 46 files in /workspaces/Team-34/airflow_home/dags
+[2025-03-27T08:51:10.278+0000] {manager.py:889} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                                                                                             PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------------------------------------------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_datetime_operator.py                                  0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group_decorator.py                                      0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_trigger_controller_dag.py                                    0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_time_delta_sensor_async.py                                   0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_short_circuit_decorator.py                                   0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_datasets.py                                                  0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_setup_teardown.py                                            0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_bash_operator.py                                             0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group.py                                                0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_complex.py                                                   0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only_with_trigger.py                                  0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_kubernetes_executor.py                                       0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_external_task_marker_dag.py                                  0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_local_kubernetes_executor.py                                 0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dynamic_task_mapping.py                                      0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_xcomargs.py                                                  0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial.py                                                          0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_taskflow_api.py                                             0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_labels.py                                             0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_python_dop_operator_3.py                              0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_xcom.py                                                      0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator.py                                           0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_params_ui_tutorial.py                                        0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_nested_branch_dag.py                                         0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_setup_teardown_taskflow.py                                   0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py                                               0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_short_circuit_operator.py                                    0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_subdag_operator.py                                           0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_skip_dag.py                                                  0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_taskflow_api_virtualenv.py                                  0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator_decorator.py                                 0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_trigger_target_dag.py                                        0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_params_trigger_ui.py                                         0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_passing_params_via_test_command.py                           0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py                                                      0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensors.py                                                   0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dag_decorator.py                                             0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_python_operator.py                                           0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py                                          0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_day_of_week_operator.py                               0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sla_dag.py                                                   0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/plugins/listener_plugin.py                                           0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/plugins/event_listener.py                                            0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/plugins/workday.py                                                   0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/subdags/subdag.py                                                    0           0
+/workspaces/Team-34/airflow_home/dags/fetch_store_dag.py                                                                                                       1           0  0.21s           2025-03-27T08:51:10
+================================================================================
+[2025-03-27T08:51:40.503+0000] {manager.py:889} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                                                                                             PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------------------------------------------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_datetime_operator.py                                  0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_datasets.py                                                  0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_setup_teardown.py                                            0           0  0.10s           2025-03-27T08:51:40
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_bash_operator.py                                             0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_complex.py                                                   0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only_with_trigger.py                                  0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_kubernetes_executor.py                                       0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_external_task_marker_dag.py                                  0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_local_kubernetes_executor.py                                 0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dynamic_task_mapping.py                                      0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_labels.py                                             0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_python_dop_operator_3.py                              0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator.py                                           0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_params_ui_tutorial.py                                        0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_nested_branch_dag.py                                         0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_setup_teardown_taskflow.py                                   0           0  0.10s           2025-03-27T08:51:40
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py                                               0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator_decorator.py                                 0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_params_trigger_ui.py                                         0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_passing_params_via_test_command.py                           0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensors.py                                                   0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dag_decorator.py                                             0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_python_operator.py                                           0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py                                          0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_day_of_week_operator.py                               0           0
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/plugins/listener_plugin.py                                           0           0  0.10s           2025-03-27T08:51:23
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/plugins/event_listener.py                                            0           0  0.11s           2025-03-27T08:51:25
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/plugins/workday.py                                                   0           0  0.31s           2025-03-27T08:51:20
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/subdags/subdag.py                                                    0           0  0.10s           2025-03-27T08:51:21
+/workspaces/Team-34/airflow_home/dags/fetch_store_dag.py                                                                                                       1           0  0.21s           2025-03-27T08:51:10
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group_decorator.py                                      1           0  0.10s           2025-03-27T08:51:31
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_trigger_controller_dag.py                                    1           0  0.10s           2025-03-27T08:51:32
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_time_delta_sensor_async.py                                   1           0  0.10s           2025-03-27T08:51:33
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_short_circuit_decorator.py                                   1           0  0.10s           2025-03-27T08:51:38
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group.py                                                1           0  0.10s           2025-03-27T08:51:34
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial.py                                                          1           0  0.10s           2025-03-27T08:51:26
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_taskflow_api.py                                             1           0  0.10s           2025-03-27T08:51:27
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_xcom.py                                                      1           0  0.10s           2025-03-27T08:51:28
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_short_circuit_operator.py                                    1           0  0.10s           2025-03-27T08:51:40
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_skip_dag.py                                                  1           0  0.11s           2025-03-27T08:51:36
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_taskflow_api_virtualenv.py                                  1           0  0.10s           2025-03-27T08:51:22
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_trigger_target_dag.py                                        1           0  0.10s           2025-03-27T08:51:29
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py                                                      1           0  0.10s           2025-03-27T08:51:30
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sla_dag.py                                                   1           0  0.10s           2025-03-27T08:51:37
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_xcomargs.py                                                  2           0  0.10s           2025-03-27T08:51:25
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_subdag_operator.py                                           3           0  0.10s           2025-03-27T08:51:35
+================================================================================
+[2025-03-27T08:52:11.297+0000] {manager.py:889} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                                                                                             PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------------------------------------------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_setup_teardown.py                                            0           0  0.10s           2025-03-27T08:51:40
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_kubernetes_executor.py                                       0           0  0.11s           2025-03-27T08:51:51
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_local_kubernetes_executor.py                                 0           0  0.10s           2025-03-27T08:51:42
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_setup_teardown_taskflow.py                                   0           0  0.10s           2025-03-27T08:51:40
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/plugins/listener_plugin.py                                           0           0  0.10s           2025-03-27T08:51:23
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/plugins/event_listener.py                                            0           0  0.11s           2025-03-27T08:51:25
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/plugins/workday.py                                                   0           0  0.31s           2025-03-27T08:52:11
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/subdags/subdag.py                                                    0           0  0.10s           2025-03-27T08:51:21
+/workspaces/Team-34/airflow_home/dags/fetch_store_dag.py                                                                                                       1           0  0.10s           2025-03-27T08:52:04
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group_decorator.py                                      1           0  0.10s           2025-03-27T08:51:31
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_trigger_controller_dag.py                                    1           0  0.10s           2025-03-27T08:51:32
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_time_delta_sensor_async.py                                   1           0  0.10s           2025-03-27T08:51:33
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_short_circuit_decorator.py                                   1           0  0.10s           2025-03-27T08:51:38
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_bash_operator.py                                             1           0  0.11s           2025-03-27T08:52:03
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group.py                                                1           0  0.10s           2025-03-27T08:51:34
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_complex.py                                                   1           0  0.10s           2025-03-27T08:51:55
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only_with_trigger.py                                  1           0  0.10s           2025-03-27T08:51:50
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dynamic_task_mapping.py                                      1           0  0.10s           2025-03-27T08:51:53
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial.py                                                          1           0  0.10s           2025-03-27T08:51:26
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_taskflow_api.py                                             1           0  0.10s           2025-03-27T08:51:27
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_labels.py                                             1           0  0.10s           2025-03-27T08:51:56
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_python_dop_operator_3.py                              1           0  0.11s           2025-03-27T08:51:57
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_xcom.py                                                      1           0  0.10s           2025-03-27T08:51:28
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator.py                                           1           0  0.10s           2025-03-27T08:51:58
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_params_ui_tutorial.py                                        1           0  0.20s           2025-03-27T08:51:44
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_nested_branch_dag.py                                         1           0  0.10s           2025-03-27T08:51:45
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py                                               1           0  0.11s           2025-03-27T08:51:54
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_short_circuit_operator.py                                    1           0  0.10s           2025-03-27T08:51:40
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_skip_dag.py                                                  1           0  0.11s           2025-03-27T08:51:36
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_taskflow_api_virtualenv.py                                  1           0  0.10s           2025-03-27T08:51:22
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator_decorator.py                                 1           0  0.10s           2025-03-27T08:51:59
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_trigger_target_dag.py                                        1           0  0.10s           2025-03-27T08:51:29
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_params_trigger_ui.py                                         1           0  0.20s           2025-03-27T08:51:45
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_passing_params_via_test_command.py                           1           0  0.11s           2025-03-27T08:51:47
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py                                                      1           0  0.10s           2025-03-27T08:51:30
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensors.py                                                   1           0  0.10s           2025-03-27T08:51:40
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dag_decorator.py                                             1           0  0.10s           2025-03-27T08:52:00
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_python_operator.py                                           1           0  0.10s           2025-03-27T08:51:48
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py                                          1           0  0.10s           2025-03-27T08:51:41
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_day_of_week_operator.py                               1           0  0.10s           2025-03-27T08:52:01
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sla_dag.py                                                   1           0  0.10s           2025-03-27T08:51:37
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_external_task_marker_dag.py                                  2           0  0.10s           2025-03-27T08:51:52
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_xcomargs.py                                                  2           0  0.10s           2025-03-27T08:51:25
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_datetime_operator.py                                  3           0  0.10s           2025-03-27T08:52:02
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_subdag_operator.py                                           3           0  0.10s           2025-03-27T08:51:35
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_datasets.py                                                  6           0  0.20s           2025-03-27T08:51:49
+================================================================================
+[2025-03-27T08:52:41.379+0000] {manager.py:889} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                                                                                             PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------------------------------------------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_setup_teardown.py                                            0           0  0.10s           2025-03-27T08:52:28
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_kubernetes_executor.py                                       0           0  0.10s           2025-03-27T08:52:41
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_local_kubernetes_executor.py                                 0           0  0.10s           2025-03-27T08:52:32
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_setup_teardown_taskflow.py                                   0           0  0.10s           2025-03-27T08:52:29
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/plugins/listener_plugin.py                                           0           0  0.11s           2025-03-27T08:52:14
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/plugins/event_listener.py                                            0           0  0.10s           2025-03-27T08:52:15
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/plugins/workday.py                                                   0           0  0.31s           2025-03-27T08:52:11
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/subdags/subdag.py                                                    0           0  0.10s           2025-03-27T08:52:12
+/workspaces/Team-34/airflow_home/dags/fetch_store_dag.py                                                                                                       1           0  0.10s           2025-03-27T08:52:04
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group_decorator.py                                      1           0  0.21s           2025-03-27T08:52:21
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_trigger_controller_dag.py                                    1           0  0.10s           2025-03-27T08:52:22
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_time_delta_sensor_async.py                                   1           0  0.10s           2025-03-27T08:52:23
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_short_circuit_decorator.py                                   1           0  0.10s           2025-03-27T08:52:27
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_bash_operator.py                                             1           0  0.11s           2025-03-27T08:52:03
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group.py                                                1           0  0.10s           2025-03-27T08:52:24
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_complex.py                                                   1           0  0.10s           2025-03-27T08:51:55
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only_with_trigger.py                                  1           0  0.10s           2025-03-27T08:52:40
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dynamic_task_mapping.py                                      1           0  0.10s           2025-03-27T08:51:53
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial.py                                                          1           0  0.10s           2025-03-27T08:52:17
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_taskflow_api.py                                             1           0  0.10s           2025-03-27T08:52:18
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_labels.py                                             1           0  0.10s           2025-03-27T08:51:56
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_python_dop_operator_3.py                              1           0  0.11s           2025-03-27T08:51:57
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_xcom.py                                                      1           0  0.10s           2025-03-27T08:52:19
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator.py                                           1           0  0.10s           2025-03-27T08:51:58
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_params_ui_tutorial.py                                        1           0  0.11s           2025-03-27T08:52:33
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_nested_branch_dag.py                                         1           0  0.11s           2025-03-27T08:52:35
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py                                               1           0  0.11s           2025-03-27T08:51:54
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_short_circuit_operator.py                                    1           0  0.10s           2025-03-27T08:52:31
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_skip_dag.py                                                  1           0  0.10s           2025-03-27T08:52:26
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_taskflow_api_virtualenv.py                                  1           0  0.10s           2025-03-27T08:52:13
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator_decorator.py                                 1           0  0.10s           2025-03-27T08:51:59
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_trigger_target_dag.py                                        1           0  0.10s           2025-03-27T08:52:20
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_params_trigger_ui.py                                         1           0  0.20s           2025-03-27T08:52:36
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_passing_params_via_test_command.py                           1           0  0.11s           2025-03-27T08:52:36
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py                                                      1           0  0.10s           2025-03-27T08:52:21
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensors.py                                                   1           0  0.10s           2025-03-27T08:52:31
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dag_decorator.py                                             1           0  0.10s           2025-03-27T08:52:00
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_python_operator.py                                           1           0  0.11s           2025-03-27T08:52:37
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py                                          1           0  0.10s           2025-03-27T08:52:31
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_day_of_week_operator.py                               1           0  0.10s           2025-03-27T08:52:01
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sla_dag.py                                                   1           0  0.10s           2025-03-27T08:52:26
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_external_task_marker_dag.py                                  2           0  0.11s           2025-03-27T08:52:41
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_xcomargs.py                                                  2           0  0.12s           2025-03-27T08:52:16
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_datetime_operator.py                                  3           0  0.10s           2025-03-27T08:52:02
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_subdag_operator.py                                           3           0  0.10s           2025-03-27T08:52:25
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_datasets.py                                                  6           0  0.10s           2025-03-27T08:52:39
+================================================================================
+[2025-03-27T08:53:11.496+0000] {manager.py:889} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                                                                                             PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------------------------------------------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_setup_teardown.py                                            0           0  0.10s           2025-03-27T08:52:28
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_kubernetes_executor.py                                       0           0  0.10s           2025-03-27T08:52:41
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_local_kubernetes_executor.py                                 0           0  0.10s           2025-03-27T08:52:32
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_setup_teardown_taskflow.py                                   0           0  0.10s           2025-03-27T08:52:29
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/plugins/listener_plugin.py                                           0           0  0.10s           2025-03-27T08:52:57
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/plugins/event_listener.py                                            0           0  0.10s           2025-03-27T08:52:58
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/plugins/workday.py                                                   0           0  0.31s           2025-03-27T08:52:45
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/subdags/subdag.py                                                    0           0  0.10s           2025-03-27T08:52:46
+/workspaces/Team-34/airflow_home/dags/fetch_store_dag.py                                                                                                       1           0  0.10s           2025-03-27T08:52:44
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group_decorator.py                                      1           0  0.10s           2025-03-27T08:53:05
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_trigger_controller_dag.py                                    1           0  0.10s           2025-03-27T08:53:07
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_time_delta_sensor_async.py                                   1           0  0.10s           2025-03-27T08:53:07
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_short_circuit_decorator.py                                   1           0  0.10s           2025-03-27T08:53:11
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_bash_operator.py                                             1           0  0.10s           2025-03-27T08:52:56
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_task_group.py                                                1           0  0.10s           2025-03-27T08:53:08
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_complex.py                                                   1           0  0.11s           2025-03-27T08:52:48
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only_with_trigger.py                                  1           0  0.10s           2025-03-27T08:52:40
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dynamic_task_mapping.py                                      1           0  0.10s           2025-03-27T08:52:41
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial.py                                                          1           0  0.10s           2025-03-27T08:53:00
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_taskflow_api.py                                             1           0  0.10s           2025-03-27T08:53:01
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_labels.py                                             1           0  0.10s           2025-03-27T08:52:49
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_python_dop_operator_3.py                              1           0  0.10s           2025-03-27T08:52:50
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_xcom.py                                                      1           0  0.10s           2025-03-27T08:53:02
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator.py                                           1           0  0.11s           2025-03-27T08:52:51
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_params_ui_tutorial.py                                        1           0  0.11s           2025-03-27T08:52:33
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_nested_branch_dag.py                                         1           0  0.11s           2025-03-27T08:52:35
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_latest_only.py                                               1           0  0.10s           2025-03-27T08:52:43
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_short_circuit_operator.py                                    1           0  0.10s           2025-03-27T08:52:31
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_skip_dag.py                                                  1           0  0.10s           2025-03-27T08:53:10
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_taskflow_api_virtualenv.py                                  1           0  0.10s           2025-03-27T08:52:47
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator_decorator.py                                 1           0  0.10s           2025-03-27T08:52:52
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_trigger_target_dag.py                                        1           0  0.10s           2025-03-27T08:53:03
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_params_trigger_ui.py                                         1           0  0.20s           2025-03-27T08:52:36
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_passing_params_via_test_command.py                           1           0  0.11s           2025-03-27T08:52:36
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/tutorial_dag.py                                                      1           0  0.10s           2025-03-27T08:53:04
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensors.py                                                   1           0  0.10s           2025-03-27T08:52:31
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_dag_decorator.py                                             1           0  0.11s           2025-03-27T08:52:53
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_python_operator.py                                           1           0  0.11s           2025-03-27T08:52:37
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sensor_decorator.py                                          1           0  0.10s           2025-03-27T08:52:31
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_day_of_week_operator.py                               1           0  0.11s           2025-03-27T08:52:54
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_sla_dag.py                                                   1           0  0.10s           2025-03-27T08:53:11
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_external_task_marker_dag.py                                  2           0  0.11s           2025-03-27T08:52:41
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_xcomargs.py                                                  2           0  0.11s           2025-03-27T08:52:59
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_datetime_operator.py                                  3           0  0.10s           2025-03-27T08:52:55
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_subdag_operator.py                                           3           0  0.10s           2025-03-27T08:53:09
+/home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_datasets.py                                                  6           0  0.10s           2025-03-27T08:52:39
+================================================================================

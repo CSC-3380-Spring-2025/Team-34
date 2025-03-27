@@ -1,0 +1,14 @@
+[2025-03-27T08:51:58.372+0000] {processor.py:156} INFO - Started process (PID=84079) to work on /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator.py
+[2025-03-27T08:51:58.372+0000] {processor.py:799} INFO - Processing file /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator.py for tasks to queue
+[2025-03-27T08:51:58.373+0000] {logging_mixin.py:149} INFO - [2025-03-27T08:51:58.372+0000] {dagbag.py:541} INFO - Filling up the DagBag from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator.py
+[2025-03-27T08:51:58.379+0000] {processor.py:809} INFO - DAG(s) dict_keys(['example_branch_operator']) retrieved from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator.py
+[2025-03-27T08:51:58.393+0000] {logging_mixin.py:149} INFO - [2025-03-27T08:51:58.393+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-27T08:51:58.408+0000] {logging_mixin.py:149} INFO - [2025-03-27T08:51:58.407+0000] {dag.py:3486} INFO - Setting next_dagrun for example_branch_operator to 2025-03-26T00:00:00+00:00, run_after=2025-03-27T00:00:00+00:00
+[2025-03-27T08:51:58.423+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator.py took 0.054 seconds
+[2025-03-27T08:52:51.419+0000] {processor.py:156} INFO - Started process (PID=84751) to work on /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator.py
+[2025-03-27T08:52:51.420+0000] {processor.py:799} INFO - Processing file /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator.py for tasks to queue
+[2025-03-27T08:52:51.420+0000] {logging_mixin.py:149} INFO - [2025-03-27T08:52:51.420+0000] {dagbag.py:541} INFO - Filling up the DagBag from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator.py
+[2025-03-27T08:52:51.427+0000] {processor.py:809} INFO - DAG(s) dict_keys(['example_branch_operator']) retrieved from /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator.py
+[2025-03-27T08:52:51.441+0000] {logging_mixin.py:149} INFO - [2025-03-27T08:52:51.441+0000] {dag.py:2726} INFO - Sync 1 DAGs
+[2025-03-27T08:52:51.455+0000] {logging_mixin.py:149} INFO - [2025-03-27T08:52:51.455+0000] {dag.py:3486} INFO - Setting next_dagrun for example_branch_operator to 2025-03-26T00:00:00+00:00, run_after=2025-03-27T00:00:00+00:00
+[2025-03-27T08:52:51.471+0000] {processor.py:178} INFO - Processing /home/vscode/miniconda/envs/airflow-env/lib/python3.10/site-packages/airflow/example_dags/example_branch_operator.py took 0.053 seconds
