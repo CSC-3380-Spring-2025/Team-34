@@ -13,3 +13,4 @@ env/
 # Ignore test cache
 tests/__pycache__/
 
+miniconda.sh
