@@ -11,6 +11,7 @@ import time
 import schedule
 from dotenv import load_dotenv
 from src.datastore.database import save_csv_data, init_db
+import src.datastore.create_multi_department_data as lsudata
 
 
 # Rest of the script remains the same...
@@ -105,7 +106,9 @@ def fetch_research(major):
    except Exception as e:
        print(f"Error fetching research for {major}: {e}")
        return pd.DataFrame()
-
+def fetch_lsu_courses(major):
+    course_data=lsudata.collect_default_data()
+    return pd.DataFrame(course_data)
 
 def save_to_csv_and_db(dataframe, filename, category, major, user_id=1):
    """Save DataFrame to CSV and store in database."""
@@ -149,13 +152,17 @@ def fetch_and_store_data():
            courses_filename = f"courses_{major.replace(' ', '_')}_{today}.csv"
            save_to_csv_and_db(courses_df, courses_filename, "courses", major)
 
-
        # Fetch and store research
        research_df = fetch_research(major)
        if not research_df.empty:
            research_filename = f"research_{major.replace(' ', '_')}_{today}.csv"
            save_to_csv_and_db(research_df, research_filename, "research", major)
 
+       # Fetch and store LSU course data
+       lsu_df=fetch_lsu_courses(major)
+       if not lsu_df.empty:
+           lsu_filename = f"lsu_{major.replace(' ', '_')}_{today}.csv"
+           save_to_csv_and_db(lsu_df, lsu_filename, "lsu", major)
 
 def schedule_daily_fetch():
    """Schedule the data fetch to run daily at a specific time (e.g., 8:00 AM)."""
