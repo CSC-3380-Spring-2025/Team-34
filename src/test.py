@@ -40,11 +40,12 @@ if 'show_lsu_datastore' not in st.session_state:
     st.session_state.show_lsu_datastore = False
 
 # Add LSU images at the top of the main area
+base_dir = os.path.dirname(__file__)
 col1, col2 = st.columns(2)
 with col1:
-    st.image("lsu_data_icon.png", caption="LSU Data Icon")
+    st.image(os.path.join(base_dir, "lsu_data_icon.png"), caption="LSU Data Icon")
 with col2:
-    st.image("lsu_logo.png", caption="LSU Logo")
+    st.image(os.path.join(base_dir, "lsu_logo.png"), caption="LSU Logo")
 
 # LSU Datastore Feed Shown First (regardless of login)
 st.title("🌭 LSU Datastore - Livestream Data Store")
@@ -150,7 +151,7 @@ if st.session_state.logged_in:
         if selected_file_id:
             df = get_csv_preview(selected_file_id)
             if not df.empty:
-                search_query = st.text_input("🔍 Search CSV Data")
+                search_query = st.text_input("🔍 Search CSV Data", key="search_query_main")
                 sort_column = st.selectbox("🔽 Sort by Column", df.columns)
                 df = df.sort_values(by=sort_column)
                 if search_query:
@@ -199,6 +200,7 @@ if st.session_state.logged_in:
             st.warning("❌ No matches found.")
 
     st.success("✅ Datastore System Ready!")
+
 
 # Link to DAG Grid
 st.markdown("---")
