@@ -10,7 +10,7 @@ import plotly.express as px
 from src.datastore.database import (
     save_csv_data, get_files, get_csv_preview, delete_file, search_csv_data, update_csv_data, authenticate_user
 )
-from datetime import datetime
+from datetime import datetime, date
 
 # Set page configuration
 st.set_page_config(page_title="📊 Datastore CSV Dashboard", layout="wide")
@@ -51,15 +51,16 @@ with col2:
 st.title("🌭 LSU Datastore - Livestream Data Store")
 st.write("Welcome to the LSU Datastore live feed! View the latest Jobs, Courses, and Research Projects for today.")
 
-# Today's date
-today = datetime.now().strftime("%Y-%m-%d")
+# Add a calendar date picker
+selected_date = st.date_input("📅 Select a Date to View Data:", value=datetime.now().date())
+selected_date_str = selected_date.strftime("%Y-%m-%d")
 
 # Fetch files
 files = get_files()
 if files:
     file_options = {}
     for file_id, filename, _, _, _ in files:
-        if today in filename and any(major.replace(" ", "_") in filename for major in ["software_engineering", "cloud_computing", "data_science"]):
+        if selected_date_str in filename and any(major.replace(" ", "_") in filename for major in ["software_engineering", "cloud_computing", "data_science"]):
             file_options[file_id] = filename
 
     if file_options:
@@ -102,9 +103,9 @@ if files:
                 else:
                     st.error("❌ No data found in the selected CSV.")
         else:
-            st.warning(f"⚠️ No {selected_category.capitalize()} data available for {selected_major.replace('_', ' ').capitalize()} today.")
+            st.warning(f"⚠️ No {selected_category.capitalize()} data available for {selected_major.replace('_', ' ').capitalize()} on {selected_date_str}.")
     else:
-        st.warning(f"⚠️ No files uploaded for today ({today}).")
+        st.warning(f"⚠️ No files uploaded for {selected_date_str}.")
 else:
     st.warning("⚠️ No files uploaded yet.")
 
@@ -200,7 +201,6 @@ if st.session_state.logged_in:
             st.warning("❌ No matches found.")
 
     st.success("✅ Datastore System Ready!")
-
 
 # Link to DAG Grid
 st.markdown("---")
