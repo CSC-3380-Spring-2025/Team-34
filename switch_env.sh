@@ -18,8 +18,11 @@ elif [ "$1" == "prod" ]; then
 elif [ "$1" == "test" ]; then
     conda activate test-env
     echo "Switched to Testing Environment (test-env)"
+elif [ "$1" == "airflow" ]; then
+    conda activate airflow-env
+    echo "Switched to Airflow Environment (airflow-env)"
 else
-    echo "Usage: sh switch_env.sh [dev|prod|test]"
+    echo "Usage: sh switch_env.sh [dev|prod|test|airflow]"
     exit 1
 fi
 
