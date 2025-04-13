@@ -36,9 +36,10 @@ if not os.getenv("IS_STREAMLIT_CLOUD", False):
     except ImportError:
         pass
 
-# API keys (LinkedIn API commented out)
+# API keys
 CORE_API_KEY = "X5FGZ97Z5ArOReiB5v02EDYToaLhupm"  # Retained as requested
-ARBEITNOW_API_URL = "https://arbeitnow.com/api/job-board-api"
+CORESIGNAL_API_KEY = "eyJhbGciOiJFZERTQSIsImtpZCI6ImE0OTQzN2UyLTUzMzUtOTRkNy05MGUwLTQxMGMyYWZjYWIyYyJ9.eyJhdWQiOiJjb2Rld2lsbGluZy5jb20iLCJleHAiOjE3NzYxNDQxOTIsImlhdCI6MTc0NDU4NzI0MCwiaXNzIjoiaHR0cHM6Ly9vcHMuY29yZXNpZ25hbC5jb206ODMwMC92MS9pZGVudGl0eS9vaWRjIiwibmFtZXNwYWNlIjoicm9vdCIsInByZWZlcnJlZF91c2VybmFtZSI6ImNvZGV3aWxsaW5nLmNvbSIsInN1YiI6Ijk3ODhkODk2LTI3MGMtNTg2OC0xNjQyLTkxYWJkOTQwYTA4NiIsInVzZXJpbmZvIjp7InNjb3BlcyI6ImNkYXBpIn19.8EAJWYvklPS2lAIoPmK3tRwIV5NWXSnBfQrA2C-vm-XSEAy6myDw5Wc9o_CPCNXhzg9UdBbeegkYoh5sBeaxDw"  # Hardcoded Coresignal API key
+CORESIGNAL_API_URL = "https://api.coresignal.com/cdapi/v1/linkedin/job/search/filter"  # Updated Coresignal API endpoint based on documentation
 MAJORS = ["software_engineering", "cloud_computing", "data_science"]
 
 # Initialize session state for terminal output
@@ -48,45 +49,53 @@ if 'terminal_output' not in st.session_state:
 def fetch_jobs(major):
     try:
         print(f"Starting job fetch for {major}...")
-        # Construct Arbeitnow API request
-        # Arbeitnow API doesn't support query parameters for filtering directly, so we'll fetch all jobs and filter in the script
-        print(f"Fetching jobs from Arbeitnow API: {ARBEITNOW_API_URL}")
-        response = requests.get(ARBEITNOW_API_URL, timeout=10)
+        # Construct Coresignal API request
+        headers = {
+            "Authorization": f"Bearer {CORESIGNAL_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        # Payload for searching jobs (adjusted based on Coresignal's API documentation)
+        payload = {
+            "title": f"{major.replace('_', ' ')}",  # Search for jobs with the major in the title
+            "is_active": True,  # Fetch active job postings
+            "pagination": {
+                "limit": 10,  # Limit to 10 jobs per request
+                "offset": 0
+            }
+        }
+        print(f"Fetching jobs from Coresignal API: {CORESIGNAL_API_URL} with payload: {payload}")
+        response = requests.post(CORESIGNAL_API_URL, headers=headers, json=payload, timeout=10)
         response.raise_for_status()  # Raises an HTTPError for bad responses
         print(f"Successfully fetched data for {major}, status code: {response.status_code}")
 
-        # Parse the JSON response
+        # Parse the JSON response (adjusted based on Coresignal's response structure)
         data = response.json()
-        jobs = data.get("data", [])  # Arbeitnow returns jobs in a "data" field
+        jobs = data.get("data", [])  # Coresignal returns jobs in a "data" field
 
-        # Filter jobs for the major and full-time roles
-        filtered_jobs = []
-        major_keywords = major.replace("_", " ").lower()
+        # Format the jobs to match our expected structure
+        formatted_jobs = []
         for job in jobs:
-            title = job.get("title", "").lower()
+            # Check if the job is full-time (if the API supports such a field or description)
             description = job.get("description", "").lower()
-            # Check if the job matches the major (in title or description)
-            if major_keywords in title or major_keywords in description:
-                # Check for full-time roles (if specified in description or title)
-                if "full time" in title or "full-time" in title or "full time" in description or "full-time" in description:
-                    filtered_jobs.append({
-                        "major": major,
-                        "title": job.get("title", "N/A"),
-                        "company": job.get("company_name", "N/A"),
-                        "location": job.get("location", "N/A"),
-                        "description": job.get("description", "N/A"),
-                        "url": job.get("url", "N/A")
-                    })
+            if "full time" in description or "full-time" in description:
+                formatted_jobs.append({
+                    "major": major,
+                    "title": job.get("title", "N/A"),
+                    "company": job.get("company_name", "N/A"),
+                    "location": job.get("location", "N/A"),
+                    "description": job.get("description", "N/A"),
+                    "url": job.get("url", "N/A")
+                })
 
-        print(f"Extracted {len(filtered_jobs)} jobs for {major}")
-        return filtered_jobs
+        print(f"Extracted {len(formatted_jobs)} jobs for {major}")
+        return formatted_jobs
     except requests.exceptions.RequestException as e:
         print(f"Error fetching jobs for {major}: {e}")
         return []
 
 def fetch_and_store_data():
     # Capture print output to display in Streamlit
-    output_buffer = StringIO()
+    output_buffer = io.StringIO()
     sys.stdout = output_buffer
 
     try:
