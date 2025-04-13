@@ -511,10 +511,25 @@ with st.container():
                     current_dir = os.getcwd()
                     st.write(f"Current working directory: {current_dir}")
 
-                    # Construct the script path relative to the repository root
-                    # Assuming the repo root is CSC-3380-Spring-2025, and fetch_store.py is at Team-34/src/data/
-                    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-                    script_path = os.path.join(repo_root, "Team-34", "src", "data", "fetch_store.py")
+                    # Debug: List contents of the working directory
+                    st.write(f"Contents of working directory: {os.listdir(current_dir)}")
+
+                    # Debug: List contents of the 'src' directory (if it exists)
+                    src_dir = os.path.join(current_dir, "src")
+                    if os.path.exists(src_dir):
+                        st.write(f"Contents of src directory: {os.listdir(src_dir)}")
+                    else:
+                        st.warning("src directory not found in working directory.")
+
+                    # Debug: List contents of the 'src/data' directory (if it exists)
+                    data_dir = os.path.join(src_dir, "data")
+                    if os.path.exists(data_dir):
+                        st.write(f"Contents of src/data directory: {os.listdir(data_dir)}")
+                    else:
+                        st.warning("src/data directory not found.")
+
+                    # Construct the script path relative to the current working directory
+                    script_path = os.path.join(current_dir, "src", "data", "fetch_store.py")
                     
                     # Debug: Print the script path being checked
                     st.write(f"Checking script path: {script_path}")
