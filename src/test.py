@@ -507,9 +507,18 @@ with st.container():
         if st.button("Fetch Today's Data"):
             with st.spinner("Fetching data..."):
                 try:
-                    # Define the script path (relative to repo root for Streamlit Cloud)
-                    script_path = "Team-34/src/data/fetch_store.py"
+                    # Debug: Print current working directory
+                    current_dir = os.getcwd()
+                    st.write(f"Current working directory: {current_dir}")
+
+                    # Construct the script path relative to the repository root
+                    # Assuming the repo root is CSC-3380-Spring-2025, and fetch_store.py is at Team-34/src/data/
+                    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+                    script_path = os.path.join(repo_root, "Team-34", "src", "data", "fetch_store.py")
                     
+                    # Debug: Print the script path being checked
+                    st.write(f"Checking script path: {script_path}")
+
                     # Verify script exists
                     if not os.path.exists(script_path):
                         st.error(f"Script not found at {script_path}")
