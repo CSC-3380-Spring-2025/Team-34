@@ -15,8 +15,9 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
 import base64
 import re
-import requests  # Added for fetch_store.py logic
-from io import StringIO  # Added to capture print output
+import requests
+from io import StringIO
+from bs4 import BeautifulSoup  # Added for web scraping
 
 # Set page configuration (must be the first Streamlit command)
 st.set_page_config(page_title="📊 LSU Datastore", layout="wide")
@@ -36,29 +37,60 @@ if not os.getenv("IS_STREAMLIT_CLOUD", False):
     except ImportError:
         pass
 
-# Define fetch_store.py logic within test.py
-# API keys
-LINKED_JOBS_API = "https://linkedin-data-api.p.rapidapi.com/get-jobs"
-CORE_API_KEY = "X5FGZ97Z5ArOReiB5v02EDYToaLhupm"
-RAPIDAPI_KEY = "5288d5c6885msh399b813109c6d5p1b1eajsnfs162676da3"
-
+# API keys (LinkedIn API commented out)
+CORE_API_KEY = "X5FGZ97Z5ArOReiB5v02EDYToaLhupm"  # Retained as requested
 MAJORS = ["software_engineering", "cloud_computing", "data_science"]
 
 def fetch_jobs(major):
     try:
+        # Construct Indeed search URL for the major (e.g., "software engineering full time")
+        search_url = f"https://www.indeed.com/jobs?q={major.replace('_', '+')}+full+time&l=&vjk=30f58c7471301c42"
+        # Add headers to mimic a browser request and avoid blocking
         headers = {
-            "x-rapidapi-host": "linkedin-data-api.p.rapidapi.com",
-            "x-rapidapi-key": RAPIDAPI_KEY
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
         }
-
-        params = {"description": major, "full_time": True}
-
-        response = requests.get(LINKED_JOBS_API, headers=headers, params=params)
+        response = requests.get(search_url, headers=headers)
         response.raise_for_status()  # Raises an HTTPError for bad responses
-        return response.json()
+
+        # Parse the HTML content with BeautifulSoup
+        soup = BeautifulSoup(response.content, "html.parser")
+        job_cards = soup.find_all("div", class_="job_seen_beacon")
+
+        jobs = []
+        for job_card in job_cards:
+            # Extract job title
+            title_elem = job_card.find("h2", class_="jobTitle")
+            title = title_elem.text.strip() if title_elem else "N/A"
+
+            # Extract company name
+            company_elem = job_card.find("span", class_="companyName")
+            company = company_elem.text.strip() if company_elem else "N/A"
+
+            # Extract location
+            location_elem = job_card.find("div", class_="companyLocation")
+            location = location_elem.text.strip() if location_elem else "N/A"
+
+            # Extract job description/snippet
+            description_elem = job_card.find("div", class_="job-snippet")
+            description = description_elem.text.strip() if description_elem else "N/A"
+
+            # Extract job URL (if available)
+            url_elem = job_card.find("a", class_="jcs-JobTitle")
+            url = "https://www.indeed.com" + url_elem["href"] if url_elem and "href" in url_elem.attrs else "N/A"
+
+            jobs.append({
+                "major": major,
+                "title": title,
+                "company": company,
+                "location": location,
+                "description": description,
+                "url": url
+            })
+
+        return jobs
     except requests.exceptions.RequestException as e:
         print(f"Error fetching jobs for {major}: {e}")
-        return None
+        return []
 
 def fetch_and_store_data():
     # Capture print output to display in Streamlit
@@ -66,16 +98,36 @@ def fetch_and_store_data():
     sys.stdout = output_buffer
 
     try:
-        for major in MAJORS:
-            data = fetch_jobs(major)
-            if data:
-                # Assuming lsudata.create_multi_department_data handles the data
-                # Replace this with the actual logic from fetch_store.py if different
-                print(f"Successfully fetched data for {major}")
-                # Example: Save the data (adjust based on your lsudata implementation)
-                # lsudata.create_multi_department_data(data, major)
+        all_jobs = []
+        for i, major in enumerate(MAJORS):
+            # Add a delay to avoid rate limits (e.g., 2 seconds between requests)
+            if i > 0:
+                print(f"Pausing for 2 seconds to avoid rate limits...")
+                time.sleep(2)
+
+            jobs = fetch_jobs(major)
+            if jobs:
+                all_jobs.extend(jobs)
+                print(f"Successfully fetched {len(jobs)} jobs for {major}")
             else:
-                print(f"Failed to fetch data for {major}")
+                print(f"Failed to fetch jobs for {major}")
+
+        # Convert the fetched jobs to a DataFrame
+        if all_jobs:
+            df = pd.DataFrame(all_jobs)
+            # Create a CSV file for the current day
+            today = datetime.now().strftime("%Y-%m-%d")
+            csv_filename = f"jobs_{today}.csv"
+            csv_buffer = io.StringIO()
+            df.to_csv(csv_buffer, index=False)
+            csv_data = csv_buffer.getvalue().encode('utf-8')
+
+            # Save the CSV using your existing save_csv_data function
+            save_csv_data(csv_filename, csv_data, len(csv_data), "csv", 1)
+            print(f"Saved {len(df)} jobs to {csv_filename}")
+        else:
+            print("No jobs fetched to save.")
+
     except Exception as e:
         print(f"Error in fetch_and_store_data: {e}")
     finally:
@@ -576,8 +628,8 @@ with st.container():
                         unsafe_allow_html=True
                     )
                     st.success("Data fetched successfully!")
-                    # Optional: Refresh UI to show new data (uncomment if needed)
-                    # st.rerun()
+                    # Refresh UI to show new data
+                    st.rerun()
                 except Exception as e:
                     st.error(f"Unexpected error: {str(e)}")
 
