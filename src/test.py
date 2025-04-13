@@ -68,8 +68,19 @@ def fetch_jobs(major):
 
         # Parse the JSON response
         data = response.json()
-        # The response is a list of jobs, not a dictionary with a "data" key
-        jobs = data if isinstance(data, list) else []
+        print(f"Raw API response for {major}: {data}")
+
+        # Handle different response types
+        if isinstance(data, int):
+            print(f"No jobs found for {major} (response is an integer: {data})")
+            return []
+        elif isinstance(data, dict):
+            jobs = data.get("data", [])  # Check for "data" key in dictionary
+        elif isinstance(data, list):
+            jobs = data  # Response is already a list of jobs
+        else:
+            print(f"Unexpected response type for {major}: {type(data)}")
+            return []
 
         # Format the jobs to match our expected structure
         formatted_jobs = []
@@ -496,7 +507,7 @@ with st.container():
                         email_input = st.text_input("Enter your email address:", key="email_live")
                         if st.button("Send Data", key="send_live"):
                             if email_input:
-                                email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+                                email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA.Z0-9-.]+$'
                                 if not re.match(email_regex, email_input):
                                     st.error("Invalid email address format.")
                                 else:
