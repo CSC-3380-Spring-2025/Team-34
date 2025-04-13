@@ -507,8 +507,8 @@ with st.container():
         if st.button("Fetch Today's Data"):
             with st.spinner("Fetching data..."):
                 try:
-                    # Define the script path (corrected to absolute workspace path)
-                    script_path = "/workspaces/Team-34/src/data/fetch_store.py"
+                    # Define the script path (relative to repo root for Streamlit Cloud)
+                    script_path = "Team-34/src/data/fetch_store.py"
                     
                     # Verify script exists
                     if not os.path.exists(script_path):
@@ -516,26 +516,38 @@ with st.container():
                     else:
                         # Run the script and capture output
                         result = subprocess.run(
-                            ["python", script_path],
+                            ["python3", script_path],  # Using python3 as per environment
                             capture_output=True,
                             text=True,
                             check=True
                         )
-                        # Display output in a terminal-like container
+                        # Always show stdout (even if empty)
                         st.markdown(
                             """
                             <div style='background-color: #000; color: #0f0; padding: 10px; border-radius: 5px; font-family: monospace;'>
                             <pre>{}</pre>
                             </div>
-                            """.format(result.stdout or "No output captured."),
+                            """.format(result.stdout or "No output produced by script."),
                             unsafe_allow_html=True
                         )
-                        if result.stderr:
-                            st.error(f"Errors:\n{result.stderr}")
+                        # Handle stderr: treat InsecureRequestWarning as non-critical
+                        if result.stderr and "InsecureRequestWarning" in result.stderr:
+                            st.warning(
+                                "SSL verification warnings occurred while fetching data. "
+                                "This is safe for development but should be fixed for production. "
+                                "Details:\n" + result.stderr
+                            )
+                            st.success("Data fetched successfully!")
+                            # Optional: Refresh UI to show new data (uncomment if needed)
+                            # st.rerun()
+                        elif result.stderr:
+                            st.error(f"Script errors:\n{result.stderr}")
                         else:
                             st.success("Data fetched successfully!")
+                            # Optional: Refresh UI to show new data (uncomment if needed)
+                            # st.rerun()
                 except subprocess.CalledProcessError as e:
-                    st.error(f"Error running script:\n{e.stderr}")
+                    st.error(f"Script failed with exit code {e.returncode}:\n{e.stderr}")
                 except Exception as e:
                     st.error(f"Unexpected error: {str(e)}")
 
