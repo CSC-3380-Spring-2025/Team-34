@@ -43,18 +43,22 @@ MAJORS = ["software_engineering", "cloud_computing", "data_science"]
 
 def fetch_jobs(major):
     try:
+        print(f"Starting job fetch for {major}...")
         # Construct Indeed search URL for the major (e.g., "software engineering full time")
         search_url = f"https://www.indeed.com/jobs?q={major.replace('_', '+')}+full+time&l=&vjk=30f58c7471301c42"
+        print(f"Fetching jobs from URL: {search_url}")
         # Add headers to mimic a browser request and avoid blocking
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
         }
-        response = requests.get(search_url, headers=headers)
+        response = requests.get(search_url, headers=headers, timeout=10)
         response.raise_for_status()  # Raises an HTTPError for bad responses
+        print(f"Successfully fetched HTML content for {major}, status code: {response.status_code}")
 
         # Parse the HTML content with BeautifulSoup
         soup = BeautifulSoup(response.content, "html.parser")
         job_cards = soup.find_all("div", class_="job_seen_beacon")
+        print(f"Found {len(job_cards)} job cards for {major}")
 
         jobs = []
         for job_card in job_cards:
@@ -87,6 +91,7 @@ def fetch_jobs(major):
                 "url": url
             })
 
+        print(f"Extracted {len(jobs)} jobs for {major}")
         return jobs
     except requests.exceptions.RequestException as e:
         print(f"Error fetching jobs for {major}: {e}")
@@ -98,7 +103,7 @@ def fetch_and_store_data():
     sys.stdout = output_buffer
 
     try:
-        all_jobs = []
+        today = datetime.now().strftime("%Y-%m-%d")
         for i, major in enumerate(MAJORS):
             # Add a delay to avoid rate limits (e.g., 2 seconds between requests)
             if i > 0:
@@ -107,26 +112,22 @@ def fetch_and_store_data():
 
             jobs = fetch_jobs(major)
             if jobs:
-                all_jobs.extend(jobs)
-                print(f"Successfully fetched {len(jobs)} jobs for {major}")
+                # Convert the fetched jobs to a DataFrame
+                df = pd.DataFrame(jobs)
+                print(f"Created DataFrame with {len(df)} jobs for {major}")
+
+                # Create a CSV file for the current day and major
+                csv_filename = f"jobs_{major}_{today}.csv"
+                csv_buffer = io.StringIO()
+                df.to_csv(csv_buffer, index=False)
+                csv_data = csv_buffer.getvalue().encode('utf-8')
+                print(f"Generated CSV file: {csv_filename}")
+
+                # Save the CSV using your existing save_csv_data function
+                save_csv_data(csv_filename, csv_data, len(csv_data), "csv", 1)
+                print(f"Saved {len(df)} jobs to {csv_filename}")
             else:
-                print(f"Failed to fetch jobs for {major}")
-
-        # Convert the fetched jobs to a DataFrame
-        if all_jobs:
-            df = pd.DataFrame(all_jobs)
-            # Create a CSV file for the current day
-            today = datetime.now().strftime("%Y-%m-%d")
-            csv_filename = f"jobs_{today}.csv"
-            csv_buffer = io.StringIO()
-            df.to_csv(csv_buffer, index=False)
-            csv_data = csv_buffer.getvalue().encode('utf-8')
-
-            # Save the CSV using your existing save_csv_data function
-            save_csv_data(csv_filename, csv_data, len(csv_data), "csv", 1)
-            print(f"Saved {len(df)} jobs to {csv_filename}")
-        else:
-            print("No jobs fetched to save.")
+                print(f"No jobs fetched for {major} to save.")
 
     except Exception as e:
         print(f"Error in fetch_and_store_data: {e}")
@@ -366,6 +367,9 @@ with st.sidebar:
 # Fetch files for the ticker as early as possible to minimize delay
 files = get_files()
 ticker_text = " | ".join([filename for _, filename, _, _, _ in files]) if files else "No datasets available"
+
+# Debug: Print the list of files fetched
+print(f"Fetched files for ticker: {[filename for _, filename, _, _, _ in files]}")
 
 # Main Content Area
 with st.container():
