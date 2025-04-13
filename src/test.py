@@ -68,7 +68,8 @@ def fetch_jobs(major):
 
         # Parse the JSON response
         data = response.json()
-        jobs = data.get("data", [])  # Coresignal typically returns jobs in a "data" field
+        # The response is a list of jobs, not a dictionary with a "data" key
+        jobs = data if isinstance(data, list) else []
 
         # Format the jobs to match our expected structure
         formatted_jobs = []
