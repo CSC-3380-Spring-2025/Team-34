@@ -11,6 +11,10 @@ from src.datastore.database import (
     save_csv_data, get_files, get_csv_preview, delete_file, search_csv_data, update_csv_data, authenticate_user
 )
 from datetime import datetime
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
+import base64
+import re
 
 # Set page configuration
 st.set_page_config(page_title="📊 Datastore CSV Dashboard", layout="wide")
@@ -90,6 +94,53 @@ if files:
                     st.write(f"📊 **Preview of {filtered_files[selected_file_id]}:**")
                     st.dataframe(df)
 
+                    # Email functionality
+                    st.subheader("📧 Send Data via Email")
+                    email_input = st.text_input("Enter your email address:")
+                    if st.button("📤 Send Data"):
+                        if email_input:
+                            # Basic email validation
+                            email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+                            if not re.match(email_regex, email_input):
+                                st.error("❌ Invalid email address format.")
+                            else:
+                                try:
+                                    # Prepare CSV data as attachment
+                                    csv_buffer = io.StringIO()
+                                    df.to_csv(csv_buffer, index=False)
+                                    csv_data = csv_buffer.getvalue().encode('utf-8')
+                                    encoded_file = base64.b64encode(csv_data).decode()
+
+                                    # Create email
+                                    message = Mail(
+                                        from_email='bdav213@lsu.edu',  # Verified sender email
+                                        to_emails=email_input,
+                                        subject=f'LSU Datastore: {filtered_files[selected_file_id]} Data',
+                                        html_content=f'<p>Attached is the data from {filtered_files[selected_file_id]} as viewed on the LSU Datastore Dashboard.</p>'
+                                    )
+
+                                    # Add attachment
+                                    attachment = Attachment(
+                                        FileContent(encoded_file),
+                                        FileName(filtered_files[selected_file_id]),
+                                        FileType('text/csv'),
+                                        Disposition('attachment')
+                                    )
+                                    message.attachment = attachment
+
+                                    # Send email via SendGrid with new API key
+                                    sg = SendGridAPIClient('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')
+                                    response = sg.send(message)
+
+                                    if response.status_code == 202:
+                                        st.success(f"✅ Data sent to {email_input}!")
+                                    else:
+                                        st.error(f"❌ Failed to send email. Status code: {response.status_code}")
+                                except Exception as e:
+                                    st.error(f"❌ Error sending email: {str(e)}")
+                        else:
+                            st.warning("⚠️ Please enter an email address.")
+
                     st.subheader("📊 Data Insights")
                     numerical_cols = df.select_dtypes(include=["number"]).columns
                     if len(numerical_cols) > 0:
@@ -160,6 +211,53 @@ if st.session_state.logged_in:
                 st.write(f"📊 **Preview of {file_options[selected_file_id]}:**")
                 st.dataframe(df)
 
+                # Email functionality for management section
+                st.subheader("📧 Send Data via Email")
+                email_input = st.text_input("Enter your email address:", key="email_management")
+                if st.button("📤 Send Data", key="send_management"):
+                    if email_input:
+                        # Basic email validation
+                        email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+                        if not re.match(email_regex, email_input):
+                            st.error("❌ Invalid email address format.")
+                        else:
+                            try:
+                                # Prepare CSV data as attachment
+                                csv_buffer = io.StringIO()
+                                df.to_csv(csv_buffer, index=False)
+                                csv_data = csv_buffer.getvalue().encode('utf-8')
+                                encoded_file = base64.b64encode(csv_data).decode()
+
+                                # Create email
+                                message = Mail(
+                                    from_email='bdav213@lsu.edu',  # Verified sender email
+                                    to_emails=email_input,
+                                    subject=f'LSU Datastore: {file_options[selected_file_id]} Data',
+                                    html_content=f'<p>Attached is the data from {file_options[selected_file_id]} as viewed on the LSU Datastore Dashboard.</p>'
+                                )
+
+                                # Add attachment
+                                attachment = Attachment(
+                                    FileContent(encoded_file),
+                                    FileName(file_options[selected_file_id]),
+                                    FileType('text/csv'),
+                                    Disposition('attachment')
+                                )
+                                message.attachment = attachment
+
+                                # Send email via SendGrid with new API key
+                                sg = SendGridAPIClient('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')
+                                response = sg.send(message)
+
+                                if response.status_code == 202:
+                                    st.success(f"✅ Data sent to {email_input}!")
+                                else:
+                                    st.error(f"❌ Failed to send email. Status code: {response.status_code}")
+                            except Exception as e:
+                                st.error(f"❌ Error sending email: {str(e)}")
+                    else:
+                        st.warning("⚠️ Please enter an email address.")
+
                 st.subheader("✏️ Edit Data")
                 edited_df = st.data_editor(df)
                 if st.button("📏 Save Changes"):
@@ -200,7 +298,6 @@ if st.session_state.logged_in:
             st.warning("❌ No matches found.")
 
     st.success("✅ Datastore System Ready!")
-
 
 # Link to DAG Grid
 st.markdown("---")
