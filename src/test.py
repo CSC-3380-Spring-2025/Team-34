@@ -38,7 +38,7 @@ if not os.getenv("IS_STREAMLIT_CLOUD", False):
 
 # Define fetch_store.py logic within test.py
 # API keys
-LINKED_JOBS_API = "https://linkedin-data-api.p.rapidapi.com/get-jobs"
+LINKED_JOBS_API = "52b85dd685msh339b181109c6d5fp11beabjsnf61b26d76da3"
 CORE_API_KEY = "X5FGZ97Z5ArOReiB5v02EDYToaLhupm"
 RAPIDAPI_KEY = "5288d5c6885msh399b813109c6d5p1b1eajsnfs162676da3"
 
