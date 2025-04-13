@@ -66,7 +66,7 @@ st.markdown(f"""
         .main {{
             background-color: {main_background};
             padding: 40px;
-            margin: 20px;
+            margin: 0 20px;  /* Adjusted margin to reduce top spacing */
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }}
@@ -186,6 +186,12 @@ st.markdown(f"""
                 box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
             }}
         }}
+
+        /* Ensure no extra white space below ticker */
+        .stMarkdown, .stMarkdown > div, .stMarkdown > div > div {{
+            margin: 0 !important;
+            padding: 0 !important;
+        }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -247,6 +253,10 @@ with st.sidebar:
             st.session_state.show_lsu_datastore = False
             st.rerun()
 
+# Fetch files for the ticker as early as possible to minimize delay
+files = get_files()
+ticker_text = " | ".join([filename for _, filename, _, _, _ in files]) if files else "No datasets available"
+
 # Main Content Area
 with st.container():
     # Demo Label at the Top
@@ -257,7 +267,51 @@ with st.container():
         </div>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="main">', unsafe_allow_html=True)
+    # Stock Ticker for All CSV Filenames (adjusted to remove extra white box below)
+    st.markdown(f"""
+        <style>
+            .ticker-container {{
+                background-color: {main_background};
+                color: {primary_color};
+                padding: 15px;
+                border-radius: 8px;
+                overflow: hidden;
+                width: 80%;
+                margin: 0 auto;  /* Centered with no extra spacing */
+                text-align: center;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                line-height: 1;  /* Tighten line height */
+                display: inline-block;  /* Prevent extra space */
+            }}
+            .ticker {{
+                display: inline-block;
+                white-space: nowrap;
+                animation: scroll 60s linear infinite;
+                font-size: 24px;
+                font-weight: bold;
+                font-family: 'Roboto', sans-serif;
+                margin: 0;
+                padding: 0;
+            }}
+            .ticker:hover {{
+                animation-play-state: paused;
+            }}
+            @keyframes scroll {{
+                0% {{ transform: translateX(100%); }}
+                100% {{ transform: translateX(-100%); }}
+            }}
+            /* Remove any Streamlit-added spacing */
+            .stMarkdown + .stMarkdown {{
+                margin-top: 0 !important;
+            }}
+        </style>
+        <div class="ticker-container">
+            <div class="ticker">{ticker_text}</div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # Main content area starts immediately after ticker
+    st.markdown('<div class="main" style="margin-top: 0;">', unsafe_allow_html=True)
 
     # Header Section
     st.header("LSU Datastore")
@@ -309,7 +363,6 @@ with st.container():
     st.subheader("LSU Datastore - Livestream Data Store")
     st.markdown("View the latest Jobs, Courses, and Research Projects for today.")
     today = datetime.now().strftime("%Y-%m-%d")
-    files = get_files()
     if files:
         file_options = {}
         for file_id, filename, _, _, _ in files:
@@ -370,10 +423,7 @@ with st.container():
                     else:
                         st.error("No data found in the selected dataset.")
             with col2:
-                try:
-                    st.image(os.path.join(base_dir, "lsu_logo.png"), caption="LSU Datastore Process", use_container_width=True, output_format="PNG")
-                except FileNotFoundError:
-                    st.warning("Image not found. Please add 'lsu_logo.png' to your project directory.")
+                pass  # Already removed the white box in the previous update
         else:
             st.warning(f"No {selected_category.capitalize()} data available for {selected_major.replace('_', ' ').capitalize()} today ({today}).")
     else:
