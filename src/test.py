@@ -41,6 +41,10 @@ if not os.getenv("IS_STREAMLIT_CLOUD", False):
 CORE_API_KEY = "X5FGZ97Z5ArOReiB5v02EDYToaLhupm"  # Retained as requested
 MAJORS = ["software_engineering", "cloud_computing", "data_science"]
 
+# Initialize session state for terminal output
+if 'terminal_output' not in st.session_state:
+    st.session_state.terminal_output = ""
+
 def fetch_jobs(major):
     try:
         print(f"Starting job fetch for {major}...")
@@ -135,6 +139,8 @@ def fetch_and_store_data():
         sys.stdout = sys.__stdout__
         output = output_buffer.getvalue()
         output_buffer.close()
+        # Store the output in session state for persistence
+        st.session_state.terminal_output = output
         return output
 
 # Determine color scheme based on login status
@@ -564,6 +570,18 @@ with st.container():
         else:
             st.warning("No matches found.")
 
+    # Display the persisted terminal output (if any)
+    if st.session_state.terminal_output:
+        st.subheader("Previous Fetch Output")
+        st.markdown(
+            """
+            <div style='background-color: #000; color: #0f0; padding: 10px; border-radius: 5px; font-family: monospace;'>
+            <pre>{}</pre>
+            </div>
+            """.format(st.session_state.terminal_output or "No previous output available."),
+            unsafe_allow_html=True
+        )
+
     # Manage Data Section (visible after login)
     if st.session_state.logged_in:
         st.subheader("Manage Data")
@@ -630,7 +648,9 @@ with st.container():
                         """.format(output or "No output produced by fetch_and_store_data."),
                         unsafe_allow_html=True
                     )
-                    st.success("Data fetched successfully!")
+                    st.success("Data fetched successfully! Page will refresh in 5 seconds to show new data...")
+                    # Delay the refresh to allow reading the output
+                    time.sleep(5)
                     # Refresh UI to show new data
                     st.rerun()
                 except Exception as e:
