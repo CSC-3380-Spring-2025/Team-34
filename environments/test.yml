@@ -1,0 +1,26 @@
+name: test-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pandas
+  - numpy
+  - sympy
+  - scipy
+  - matplotlib
+  - seaborn
+  - requests
+  - streamlit
+  - pytest  # Testing framework
+  - coverage  # Code coverage reports
+  - hypothesis  # Property-based testing
+  - black  # Code formatter
+  - pylint  # Linting tool
+  - flake8  # Additional linting
+  - pre-commit  # Automates linting before commits
+  - ipython  # Interactive testing
+  - jupyterlab  # Development support
+  - tqdm  # Progress bars for debugging
+  - pip:
+      - python-dotenv  # Environment variables

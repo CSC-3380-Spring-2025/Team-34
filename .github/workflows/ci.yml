@@ -1,1 +1,65 @@
-name: hello
+name: Dev Branch CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code from the GitHub repository
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Conda with Python and create/use airflow-env from the YAML file
+      - name: 🐍 Set up Python & Conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: 3.10
+          environment-file: environments/airflow.yml  # uses airflow-specific env
+          activate-environment: airflow-env            # activates airflow env for all steps
+          auto-activate-base: false
+
+      # Step 3: Install additional packages if needed for testing/linting
+      - name: 📦 Install Additional Dependencies
+        shell: bash -l {0}
+        run: |
+          conda activate airflow-env
+          pip install -r requirements.txt || true
+          pip install pytest black pylint
+
+      # Step 4: Run lint checks on source and test code using pylint
+      - name: 🔍 Run Code Linting (pylint)
+        shell: bash -l {0}
+        run: |
+          conda activate airflow-env
+          pylint src/ tests/
+
+      # Step 5: Run Python unit tests in the tests/ directory
+      - name: 🧪 Run Unit Tests (pytest)
+        shell: bash -l {0}
+        run: |
+          conda activate airflow-env
+          pytest tests/
+
+      # Step 6: Run Streamlit app and confirm it serves content (optional)
+      - name: 🚀 Validate Streamlit Deployment
+        shell: bash -l {0}
+        run: |
+          conda activate airflow-env
+          streamlit run src/test.py --server.headless true & sleep 10
+          curl -I http://localhost:8501 || exit 1
+
+      # Step 7: (NEW) Validate that Airflow DAGs are loadable
+      - name: 🛫 Validate Airflow DAGs
+        shell: bash -l {0}
+        run: |
+          conda activate airflow-env
+          airflow dags list  # confirms airflow is installed and DAGs parse correctly
+

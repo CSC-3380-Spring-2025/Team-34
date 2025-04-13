@@ -1,0 +1,16 @@
+name: airflow-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - apache-airflow=2.6.0
+  - sqlite3
+  - pandas
+  - sqlalchemy
+  - requests
+  - pip
+  - pip:
+      - schedule
+      - python-dotenv
+
