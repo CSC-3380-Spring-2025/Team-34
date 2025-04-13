@@ -79,7 +79,8 @@ if files:
         if filtered_files:
             selected_file_id = st.selectbox("📂 Select a file to preview:", options=filtered_files.keys(), format_func=lambda x: filtered_files[x])
             if selected_file_id:
-                df=get_csv_preview(selected_file_id)
+                file_path = f"src/csv_data/{file_options[selected_file_id]}"
+                df = pd.read_csv(file_path)
                 if not df.empty:
                     search_query = st.text_input("🔍 Search CSV Data")
                     sort_column = st.selectbox("🔽 Sort by Column", df.columns)
