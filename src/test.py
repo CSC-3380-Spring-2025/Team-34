@@ -17,6 +17,20 @@ from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileT
 import base64
 import re
 
+# Debug: Check if requests is installed, and attempt to install if missing
+try:
+    import requests
+    st.write("Requests module is installed.")
+except ImportError:
+    st.error("Requests module is not installed. Attempting to install dynamically...")
+    try:
+        subprocess.run(["pip", "install", "requests==2.32.3"], check=True)
+        import requests
+        st.write("Requests module installed successfully.")
+    except Exception as e:
+        st.error(f"Failed to install requests dynamically: {e}")
+        st.error("Please ensure 'requests==2.32.3' is in requirements.txt and redeploy the app.")
+
 # Load environment variables from .env file (for local development only)
 if not os.getenv("IS_STREAMLIT_CLOUD", False):
     try:
