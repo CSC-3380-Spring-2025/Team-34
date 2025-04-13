@@ -1,5 +1,6 @@
 import os
 import sys
+import subprocess  # For script execution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import streamlit as st
@@ -499,6 +500,44 @@ with st.container():
                     st.error("No data found in the selected dataset.")
         else:
             st.warning("No datasets uploaded yet.")
+
+        # Add Fetch Today's Data Button
+        st.markdown("---")  # Separator for clarity
+        st.subheader("Fetch Today's Data")
+        if st.button("Fetch Today's Data"):
+            with st.spinner("Fetching data..."):
+                try:
+                    # Define the script path (corrected to absolute workspace path)
+                    script_path = "/workspaces/Team-34/src/data/fetch_store.py"
+                    
+                    # Verify script exists
+                    if not os.path.exists(script_path):
+                        st.error(f"Script not found at {script_path}")
+                    else:
+                        # Run the script and capture output
+                        result = subprocess.run(
+                            ["python", script_path],
+                            capture_output=True,
+                            text=True,
+                            check=True
+                        )
+                        # Display output in a terminal-like container
+                        st.markdown(
+                            """
+                            <div style='background-color: #000; color: #0f0; padding: 10px; border-radius: 5px; font-family: monospace;'>
+                            <pre>{}</pre>
+                            </div>
+                            """.format(result.stdout or "No output captured."),
+                            unsafe_allow_html=True
+                        )
+                        if result.stderr:
+                            st.error(f"Errors:\n{result.stderr}")
+                        else:
+                            st.success("Data fetched successfully!")
+                except subprocess.CalledProcessError as e:
+                    st.error(f"Error running script:\n{e.stderr}")
+                except Exception as e:
+                    st.error(f"Unexpected error: {str(e)}")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
