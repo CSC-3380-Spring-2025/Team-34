@@ -44,8 +44,8 @@ MAJORS = ["software_engineering", "cloud_computing", "data_science"]
 def fetch_jobs(major):
     try:
         print(f"Starting job fetch for {major}...")
-        # Construct Indeed search URL for the major (e.g., "software engineering full time")
-        search_url = f"https://www.indeed.com/jobs?q={major.replace('_', '+')}+full+time&l=&vjk=30f58c7471301c42"
+        # Construct Monster search URL for the major (e.g., "software-engineering full time")
+        search_url = f"https://www.monster.com/jobs/search/?q={major.replace('_', '-')}+full-time"
         print(f"Fetching jobs from URL: {search_url}")
         # Add headers to mimic a browser request and avoid blocking
         headers = {
@@ -57,30 +57,28 @@ def fetch_jobs(major):
 
         # Parse the HTML content with BeautifulSoup
         soup = BeautifulSoup(response.content, "html.parser")
-        job_cards = soup.find_all("div", class_="job_seen_beacon")
-        print(f"Found {len(job_cards)} job cards for {major}")
+        job_cards = soup.find_all("div", class_="job-tittle")  # Monster uses this class for job listings
 
         jobs = []
         for job_card in job_cards:
             # Extract job title
-            title_elem = job_card.find("h2", class_="jobTitle")
+            title_elem = job_card.find("h3")
             title = title_elem.text.strip() if title_elem else "N/A"
 
             # Extract company name
-            company_elem = job_card.find("span", class_="companyName")
+            company_elem = job_card.find("div", class_="company-name")
             company = company_elem.text.strip() if company_elem else "N/A"
 
             # Extract location
-            location_elem = job_card.find("div", class_="companyLocation")
+            location_elem = job_card.find("div", class_="location")
             location = location_elem.text.strip() if location_elem else "N/A"
 
-            # Extract job description/snippet
-            description_elem = job_card.find("div", class_="job-snippet")
-            description = description_elem.text.strip() if description_elem else "N/A"
+            # Monster doesn't always show a description snippet on the listing page, so we'll use N/A
+            description = "N/A"
 
             # Extract job URL (if available)
-            url_elem = job_card.find("a", class_="jcs-JobTitle")
-            url = "https://www.indeed.com" + url_elem["href"] if url_elem and "href" in url_elem.attrs else "N/A"
+            url_elem = job_card.find_parent("a")
+            url = url_elem["href"] if url_elem and "href" in url_elem.attrs else "N/A"
 
             jobs.append({
                 "major": major,
@@ -91,6 +89,7 @@ def fetch_jobs(major):
                 "url": url
             })
 
+        print(f"Found {len(job_cards)} job cards for {major}")
         print(f"Extracted {len(jobs)} jobs for {major}")
         return jobs
     except requests.exceptions.RequestException as e:
