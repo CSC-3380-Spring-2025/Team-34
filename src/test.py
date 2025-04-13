@@ -15,8 +15,8 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
 import base64
 import re
-import requests  # Added for fetch_store.py logic
-from io import StringIO  # Added to capture print output
+import requests
+from io import StringIO
 
 # Set page configuration (must be the first Streamlit command)
 st.set_page_config(page_title="📊 LSU Datastore", layout="wide")
@@ -36,24 +36,21 @@ if not os.getenv("IS_STREAMLIT_CLOUD", False):
     except ImportError:
         pass
 
-# Define fetch_store.py logic within test.py
-# API keys
-LINKED_JOBS_API = "https://linkedin-data-api.p.rapidapi.com/get-jobs"
-CORE_API_KEY = "X5FGZ97Z5ArOReiB5v02EDYToaLhupm"
-RAPIDAPI_KEY = "5288d5c6885msh399b813109c6d5p1b1eajsnfs162676da3"
-
+# SerpApi Google Jobs API configuration
+SERPAPI_KEY = "a6e6459991a50c1a5ec0c279106db714d5586c66c2605c66"  # Hardcoded SerpApi key
+GOOGLE_JOBS_API = "https://serpapi.com/search.json"
+CORE_API_KEY = "X5FGZ97Z5ArOReiB5v02EDYToaLhupm"  # Retained as requested
 MAJORS = ["software_engineering", "cloud_computing", "data_science"]
 
 def fetch_jobs(major):
     try:
-        headers = {
-            "x-rapidapi-host": "linkedin-data-api.p.rapidapi.com",
-            "x-rapidapi-key": RAPIDAPI_KEY
+        params = {
+            "engine": "google_jobs",
+            "q": f"{major} full time",  # Search query (e.g., "software_engineering full time")
+            "api_key": SERPAPI_KEY
         }
 
-        params = {"description": major, "full_time": True}
-
-        response = requests.get(LINKED_JOBS_API, headers=headers, params=params)
+        response = requests.get(GOOGLE_JOBS_API, params=params)
         response.raise_for_status()  # Raises an HTTPError for bad responses
         return response.json()
     except requests.exceptions.RequestException as e:
@@ -66,16 +63,43 @@ def fetch_and_store_data():
     sys.stdout = output_buffer
 
     try:
-        for major in MAJORS:
+        all_jobs = []
+        for i, major in enumerate(MAJORS):
+            # Add a delay to avoid rate limits (e.g., 2 seconds between requests)
+            if i > 0:
+                print(f"Pausing for 2 seconds to avoid rate limits...")
+                time.sleep(2)
+
             data = fetch_jobs(major)
-            if data:
-                # Assuming lsudata.create_multi_department_data handles the data
-                # Replace this with the actual logic from fetch_store.py if different
-                print(f"Successfully fetched data for {major}")
-                # Example: Save the data (adjust based on your lsudata implementation)
-                # lsudata.create_multi_department_data(data, major)
+            if data and "jobs_results" in data:
+                jobs = data["jobs_results"]
+                for job in jobs:
+                    job["major"] = major  # Add the major to the job data
+                    all_jobs.append(job)
+                print(f"Successfully fetched {len(jobs)} jobs for {major}")
             else:
-                print(f"Failed to fetch data for {major}")
+                print(f"Failed to fetch jobs for {major}")
+
+        # Convert the fetched jobs to a DataFrame
+        if all_jobs:
+            df = pd.DataFrame(all_jobs)
+            # Select relevant columns (adjust based on your needs)
+            columns = ["major", "title", "company_name", "location", "description", "via", "posted_at"]
+            df = df[[col for col in columns if col in df.columns]]
+
+            # Create a CSV file for the current day
+            today = datetime.now().strftime("%Y-%m-%d")
+            csv_filename = f"jobs_{today}.csv"
+            csv_buffer = io.StringIO()
+            df.to_csv(csv_buffer, index=False)
+            csv_data = csv_buffer.getvalue().encode('utf-8')
+
+            # Save the CSV using your existing save_csv_data function
+            save_csv_data(csv_filename, csv_data, len(csv_data), "csv", 1)
+            print(f"Saved {len(df)} jobs to {csv_filename}")
+        else:
+            print("No jobs fetched to save.")
+
     except Exception as e:
         print(f"Error in fetch_and_store_data: {e}")
     finally:
@@ -442,7 +466,7 @@ with st.container():
                         email_input = st.text_input("Enter your email address:", key="email_live")
                         if st.button("Send Data", key="send_live"):
                             if email_input:
-                                email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+                                email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA>Z0-9-]+\.[a-zA-Z0-9-.]+$'
                                 if not re.match(email_regex, email_input):
                                     st.error("Invalid email address format.")
                                 else:
@@ -576,8 +600,8 @@ with st.container():
                         unsafe_allow_html=True
                     )
                     st.success("Data fetched successfully!")
-                    # Optional: Refresh UI to show new data (uncomment if needed)
-                    # st.rerun()
+                    # Refresh UI to show new data
+                    st.rerun()
                 except Exception as e:
                     st.error(f"Unexpected error: {str(e)}")
 
