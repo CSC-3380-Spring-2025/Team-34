@@ -331,7 +331,7 @@ with st.container():
                         email_input = st.text_input("Enter your email address:", key="email_live")
                         if st.button("Send Data", key="send_live"):
                             if email_input:
-                                email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-0-9-.]+$'
+                                email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
                                 if not re.match(email_regex, email_input):
                                     st.error("Invalid email address format.")
                                 else:
