@@ -39,12 +39,12 @@ def fetch_jobs(major):
         jobs = response.json()
 
         job_data = [{
-            "title": job.get("title", ""),
-            "company": job.get("company", ""),
-            "location": job.get("location", ""),
-            "description": job.get("description", ""),
-            "url": job.get("url", ""),
-            "posted_date": job.get("created_at", "")
+            "Title": job.get("title", ""),
+            "Company": job.get("company", ""),
+            "Location": job.get("location", ""),
+            "Description": job.get("description", ""),
+            "URL": job.get("url", ""),
+            "Posted Date": job.get("created_at", "")
         } for job in jobs] if jobs else []
         return pd.DataFrame(job_data)
     except requests.RequestException as e:
@@ -54,8 +54,8 @@ def fetch_jobs(major):
 def fetch_courses(major):
     try:
         return pd.DataFrame([
-            {"title": f"{major.capitalize()} Basics", "platform": "Coursera", "duration": "4 weeks", "url": "https://example.com"},
-            {"title": f"Advanced {major.capitalize()}", "platform": "Udemy", "duration": "6 weeks", "url": "https://example.com"}
+            {"Title": f"{major.capitalize()} Basics", "Platform": "Coursera", "Duration": "4 weeks", "URL": "https://example.com"},
+            {"Title": f"Advanced {major.capitalize()}", "Platform": "Udemy", "Duration": "6 weeks", "URL": "https://example.com"}
         ])
     except Exception as e:
         print(f"Error fetching courses for {major}: {e}")
@@ -69,26 +69,23 @@ def fetch_research(major):
         response.raise_for_status()
         data = response.json()
         research_data = [{
-            "title": item.get("title", ""),
-            "authors": ", ".join([author.get("name", "") for author in item.get("authors", [])]),
-            "publication_date": item.get("publishedDate", ""),
-            "url": item.get("doi", "")
+            "Title": item.get("title", ""),
+            "Authors": ", ".join([author.get("name", "") for author in item.get("authors", [])]),
+            "Publication Date": item.get("publishedDate", ""),
+            "URL": item.get("doi", "")
         } for item in data.get("results", [])]
         return pd.DataFrame(research_data)
     except requests.RequestException as e:
         print(f"Error fetching research for {major}: {e}")
         return pd.DataFrame()
-   """Fetch research papers for a given major (using a placeholder API; replace with real API)."""
-   try:
+    try:
        # Placeholder: Replace with actual API (e.g., arXiv, Google Scholar)
        research_data = [
-           {"title": f"Latest Trends in {major.capitalize()}", "authors": "John Doe", "publication_date": "2025-01-01", "url": "https://example.com"},
-           {"title": f"Future of {major.capitalize()}", "authors": "Jane Smith", "publication_date": "2025-02-01", "url": "https://example.com"}
+           {"Title": f"Latest Trends in {major.capitalize()}", "Authors": "John Doe", "Publication Date": "2025-01-01", "URL": "https://example.com"},
+           {"Title": f"Future of {major.capitalize()}", "Authors": "Jane Smith", "Publication Date": "2025-02-01", "Url": "https://example.com"}
        ]
        return pd.DataFrame(research_data)
-
-
-   except Exception as e:
+    except Exception as e:
        print(f"Error fetching research for {major}: {e}")
        return pd.DataFrame()
 def fetch_lsu_courses(major):
@@ -120,9 +117,12 @@ def fetch_and_store_data():
         research_df = fetch_research(major)
         if not research_df.empty:
             save_to_csv_and_db(research_df, f"research_{major.replace(' ', '_')}_{today}.csv", "research", major)
-   """Fetch data for jobs, courses, and research, then save to CSV and database."""
-   today = datetime.now().strftime("%Y-%m-%d")
-   for major in MAJORS:
+        lsu_df=fetch_lsu_courses(major)
+        print(lsu_df)
+        if not lsu_df.empty:
+            save_to_csv_and_db(lsu_df, f"lsu_{major.replace(' ', '_')}_{today}.csv", "lsu", major)
+        today = datetime.now().strftime("%Y-%m-%d")
+    for major in MAJORS:
        print(f"Fetching data for {major} on {today}...")
 
 

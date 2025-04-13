@@ -66,11 +66,11 @@ if files:
     if file_options:
         st.sidebar.subheader("📋 Select Major")
         majors = ["software_engineering", "cloud_computing", "data_science"]
-        selected_major = st.sidebar.selectbox("Choose a Major:", majors, format_func=lambda x: x.replace("_", " ").capitalize())
+        selected_major = st.sidebar.selectbox("Choose a Major:", majors, format_func=lambda x: x.replace("_", " ").title())
 
         st.sidebar.subheader("📂 Select Category")
-        categories = ["jobs", "courses", "research"]
-        selected_category = st.sidebar.selectbox("Choose a Category:", categories, format_func=lambda x: x.capitalize())
+        categories = ["jobs", "courses", "research", "lsu"]
+        selected_category = st.sidebar.selectbox("Choose a Category:", categories, format_func=lambda x: x.upper() if x=="lsu" else x.title())
 
         filtered_files = {
             file_id: fname for file_id, fname in file_options.items()
@@ -80,7 +80,8 @@ if files:
         if filtered_files:
             selected_file_id = st.selectbox("📂 Select a file to preview:", options=filtered_files.keys(), format_func=lambda x: filtered_files[x])
             if selected_file_id:
-                df = get_csv_preview(selected_file_id)
+                file_path = f"src/csv_data/{file_options[selected_file_id]}"
+                df = pd.read_csv(file_path)
                 if not df.empty:
                     search_query = st.text_input("🔍 Search CSV Data")
                     sort_column = st.selectbox("🔽 Sort by Column", df.columns)
@@ -103,7 +104,7 @@ if files:
                 else:
                     st.error("❌ No data found in the selected CSV.")
         else:
-            st.warning(f"⚠️ No {selected_category.capitalize()} data available for {selected_major.replace('_', ' ').capitalize()} on {selected_date_str}.")
+            st.warning(f"⚠️ No {selected_category.title()} data available for {selected_major.replace('_', ' ').title()} today.")
     else:
         st.warning(f"⚠️ No files uploaded for {selected_date_str}.")
 else:
@@ -153,7 +154,7 @@ if st.session_state.logged_in:
             df = get_csv_preview(selected_file_id)
             if not df.empty:
                 search_query = st.text_input("🔍 Search CSV Data", key="search_query_main")
-                sort_column = st.selectbox("🔽 Sort by Column", df.columns)
+                sort_column = st.selectbox("🔽 Sort by Column", df.columns, key="select_column")
                 df = df.sort_values(by=sort_column)
                 if search_query:
                     df = df[df.apply(lambda row: row.astype(str).str.contains(search_query, case=False).any(), axis=1)]
