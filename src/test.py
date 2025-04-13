@@ -147,7 +147,7 @@ if st.session_state.logged_in:
     files = get_files()
     if files:
         file_options = {file_id: filename for file_id, filename, _, _, _ in files}
-        selected_file_id = st.selectbox("📂 Select a file to preview:", options=file_options.keys(), format_func=lambda x: file_options[x])
+        selected_file_id = st.selectbox("📂 Select a file to preview: ", options=file_options.keys(), format_func=lambda x: file_options[x])
         if selected_file_id:
             df = get_csv_preview(selected_file_id)
             if not df.empty:
