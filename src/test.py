@@ -48,12 +48,15 @@ if 'terminal_output' not in st.session_state:
 def fetch_jobs(major):
     try:
         print(f"Starting job fetch for {major}...")
-        # Construct Monster search URL for the major (e.g., "software-engineering full time")
-        search_url = f"https://www.monster.com/jobs/search/?q={major.replace('_', '-')}+full-time"
+        # Construct CareerBuilder search URL for the major (e.g., "software+engineering+full+time")
+        search_url = f"https://www.careerbuilder.com/jobs?keywords={major.replace('_', '+')}+full+time&location="
         print(f"Fetching jobs from URL: {search_url}")
         # Add headers to mimic a browser request and avoid blocking
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.5",
+            "Referer": "https://www.careerbuilder.com/"
         }
         response = requests.get(search_url, headers=headers, timeout=10)
         response.raise_for_status()  # Raises an HTTPError for bad responses
@@ -61,28 +64,29 @@ def fetch_jobs(major):
 
         # Parse the HTML content with BeautifulSoup
         soup = BeautifulSoup(response.content, "html.parser")
-        job_cards = soup.find_all("div", class_="job-tittle")  # Monster uses this class for job listings
+        job_cards = soup.find_all("div", class_="data-results-title")  # CareerBuilder job listing container
 
         jobs = []
         for job_card in job_cards:
             # Extract job title
-            title_elem = job_card.find("h3")
+            title_elem = job_card.find("a")
             title = title_elem.text.strip() if title_elem else "N/A"
 
             # Extract company name
-            company_elem = job_card.find("div", class_="company-name")
+            company_elem = job_card.find_next("div", class_="data-details").find("span", class_="company")
             company = company_elem.text.strip() if company_elem else "N/A"
 
             # Extract location
-            location_elem = job_card.find("div", class_="location")
+            location_elem = job_card.find_next("div", class_="data-details").find("span", class_="location")
             location = location_elem.text.strip() if location_elem else "N/A"
 
-            # Monster doesn't always show a description snippet on the listing page, so we'll use N/A
+            # CareerBuilder doesn't always show a description snippet on the listing page, so we'll use N/A
             description = "N/A"
 
             # Extract job URL (if available)
-            url_elem = job_card.find_parent("a")
-            url = url_elem["href"] if url_elem and "href" in url_elem.attrs else "N/A"
+            url = title_elem["href"] if title_elem and "href" in title_elem.attrs else "N/A"
+            if url and not url.startswith("http"):
+                url = "https://www.careerbuilder.com" + url
 
             jobs.append({
                 "major": major,
