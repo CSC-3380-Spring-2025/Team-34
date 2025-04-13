@@ -17,7 +17,6 @@ import base64
 import re
 import requests
 from io import StringIO
-from bs4 import BeautifulSoup  # Added for web scraping
 
 # Set page configuration (must be the first Streamlit command)
 st.set_page_config(page_title="📊 LSU Datastore", layout="wide")
@@ -39,6 +38,7 @@ if not os.getenv("IS_STREAMLIT_CLOUD", False):
 
 # API keys (LinkedIn API commented out)
 CORE_API_KEY = "X5FGZ97Z5ArOReiB5v02EDYToaLhupm"  # Retained as requested
+ARBEITNOW_API_URL = "https://arbeitnow.com/api/job-board-api"
 MAJORS = ["software_engineering", "cloud_computing", "data_science"]
 
 # Initialize session state for terminal output
@@ -48,58 +48,38 @@ if 'terminal_output' not in st.session_state:
 def fetch_jobs(major):
     try:
         print(f"Starting job fetch for {major}...")
-        # Construct CareerBuilder search URL for the major (e.g., "software+engineering+full+time")
-        search_url = f"https://www.careerbuilder.com/jobs?keywords={major.replace('_', '+')}+full+time&location="
-        print(f"Fetching jobs from URL: {search_url}")
-        # Add headers to mimic a browser request and avoid blocking
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.5",
-            "Referer": "https://www.careerbuilder.com/"
-        }
-        response = requests.get(search_url, headers=headers, timeout=10)
+        # Construct Arbeitnow API request
+        # Arbeitnow API doesn't support query parameters for filtering directly, so we'll fetch all jobs and filter in the script
+        print(f"Fetching jobs from Arbeitnow API: {ARBEITNOW_API_URL}")
+        response = requests.get(ARBEITNOW_API_URL, timeout=10)
         response.raise_for_status()  # Raises an HTTPError for bad responses
-        print(f"Successfully fetched HTML content for {major}, status code: {response.status_code}")
+        print(f"Successfully fetched data for {major}, status code: {response.status_code}")
 
-        # Parse the HTML content with BeautifulSoup
-        soup = BeautifulSoup(response.content, "html.parser")
-        job_cards = soup.find_all("div", class_="data-results-title")  # CareerBuilder job listing container
+        # Parse the JSON response
+        data = response.json()
+        jobs = data.get("data", [])  # Arbeitnow returns jobs in a "data" field
 
-        jobs = []
-        for job_card in job_cards:
-            # Extract job title
-            title_elem = job_card.find("a")
-            title = title_elem.text.strip() if title_elem else "N/A"
+        # Filter jobs for the major and full-time roles
+        filtered_jobs = []
+        major_keywords = major.replace("_", " ").lower()
+        for job in jobs:
+            title = job.get("title", "").lower()
+            description = job.get("description", "").lower()
+            # Check if the job matches the major (in title or description)
+            if major_keywords in title or major_keywords in description:
+                # Check for full-time roles (if specified in description or title)
+                if "full time" in title or "full-time" in title or "full time" in description or "full-time" in description:
+                    filtered_jobs.append({
+                        "major": major,
+                        "title": job.get("title", "N/A"),
+                        "company": job.get("company_name", "N/A"),
+                        "location": job.get("location", "N/A"),
+                        "description": job.get("description", "N/A"),
+                        "url": job.get("url", "N/A")
+                    })
 
-            # Extract company name
-            company_elem = job_card.find_next("div", class_="data-details").find("span", class_="company")
-            company = company_elem.text.strip() if company_elem else "N/A"
-
-            # Extract location
-            location_elem = job_card.find_next("div", class_="data-details").find("span", class_="location")
-            location = location_elem.text.strip() if location_elem else "N/A"
-
-            # CareerBuilder doesn't always show a description snippet on the listing page, so we'll use N/A
-            description = "N/A"
-
-            # Extract job URL (if available)
-            url = title_elem["href"] if title_elem and "href" in title_elem.attrs else "N/A"
-            if url and not url.startswith("http"):
-                url = "https://www.careerbuilder.com" + url
-
-            jobs.append({
-                "major": major,
-                "title": title,
-                "company": company,
-                "location": location,
-                "description": description,
-                "url": url
-            })
-
-        print(f"Found {len(job_cards)} job cards for {major}")
-        print(f"Extracted {len(jobs)} jobs for {major}")
-        return jobs
+        print(f"Extracted {len(filtered_jobs)} jobs for {major}")
+        return filtered_jobs
     except requests.exceptions.RequestException as e:
         print(f"Error fetching jobs for {major}: {e}")
         return []
