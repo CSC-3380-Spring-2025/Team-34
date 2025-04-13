@@ -16,6 +16,15 @@ from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileT
 import base64
 import re
 
+# Load environment variables from .env file (for local development only)
+# On Streamlit Cloud, secrets are automatically available as environment variables
+if not os.getenv("IS_STREAMLIT_CLOUD", False):  # Check if running on Streamlit Cloud
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass  # python-dotenv not needed on Streamlit Cloud
+
 # Set page configuration
 st.set_page_config(page_title="📊 Datastore CSV Dashboard", layout="wide")
 
@@ -128,8 +137,8 @@ if files:
                                     )
                                     message.attachment = attachment
 
-                                    # Send email via SendGrid with new API key
-                                    sg = SendGridAPIClient('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')
+                                    # Send email via SendGrid
+                                    sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
                                     response = sg.send(message)
 
                                     if response.status_code == 202:
@@ -245,8 +254,8 @@ if st.session_state.logged_in:
                                 )
                                 message.attachment = attachment
 
-                                # Send email via SendGrid with new API key
-                                sg = SendGridAPIClient('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')
+                                # Send email via SendGrid
+                                sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
                                 response = sg.send(message)
 
                                 if response.status_code == 202:
