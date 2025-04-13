@@ -17,6 +17,9 @@ from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileT
 import base64
 import re
 
+# Set page configuration (must be the first Streamlit command)
+st.set_page_config(page_title="📊 LSU Datastore", layout="wide")
+
 # Debug: Check if requests is installed, and attempt to install if missing
 try:
     import requests
@@ -38,9 +41,6 @@ if not os.getenv("IS_STREAMLIT_CLOUD", False):
         load_dotenv()
     except ImportError:
         pass
-
-# Set page configuration
-st.set_page_config(page_title="📊 LSU Datastore", layout="wide")
 
 # Determine color scheme based on login status
 if st.session_state.get('logged_in', False):
