@@ -39,7 +39,7 @@ if not os.getenv("IS_STREAMLIT_CLOUD", False):
 # API keys
 CORE_API_KEY = "X5FGZ97Z5ArOReiB5v02EDYToaLhupm"  # Retained as requested
 CORESIGNAL_API_KEY = "eyJhbGciOiJFZERTQSIsImtpZCI6ImE0OTQzN2UyLTUzMzUtOTRkNy05MGUwLTQxMGMyYWZjYWIyYyJ9.eyJhdWQiOiJjb2Rld2lsbGluZy5jb20iLCJleHAiOjE3NzYxNDQxOTIsImlhdCI6MTc0NDU4NzI0MCwiaXNzIjoiaHR0cHM6Ly9vcHMuY29yZXNpZ25hbC5jb206ODMwMC92MS9pZGVudGl0eS9vaWRjIiwibmFtZXNwYWNlIjoicm9vdCIsInByZWZlcnJlZF91c2VybmFtZSI6ImNvZGV3aWxsaW5nLmNvbSIsInN1YiI6Ijk3ODhkODk2LTI3MGMtNTg2OC0xNjQyLTkxYWJkOTQwYTA4NiIsInVzZXJpbmZvIjp7InNjb3BlcyI6ImNkYXBpIn19.8EAJWYvklPS2lAIoPmK3tRwIV5NWXSnBfQrA2C-vm-XSEAy6myDw5Wc9o_CPCNXhzg9UdBbeegkYoh5sBeaxDw"  # Hardcoded Coresignal API key
-CORESIGNAL_API_URL = "https://api.coresignal.com/cdapi/v1/linkedin/job/search/filter"  # Updated Coresignal API endpoint based on documentation
+CORESIGNAL_API_URL = "https://api.coresignal.com/cdapi/v1/professional_network/job/search/filter"  # Correct endpoint for job search
 MAJORS = ["software_engineering", "cloud_computing", "data_science"]
 
 # Initialize session state for terminal output
@@ -52,32 +52,31 @@ def fetch_jobs(major):
         # Construct Coresignal API request
         headers = {
             "Authorization": f"Bearer {CORESIGNAL_API_KEY}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Accept": "application/json"
         }
-        # Payload for searching jobs (adjusted based on Coresignal's API documentation)
+        # Payload for searching jobs
         payload = {
             "title": f"{major.replace('_', ' ')}",  # Search for jobs with the major in the title
-            "is_active": True,  # Fetch active job postings
-            "pagination": {
-                "limit": 10,  # Limit to 10 jobs per request
-                "offset": 0
-            }
+            "application_active": True,  # Fetch active job postings
+            "deleted": False  # Exclude deleted postings
         }
         print(f"Fetching jobs from Coresignal API: {CORESIGNAL_API_URL} with payload: {payload}")
         response = requests.post(CORESIGNAL_API_URL, headers=headers, json=payload, timeout=10)
         response.raise_for_status()  # Raises an HTTPError for bad responses
         print(f"Successfully fetched data for {major}, status code: {response.status_code}")
 
-        # Parse the JSON response (adjusted based on Coresignal's response structure)
+        # Parse the JSON response
         data = response.json()
-        jobs = data.get("data", [])  # Coresignal returns jobs in a "data" field
+        jobs = data.get("data", [])  # Coresignal typically returns jobs in a "data" field
 
         # Format the jobs to match our expected structure
         formatted_jobs = []
         for job in jobs:
-            # Check if the job is full-time (if the API supports such a field or description)
+            # Ensure the job is full-time by checking the employment_type or description
+            employment_type = job.get("employment_type", "").lower()
             description = job.get("description", "").lower()
-            if "full time" in description or "full-time" in description:
+            if employment_type == "full-time" or "full time" in description or "full-time" in description:
                 formatted_jobs.append({
                     "major": major,
                     "title": job.get("title", "N/A"),
