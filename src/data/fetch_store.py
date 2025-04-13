@@ -78,17 +78,14 @@ def fetch_research(major):
     except requests.RequestException as e:
         print(f"Error fetching research for {major}: {e}")
         return pd.DataFrame()
-   """Fetch research papers for a given major (using a placeholder API; replace with real API)."""
-   try:
+    try:
        # Placeholder: Replace with actual API (e.g., arXiv, Google Scholar)
        research_data = [
            {"title": f"Latest Trends in {major.capitalize()}", "authors": "John Doe", "publication_date": "2025-01-01", "url": "https://example.com"},
            {"title": f"Future of {major.capitalize()}", "authors": "Jane Smith", "publication_date": "2025-02-01", "url": "https://example.com"}
        ]
        return pd.DataFrame(research_data)
-
-
-   except Exception as e:
+    except Exception as e:
        print(f"Error fetching research for {major}: {e}")
        return pd.DataFrame()
 def fetch_lsu_courses(major):
@@ -120,9 +117,12 @@ def fetch_and_store_data():
         research_df = fetch_research(major)
         if not research_df.empty:
             save_to_csv_and_db(research_df, f"research_{major.replace(' ', '_')}_{today}.csv", "research", major)
-   """Fetch data for jobs, courses, and research, then save to CSV and database."""
-   today = datetime.now().strftime("%Y-%m-%d")
-   for major in MAJORS:
+        lsu_df=fetch_lsu_courses(major)
+        print(lsu_df)
+        if not lsu_df.empty:
+            save_to_csv_and_db(lsu_df, f"lsu_{major.replace(' ', '_')}_{today}.csv", "lsu", major)
+        today = datetime.now().strftime("%Y-%m-%d")
+    for major in MAJORS:
        print(f"Fetching data for {major} on {today}...")
 
 
