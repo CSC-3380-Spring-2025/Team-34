@@ -2,6 +2,7 @@ streamlit~=1.43.0
 plotly==5.20.0
 python-dotenv==1.0.1
 xlsxwriter==3.2.0
-sendgrid==6.11.0  # Add sendgrid (latest version as of now)
-pandas==2.2.3     # Add pandas (latest version as of now)
-requests==2.32.3  # Added requests
+sendgrid==6.11.0
+pandas==2.2.3
+requests==2.32.3
+bs4==0.0.2  # Added BeautifulSoup
