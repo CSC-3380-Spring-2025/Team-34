@@ -147,12 +147,12 @@ if st.session_state.logged_in:
     files = get_files()
     if files:
         file_options = {file_id: filename for file_id, filename, _, _, _ in files}
-        selected_file_id = st.selectbox("📂 Select a file to preview: ", options=file_options.keys(), format_func=lambda x: file_options[x])
+        selected_file_id = st.selectbox("📂 Select a file to preview:", options=file_options.keys(), format_func=lambda x: file_options[x])
         if selected_file_id:
             df = get_csv_preview(selected_file_id)
             if not df.empty:
                 search_query = st.text_input("🔍 Search CSV Data", key="search_query_main")
-                sort_column = st.selectbox("🔽 Sort by Column", df.columns)
+                sort_column = st.selectbox("🔽 Sort by Column", df.columns, key="select_column")
                 df = df.sort_values(by=sort_column)
                 if search_query:
                     df = df[df.apply(lambda row: row.astype(str).str.contains(search_query, case=False).any(), axis=1)]
