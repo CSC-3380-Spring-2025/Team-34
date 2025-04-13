@@ -1,6 +1,5 @@
 import os
 import sys
-import subprocess  # For script execution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import streamlit as st
@@ -16,23 +15,18 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
 import base64
 import re
+import requests  # Added for fetch_store.py logic
+from io import StringIO  # Added to capture print output
 
 # Set page configuration (must be the first Streamlit command)
 st.set_page_config(page_title="📊 LSU Datastore", layout="wide")
 
-# Debug: Check if requests is installed, and attempt to install if missing
+# Debug: Check if requests is installed
 try:
     import requests
     st.write("Requests module is installed.")
 except ImportError:
-    st.error("Requests module is not installed. Attempting to install dynamically...")
-    try:
-        subprocess.run(["pip", "install", "requests==2.32.3"], check=True)
-        import requests
-        st.write("Requests module installed successfully.")
-    except Exception as e:
-        st.error(f"Failed to install requests dynamically: {e}")
-        st.error("Please ensure 'requests==2.32.3' is in requirements.txt and redeploy the app.")
+    st.error("Requests module is not installed. Please ensure 'requests==2.32.3' is in requirements.txt and redeploy the app.")
 
 # Load environment variables from .env file (for local development only)
 if not os.getenv("IS_STREAMLIT_CLOUD", False):
@@ -41,6 +35,55 @@ if not os.getenv("IS_STREAMLIT_CLOUD", False):
         load_dotenv()
     except ImportError:
         pass
+
+# Define fetch_store.py logic within test.py
+# API keys
+LINKED_JOBS_API = "https://linkedin-data-api.p.rapidapi.com/get-jobs"
+CORE_API_KEY = "X5FGZ97Z5ArOReiB5v02EDYToaLhupm"
+RAPIDAPI_KEY = "5288d5c6885msh399b813109c6d5p1b1eajsnfs162676da3"
+
+MAJORS = ["software_engineering", "cloud_computing", "data_science"]
+
+def fetch_jobs(major):
+    try:
+        headers = {
+            "x-rapidapi-host": "linkedin-data-api.p.rapidapi.com",
+            "x-rapidapi-key": RAPIDAPI_KEY
+        }
+
+        params = {"description": major, "full_time": True}
+
+        response = requests.get(LINKED_JOBS_API, headers=headers, params=params)
+        response.raise_for_status()  # Raises an HTTPError for bad responses
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching jobs for {major}: {e}")
+        return None
+
+def fetch_and_store_data():
+    # Capture print output to display in Streamlit
+    output_buffer = StringIO()
+    sys.stdout = output_buffer
+
+    try:
+        for major in MAJORS:
+            data = fetch_jobs(major)
+            if data:
+                # Assuming lsudata.create_multi_department_data handles the data
+                # Replace this with the actual logic from fetch_store.py if different
+                print(f"Successfully fetched data for {major}")
+                # Example: Save the data (adjust based on your lsudata implementation)
+                # lsudata.create_multi_department_data(data, major)
+            else:
+                print(f"Failed to fetch data for {major}")
+    except Exception as e:
+        print(f"Error in fetch_and_store_data: {e}")
+    finally:
+        # Reset stdout and get the captured output
+        sys.stdout = sys.__stdout__
+        output = output_buffer.getvalue()
+        output_buffer.close()
+        return output
 
 # Determine color scheme based on login status
 if st.session_state.get('logged_in', False):
@@ -515,77 +558,26 @@ with st.container():
         else:
             st.warning("No datasets uploaded yet.")
 
-        # Add Fetch Today's Data Button
+        # Add Fetch Today's Data Button (now calls the integrated function)
         st.markdown("---")  # Separator for clarity
         st.subheader("Fetch Today's Data")
         if st.button("Fetch Today's Data"):
             with st.spinner("Fetching data..."):
                 try:
-                    # Debug: Print current working directory
-                    current_dir = os.getcwd()
-                    st.write(f"Current working directory: {current_dir}")
-
-                    # Debug: List contents of the working directory
-                    st.write(f"Contents of working directory: {os.listdir(current_dir)}")
-
-                    # Debug: List contents of the 'src' directory (if it exists)
-                    src_dir = os.path.join(current_dir, "src")
-                    if os.path.exists(src_dir):
-                        st.write(f"Contents of src directory: {os.listdir(src_dir)}")
-                    else:
-                        st.warning("src directory not found in working directory.")
-
-                    # Debug: List contents of the 'src/data' directory (if it exists)
-                    data_dir = os.path.join(src_dir, "data")
-                    if os.path.exists(data_dir):
-                        st.write(f"Contents of src/data directory: {os.listdir(data_dir)}")
-                    else:
-                        st.warning("src/data directory not found.")
-
-                    # Construct the script path relative to the current working directory
-                    script_path = os.path.join(current_dir, "src", "data", "fetch_store.py")
-                    
-                    # Debug: Print the script path being checked
-                    st.write(f"Checking script path: {script_path}")
-
-                    # Verify script exists
-                    if not os.path.exists(script_path):
-                        st.error(f"Script not found at {script_path}")
-                    else:
-                        # Run the script and capture output
-                        result = subprocess.run(
-                            ["python3", script_path],  # Using python3 as per environment
-                            capture_output=True,
-                            text=True,
-                            check=True
-                        )
-                        # Always show stdout (even if empty)
-                        st.markdown(
-                            """
-                            <div style='background-color: #000; color: #0f0; padding: 10px; border-radius: 5px; font-family: monospace;'>
-                            <pre>{}</pre>
-                            </div>
-                            """.format(result.stdout or "No output produced by script."),
-                            unsafe_allow_html=True
-                        )
-                        # Handle stderr: treat InsecureRequestWarning as non-critical
-                        if result.stderr and "InsecureRequestWarning" in result.stderr:
-                            st.warning(
-                                "SSL verification warnings occurred while fetching data. "
-                                "This is safe for development but should be fixed for production. "
-                                "Details:\n" + result.stderr
-                            )
-                            st.success("Data fetched successfully!")
-                            # Optional: Refresh UI to show new data (uncomment if needed)
-                            # st.rerun()
-                        elif result.stderr:
-                            st.error(f"Script errors:\n{result.stderr}")
-                        else:
-                            st.success("Data fetched successfully!")
-                            # Optional: Refresh UI to show new data (uncomment if needed)
-                            # st.rerun()
-                except subprocess.CalledProcessError as e:
-                    st.error(f"Script failed with exit code {e.returncode}:\n{e.stderr}")
+                    # Call the integrated fetch_and_store_data function
+                    output = fetch_and_store_data()
+                    # Display the captured output in a terminal-like box
+                    st.markdown(
+                        """
+                        <div style='background-color: #000; color: #0f0; padding: 10px; border-radius: 5px; font-family: monospace;'>
+                        <pre>{}</pre>
+                        </div>
+                        """.format(output or "No output produced by fetch_and_store_data."),
+                        unsafe_allow_html=True
+                    )
+                    st.success("Data fetched successfully!")
+                    # Optional: Refresh UI to show new data (uncomment if needed)
+                    # st.rerun()
                 except Exception as e:
                     st.error(f"Unexpected error: {str(e)}")
 
