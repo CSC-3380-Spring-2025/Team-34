@@ -305,21 +305,31 @@ with st.container():
         - **Manage Data**: Upload, edit, and delete datasets (requires login).
     """)
 
-    # Livestream Data Store Section with Filters
+    # Livestream Data Store Section with Filters and Calendar
     st.subheader("LSU Datastore - Livestream Data Store")
-    st.markdown("View the latest Jobs, Courses, and Research Projects for today.")
-    today = datetime.now().strftime("%Y-%m-%d")
+    st.markdown("Select a date to view Jobs, Courses, and Research Projects for that day.")
+
+    # Calendar widget for date selection
+    selected_date = st.date_input("Select a date:", value=datetime.now(), key="date_select")
+    formatted_date = selected_date.strftime("%Y-%m-%d")
+
     files = get_files()
     if files:
         file_options = {}
         for file_id, filename, _, _, _ in files:
-            if today in filename and selected_major in filename and selected_category in filename:
+            # Check if the filename contains the selected date, major, and category
+            if formatted_date in filename and selected_major in filename and selected_category in filename:
                 file_options[file_id] = filename
 
         if file_options:
             col1, col2 = st.columns([3, 1])
             with col1:
-                selected_file_id = st.selectbox("Select a dataset to preview:", options=file_options.keys(), format_func=lambda x: file_options[x], key="live_select")
+                selected_file_id = st.selectbox(
+                    "Select a dataset to preview:",
+                    options=file_options.keys(),
+                    format_func=lambda x: file_options[x],
+                    key="live_select"
+                )
                 if selected_file_id:
                     df = get_csv_preview(selected_file_id)
                     if not df.empty:
@@ -375,7 +385,7 @@ with st.container():
                 except FileNotFoundError:
                     st.warning("Image not found. Please add 'lsu_logo.png' to your project directory.")
         else:
-            st.warning(f"No {selected_category.capitalize()} data available for {selected_major.replace('_', ' ').capitalize()} today ({today}).")
+            st.warning(f"No {selected_category.capitalize()} data available for {selected_major.replace('_', ' ').capitalize()} on {formatted_date}.")
     else:
         st.warning("No datasets uploaded yet.")
 
