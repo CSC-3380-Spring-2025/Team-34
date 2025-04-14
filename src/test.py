@@ -39,12 +39,58 @@ if not os.getenv("IS_STREAMLIT_CLOUD", False):
 # API keys
 CORE_API_KEY = "X5FGZ97Z5ArOReiB5v02EDYToaLhupm"  # Retained as requested
 CORESIGNAL_API_KEY = "eyJhbGciOiJFZERTQSIsImtpZCI6ImE0OTQzN2UyLTUzMzUtOTRkNy05MGUwLTQxMGMyYWZjYWIyYyJ9.eyJhdWQiOiJjb2Rld2lsbGluZy5jb20iLCJleHAiOjE3NzYxNDQxOTIsImlhdCI6MTc0NDU4NzI0MCwiaXNzIjoiaHR0cHM6Ly9vcHMuY29yZXNpZ25hbC5jb206ODMwMC92MS9pZGVudGl0eS9vaWRjIiwibmFtZXNwYWNlIjoicm9vdCIsInByZWZlcnJlZF91c2VybmFtZSI6ImNvZGV3aWxsaW5nLmNvbSIsInN1YiI6Ijk3ODhkODk2LTI3MGMtNTg2OC0xNjQyLTkxYWJkOTQwYTA4NiIsInVzZXJpbmZvIjp7InNjb3BlcyI6ImNkYXBpIn19.8EAJWYvklPS2lAIoPmK3tRwIV5NWXSnBfQrA2C-vm-XSEAy6myDw5Wc9o_CPCNXhzg9UdBbeegkYoh5sBeaxDw"  # Hardcoded Coresignal API key
-CORESIGNAL_API_URL = "https://api.coresignal.com/cdapi/v1/professional_network/job/search/filter"  # Updated endpoint
+CORESIGNAL_API_URL = "https://api.coresignal.com/cdapi/v1/professional_network/job/search/filter"
 MAJORS = ["software_engineering", "cloud_computing", "data_science"]
 
 # Initialize session state for terminal output
 if 'terminal_output' not in st.session_state:
     st.session_state.terminal_output = ""
+
+# Static fallback job data
+STATIC_JOBS = {
+    "software_engineering": [
+        {
+            "major": "software_engineering",
+            "title": "Software Engineer",
+            "company": "Tech Corp",
+            "location": "San Francisco, CA",
+            "description": "Full-time software engineering role developing web applications.",
+            "url": "https://techcorp.com/jobs/123",
+            "employment_type": "full-time"
+        },
+        {
+            "major": "software_engineering",
+            "title": "Backend Developer",
+            "company": "Innovate Inc",
+            "location": "Remote",
+            "description": "Full-time position building scalable APIs.",
+            "url": "https://innovateinc.com/careers/456",
+            "employment_type": "full-time"
+        }
+    ],
+    "cloud_computing": [
+        {
+            "major": "cloud_computing",
+            "title": "Cloud Architect",
+            "company": "Cloud Solutions",
+            "location": "Seattle, WA",
+            "description": "Design full-time cloud infrastructure using AWS.",
+            "url": "https://cloudsolutions.com/jobs/789",
+            "employment_type": "full-time"
+        }
+    ],
+    "data_science": [
+        {
+            "major": "data_science",
+            "title": "Data Scientist",
+            "company": "Data Analytics Ltd",
+            "location": "New York, NY",
+            "description": "Full-time role analyzing large datasets.",
+            "url": "https://dataanalytics.com/careers/101",
+            "employment_type": "full-time"
+        }
+    ]
+}
 
 def fetch_jobs(major):
     try:
@@ -71,40 +117,51 @@ def fetch_jobs(major):
         print(f"Raw API response for {major}: {job_ids}")
 
         if not isinstance(job_ids, list):
-            print(f"Unexpected response type for {major}: {type(job_ids)}")
-            return []
+            print(f"Unexpected response type for {major}: {type(job_ids)}. Falling back to static data.")
+            return STATIC_JOBS.get(major, [])
 
         # Fetch details for each job ID
         formatted_jobs = []
-        for i, job_id in enumerate(job_ids[:10]):  # Limit to 10 jobs to avoid rate limits
+        for i, job_id in enumerate(job_ids[:5]):  # Limit to 5 jobs to avoid rate limits
             print(f"Fetching details for job ID {job_id}...")
-            # Construct request for job details
-            job_url = f"https://api.coresignal.com/cdapi/v1/professional_network/job/{job_id}"
-            job_response = requests.get(job_url, headers=headers, timeout=10)
-            job_response.raise_for_status()
-            job_data = job_response.json()
-            print(f"Job details for ID {job_id}: {job_data}")
+            # Try a corrected job details endpoint
+            job_url = f"https://api.coresignal.com/cdapi/v1/professional_network/job/detail/{job_id}"
+            try:
+                job_response = requests.get(job_url, headers=headers, timeout=10)
+                job_response.raise_for_status()
+                job_data = job_response.json()
+                print(f"Job details for ID {job_id}: {job_data}")
 
-            # Ensure the job is full-time
-            employment_type = job_data.get("employment_type", "").lower()
-            description = job_data.get("description", "").lower()
-            if employment_type == "full-time" or "full time" in description or "full-time" in description:
-                formatted_jobs.append({
-                    "major": major,
-                    "title": job_data.get("title", "N/A"),
-                    "company": job_data.get("company_name", "N/A"),
-                    "location": job_data.get("location", "N/A"),
-                    "description": job_data.get("description", "N/A"),
-                    "url": job_data.get("url", "N/A")
-                })
+                # Ensure the job is full-time
+                employment_type = job_data.get("employment_type", "").lower()
+                description = job_data.get("description", "").lower()
+                if employment_type == "full-time" or "full time" in description or "full-time" in description:
+                    formatted_jobs.append({
+                        "major": major,
+                        "title": job_data.get("title", "N/A"),
+                        "company": job_data.get("company_name", "N/A"),
+                        "location": job_data.get("location", "N/A"),
+                        "description": job_data.get("description", "N/A"),
+                        "url": job_data.get("url", "N/A")
+                    })
+            except requests.exceptions.HTTPError as e:
+                print(f"HTTP error for job ID {job_id}: {e}. Response: {job_response.text}")
+                continue
+            except requests.exceptions.RequestException as e:
+                print(f"Request error for job ID {job_id}: {e}")
+                continue
             # Add delay to respect rate limits
-            time.sleep(1)  # 1 second delay between requests
+            time.sleep(1)
+
+        if not formatted_jobs:
+            print(f"No valid jobs fetched for {major}. Falling back to static data.")
+            return STATIC_JOBS.get(major, [])
 
         print(f"Extracted {len(formatted_jobs)} jobs for {major}")
         return formatted_jobs
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching jobs for {major}: {e}")
-        return []
+        print(f"Error fetching jobs for {major}: {e}. Falling back to static data.")
+        return STATIC_JOBS.get(major, [])
 
 def fetch_and_store_data():
     # Capture print output to display in Streamlit
