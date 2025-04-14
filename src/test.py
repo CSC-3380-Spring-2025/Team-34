@@ -15,18 +15,6 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
 import base64
 import re
-import requests
-from io import StringIO
-
-# Set page configuration (must be the first Streamlit command)
-st.set_page_config(page_title="📊 LSU Datastore", layout="wide")
-
-# Debug: Check if requests is installed
-try:
-    import requests
-    st.write("Requests module is installed.")
-except ImportError:
-    st.error("Requests module is not installed. Please ensure 'requests==2.32.3' is in requirements.txt and redeploy the app.")
 
 # Load environment variables from .env file (for local development only)
 if not os.getenv("IS_STREAMLIT_CLOUD", False):
@@ -36,175 +24,8 @@ if not os.getenv("IS_STREAMLIT_CLOUD", False):
     except ImportError:
         pass
 
-# API keys
-CORE_API_KEY = "X5FGZ97Z5ArOReiB5v02EDYToaLhupm"  # Retained as requested
-CORESIGNAL_API_KEY = "eyJhbGciOiJFZERTQSIsImtpZCI6ImE0OTQzN2UyLTUzMzUtOTRkNy05MGUwLTQxMGMyYWZjYWIyYyJ9.eyJhdWQiOiJjb2Rld2lsbGluZy5jb20iLCJleHAiOjE3NzYxNDQxOTIsImlhdCI6MTc0NDU4NzI0MCwiaXNzIjoiaHR0cHM6Ly9vcHMuY29yZXNpZ25hbC5jb206ODMwMC92MS9pZGVudGl0eS9vaWRjIiwibmFtZXNwYWNlIjoicm9vdCIsInByZWZlcnJlZF91c2VybmFtZSI6ImNvZGV3aWxsaW5nLmNvbSIsInN1YiI6Ijk3ODhkODk2LTI3MGMtNTg2OC0xNjQyLTkxYWJkOTQwYTA4NiIsInVzZXJpbmZvIjp7InNjb3BlcyI6ImNkYXBpIn19.8EAJWYvklPS2lAIoPmK3tRwIV5NWXSnBfQrA2C-vm-XSEAy6myDw5Wc9o_CPCNXhzg9UdBbeegkYoh5sBeaxDw"  # Hardcoded Coresignal API key
-CORESIGNAL_API_URL = "https://api.coresignal.com/cdapi/v1/professional_network/job/search/filter"
-MAJORS = ["software_engineering", "cloud_computing", "data_science"]
-
-# Initialize session state for terminal output
-if 'terminal_output' not in st.session_state:
-    st.session_state.terminal_output = ""
-
-# Static fallback job data
-STATIC_JOBS = {
-    "software_engineering": [
-        {
-            "major": "software_engineering",
-            "title": "Software Engineer",
-            "company": "Tech Corp",
-            "location": "San Francisco, CA",
-            "description": "Full-time software engineering role developing web applications.",
-            "url": "https://techcorp.com/jobs/123",
-            "employment_type": "full-time"
-        },
-        {
-            "major": "software_engineering",
-            "title": "Backend Developer",
-            "company": "Innovate Inc",
-            "location": "Remote",
-            "description": "Full-time position building scalable APIs.",
-            "url": "https://innovateinc.com/careers/456",
-            "employment_type": "full-time"
-        }
-    ],
-    "cloud_computing": [
-        {
-            "major": "cloud_computing",
-            "title": "Cloud Architect",
-            "company": "Cloud Solutions",
-            "location": "Seattle, WA",
-            "description": "Design full-time cloud infrastructure using AWS.",
-            "url": "https://cloudsolutions.com/jobs/789",
-            "employment_type": "full-time"
-        }
-    ],
-    "data_science": [
-        {
-            "major": "data_science",
-            "title": "Data Scientist",
-            "company": "Data Analytics Ltd",
-            "location": "New York, NY",
-            "description": "Full-time role analyzing large datasets.",
-            "url": "https://dataanalytics.com/careers/101",
-            "employment_type": "full-time"
-        }
-    ]
-}
-
-def fetch_jobs(major):
-    try:
-        print(f"Starting job fetch for {major}...")
-        # Construct Coresignal API request for search
-        headers = {
-            "Authorization": f"Bearer {CORESIGNAL_API_KEY}",
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        }
-        # Payload for searching jobs
-        payload = {
-            "title": f"{major.replace('_', ' ')}",
-            "application_active": True,
-            "deleted": False
-        }
-        print(f"Fetching job IDs from Coresignal API: {CORESIGNAL_API_URL} with payload: {payload}")
-        response = requests.post(CORESIGNAL_API_URL, headers=headers, json=payload, timeout=10)
-        response.raise_for_status()
-        print(f"Successfully fetched data for {major}, status code: {response.status_code}")
-
-        # Parse the JSON response (expecting a list of job IDs)
-        job_ids = response.json()
-        print(f"Raw API response for {major}: {job_ids}")
-
-        if not isinstance(job_ids, list):
-            print(f"Unexpected response type for {major}: {type(job_ids)}. Falling back to static data.")
-            return STATIC_JOBS.get(major, [])
-
-        # Fetch details for each job ID
-        formatted_jobs = []
-        for i, job_id in enumerate(job_ids[:5]):  # Limit to 5 jobs to avoid rate limits
-            print(f"Fetching details for job ID {job_id}...")
-            # Try a corrected job details endpoint
-            job_url = f"https://api.coresignal.com/cdapi/v1/professional_network/job/detail/{job_id}"
-            try:
-                job_response = requests.get(job_url, headers=headers, timeout=10)
-                job_response.raise_for_status()
-                job_data = job_response.json()
-                print(f"Job details for ID {job_id}: {job_data}")
-
-                # Ensure the job is full-time
-                employment_type = job_data.get("employment_type", "").lower()
-                description = job_data.get("description", "").lower()
-                if employment_type == "full-time" or "full time" in description or "full-time" in description:
-                    formatted_jobs.append({
-                        "major": major,
-                        "title": job_data.get("title", "N/A"),
-                        "company": job_data.get("company_name", "N/A"),
-                        "location": job_data.get("location", "N/A"),
-                        "description": job_data.get("description", "N/A"),
-                        "url": job_data.get("url", "N/A")
-                    })
-            except requests.exceptions.HTTPError as e:
-                print(f"HTTP error for job ID {job_id}: {e}. Response: {job_response.text}")
-                continue
-            except requests.exceptions.RequestException as e:
-                print(f"Request error for job ID {job_id}: {e}")
-                continue
-            # Add delay to respect rate limits
-            time.sleep(1)
-
-        if not formatted_jobs:
-            print(f"No valid jobs fetched for {major}. Falling back to static data.")
-            return STATIC_JOBS.get(major, [])
-
-        print(f"Extracted {len(formatted_jobs)} jobs for {major}")
-        return formatted_jobs
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching jobs for {major}: {e}. Falling back to static data.")
-        return STATIC_JOBS.get(major, [])
-
-def fetch_and_store_data():
-    # Capture print output to display in Streamlit
-    output_buffer = io.StringIO()
-    sys.stdout = output_buffer
-
-    try:
-        today = datetime.now().strftime("%Y-%m-%d")
-        for i, major in enumerate(MAJORS):
-            # Add a delay to avoid rate limits (e.g., 2 seconds between requests)
-            if i > 0:
-                print(f"Pausing for 2 seconds to avoid rate limits...")
-                time.sleep(2)
-
-            jobs = fetch_jobs(major)
-            if jobs:
-                # Convert the fetched jobs to a DataFrame
-                df = pd.DataFrame(jobs)
-                print(f"Created DataFrame with {len(df)} jobs for {major}")
-
-                # Create a CSV file for the current day and major
-                csv_filename = f"jobs_{major}_{today}.csv"
-                csv_buffer = io.StringIO()
-                df.to_csv(csv_buffer, index=False)
-                csv_data = csv_buffer.getvalue().encode('utf-8')
-                print(f"Generated CSV file: {csv_filename}")
-
-                # Save the CSV using your existing save_csv_data function
-                save_csv_data(csv_filename, csv_data, len(csv_data), "csv", 1)
-                print(f"Saved {len(df)} jobs to {csv_filename}")
-            else:
-                print(f"No jobs fetched for {major} to save.")
-
-    except Exception as e:
-        print(f"Error in fetch_and_store_data: {e}")
-    finally:
-        # Reset stdout and get the captured output
-        sys.stdout = sys.__stdout__
-        output = output_buffer.getvalue()
-        output_buffer.close()
-        # Store the output in session state for persistence
-        st.session_state.terminal_output = output
-        return output
+# Set page configuration
+st.set_page_config(page_title="📊 LSU Datastore", layout="wide")
 
 # Determine color scheme based on login status
 if st.session_state.get('logged_in', False):
@@ -245,7 +66,7 @@ st.markdown(f"""
         .main {{
             background-color: {main_background};
             padding: 40px;
-            margin: 0 20px;  /* Adjusted margin to reduce top spacing */
+            margin: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }}
@@ -365,12 +186,6 @@ st.markdown(f"""
                 box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
             }}
         }}
-
-        /* Ensure no extra white space below ticker */
-        .stMarkdown, .stMarkdown > div, .stMarkdown > div > div {{
-            margin: 0 !important;
-            padding: 0 !important;
-        }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -432,13 +247,6 @@ with st.sidebar:
             st.session_state.show_lsu_datastore = False
             st.rerun()
 
-# Fetch files for the ticker as early as possible to minimize delay
-files = get_files()
-ticker_text = " | ".join([filename for _, filename, _, _, _ in files]) if files else "No datasets available"
-
-# Debug: Print the list of files fetched
-print(f"Fetched files for ticker: {[filename for _, filename, _, _, _ in files]}")
-
 # Main Content Area
 with st.container():
     # Demo Label at the Top
@@ -449,51 +257,7 @@ with st.container():
         </div>
     """, unsafe_allow_html=True)
 
-    # Stock Ticker for All CSV Filenames (adjusted to remove extra white box below)
-    st.markdown(f"""
-        <style>
-            .ticker-container {{
-                background-color: {main_background};
-                color: {primary_color};
-                padding: 15px;
-                border-radius: 8px;
-                overflow: hidden;
-                width: 80%;
-                margin: 0 auto;  /* Centered with no extra spacing */
-                text-align: center;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                line-height: 1;  /* Tighten line height */
-                display: inline-block;  /* Prevent extra space */
-            }}
-            .ticker {{
-                display: inline-block;
-                white-space: nowrap;
-                animation: scroll 60s linear infinite;
-                font-size: 24px;
-                font-weight: bold;
-                font-family: 'Roboto', sans-serif;
-                margin: 0;
-                padding: 0;
-            }}
-            .ticker:hover {{
-                animation-play-state: paused;
-            }}
-            @keyframes scroll {{
-                0% {{ transform: translateX(100%); }}
-                100% {{ transform: translateX(-100%); }}
-            }}
-            /* Remove any Streamlit-added spacing */
-            .stMarkdown + .stMarkdown {{
-                margin-top: 0 !important;
-            }}
-        </style>
-        <div class="ticker-container">
-            <div class="ticker">{ticker_text}</div>
-        </div>
-    """, unsafe_allow_html=True)
-
-    # Main content area starts immediately after ticker
-    st.markdown('<div class="main" style="margin-top: 0;">', unsafe_allow_html=True)
+    st.markdown('<div class="main">', unsafe_allow_html=True)
 
     # Header Section
     st.header("LSU Datastore")
@@ -545,6 +309,7 @@ with st.container():
     st.subheader("LSU Datastore - Livestream Data Store")
     st.markdown("View the latest Jobs, Courses, and Research Projects for today.")
     today = datetime.now().strftime("%Y-%m-%d")
+    files = get_files()
     if files:
         file_options = {}
         for file_id, filename, _, _, _ in files:
@@ -566,7 +331,7 @@ with st.container():
                         email_input = st.text_input("Enter your email address:", key="email_live")
                         if st.button("Send Data", key="send_live"):
                             if email_input:
-                                email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA.Z0-9-]+\.[a-zA.Z0-9-.]+$'
+                                email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
                                 if not re.match(email_regex, email_input):
                                     st.error("Invalid email address format.")
                                 else:
@@ -605,7 +370,10 @@ with st.container():
                     else:
                         st.error("No data found in the selected dataset.")
             with col2:
-                pass  # Already removed the white box in the previous update
+                try:
+                    st.image(os.path.join(base_dir, "lsu_logo.png"), caption="LSU Datastore Process", use_container_width=True, output_format="PNG")
+                except FileNotFoundError:
+                    st.warning("Image not found. Please add 'lsu_logo.png' to your project directory.")
         else:
             st.warning(f"No {selected_category.capitalize()} data available for {selected_major.replace('_', ' ').capitalize()} today ({today}).")
     else:
@@ -632,18 +400,6 @@ with st.container():
             st.dataframe(pd.DataFrame(results, columns=["File ID", "Row", "Column", "Value"]))
         else:
             st.warning("No matches found.")
-
-    # Display the persisted terminal output (if any)
-    if st.session_state.terminal_output:
-        st.subheader("Previous Fetch Output")
-        st.markdown(
-            """
-            <div style='background-color: #000; color: #0f0; padding: 10px; border-radius: 5px; font-family: monospace;'>
-            <pre>{}</pre>
-            </div>
-            """.format(st.session_state.terminal_output or "No previous output available."),
-            unsafe_allow_html=True
-        )
 
     # Manage Data Section (visible after login)
     if st.session_state.logged_in:
@@ -693,31 +449,6 @@ with st.container():
                     st.error("No data found in the selected dataset.")
         else:
             st.warning("No datasets uploaded yet.")
-
-        # Add Fetch Today's Data Button (now calls the integrated function)
-        st.markdown("---")  # Separator for clarity
-        st.subheader("Fetch Today's Data")
-        if st.button("Fetch Today's Data"):
-            with st.spinner("Fetching data..."):
-                try:
-                    # Call the integrated fetch_and_store_data function
-                    output = fetch_and_store_data()
-                    # Display the captured output in a terminal-like box
-                    st.markdown(
-                        """
-                        <div style='background-color: #000; color: #0f0; padding: 10px; border-radius: 5px; font-family: monospace;'>
-                        <pre>{}</pre>
-                        </div>
-                        """.format(output or "No output produced by fetch_and_store_data."),
-                        unsafe_allow_html=True
-                    )
-                    st.success("Data fetched successfully! Page will refresh in 5 seconds to show new data...")
-                    # Delay the refresh to allow reading the output
-                    time.sleep(5)
-                    # Refresh UI to show new data
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Unexpected error: {str(e)}")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
