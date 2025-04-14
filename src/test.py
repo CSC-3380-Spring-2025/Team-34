@@ -39,7 +39,7 @@ if not os.getenv("IS_STREAMLIT_CLOUD", False):
 # API keys
 CORE_API_KEY = "X5FGZ97Z5ArOReiB5v02EDYToaLhupm"  # Retained as requested
 CORESIGNAL_API_KEY = "eyJhbGciOiJFZERTQSIsImtpZCI6ImE0OTQzN2UyLTUzMzUtOTRkNy05MGUwLTQxMGMyYWZjYWIyYyJ9.eyJhdWQiOiJjb2Rld2lsbGluZy5jb20iLCJleHAiOjE3NzYxNDQxOTIsImlhdCI6MTc0NDU4NzI0MCwiaXNzIjoiaHR0cHM6Ly9vcHMuY29yZXNpZ25hbC5jb206ODMwMC92MS9pZGVudGl0eS9vaWRjIiwibmFtZXNwYWNlIjoicm9vdCIsInByZWZlcnJlZF91c2VybmFtZSI6ImNvZGV3aWxsaW5nLmNvbSIsInN1YiI6Ijk3ODhkODk2LTI3MGMtNTg2OC0xNjQyLTkxYWJkOTQwYTA4NiIsInVzZXJpbmZvIjp7InNjb3BlcyI6ImNkYXBpIn19.8EAJWYvklPS2lAIoPmK3tRwIV5NWXSnBfQrA2C-vm-XSEAy6myDw5Wc9o_CPCNXhzg9UdBbeegkYoh5sBeaxDw"  # Hardcoded Coresignal API key
-CORESIGNAL_API_URL = "https://api.coresignal.com/cdapi/v1/professional_network/job/search/filter"  # Correct endpoint for job search
+CORESIGNAL_API_URL = "https://api.coresignal.com/cdapi/v1/professional_network/job/search/filter"  # Updated endpoint
 MAJORS = ["software_engineering", "cloud_computing", "data_science"]
 
 # Initialize session state for terminal output
@@ -49,7 +49,7 @@ if 'terminal_output' not in st.session_state:
 def fetch_jobs(major):
     try:
         print(f"Starting job fetch for {major}...")
-        # Construct Coresignal API request
+        # Construct Coresignal API request for search
         headers = {
             "Authorization": f"Bearer {CORESIGNAL_API_KEY}",
             "Content-Type": "application/json",
@@ -57,46 +57,48 @@ def fetch_jobs(major):
         }
         # Payload for searching jobs
         payload = {
-            "title": f"{major.replace('_', ' ')}",  # Search for jobs with the major in the title
-            "application_active": True,  # Fetch active job postings
-            "deleted": False  # Exclude deleted postings
+            "title": f"{major.replace('_', ' ')}",
+            "application_active": True,
+            "deleted": False
         }
-        print(f"Fetching jobs from Coresignal API: {CORESIGNAL_API_URL} with payload: {payload}")
+        print(f"Fetching job IDs from Coresignal API: {CORESIGNAL_API_URL} with payload: {payload}")
         response = requests.post(CORESIGNAL_API_URL, headers=headers, json=payload, timeout=10)
-        response.raise_for_status()  # Raises an HTTPError for bad responses
+        response.raise_for_status()
         print(f"Successfully fetched data for {major}, status code: {response.status_code}")
 
-        # Parse the JSON response
-        data = response.json()
-        print(f"Raw API response for {major}: {data}")
+        # Parse the JSON response (expecting a list of job IDs)
+        job_ids = response.json()
+        print(f"Raw API response for {major}: {job_ids}")
 
-        # Handle different response types
-        if isinstance(data, int):
-            print(f"No jobs found for {major} (response is an integer: {data})")
-            return []
-        elif isinstance(data, dict):
-            jobs = data.get("data", [])  # Check for "data" key in dictionary
-        elif isinstance(data, list):
-            jobs = data  # Response is already a list of jobs
-        else:
-            print(f"Unexpected response type for {major}: {type(data)}")
+        if not isinstance(job_ids, list):
+            print(f"Unexpected response type for {major}: {type(job_ids)}")
             return []
 
-        # Format the jobs to match our expected structure
+        # Fetch details for each job ID
         formatted_jobs = []
-        for job in jobs:
-            # Ensure the job is full-time by checking the employment_type or description
-            employment_type = job.get("employment_type", "").lower()
-            description = job.get("description", "").lower()
+        for i, job_id in enumerate(job_ids[:10]):  # Limit to 10 jobs to avoid rate limits
+            print(f"Fetching details for job ID {job_id}...")
+            # Construct request for job details
+            job_url = f"https://api.coresignal.com/cdapi/v1/professional_network/job/{job_id}"
+            job_response = requests.get(job_url, headers=headers, timeout=10)
+            job_response.raise_for_status()
+            job_data = job_response.json()
+            print(f"Job details for ID {job_id}: {job_data}")
+
+            # Ensure the job is full-time
+            employment_type = job_data.get("employment_type", "").lower()
+            description = job_data.get("description", "").lower()
             if employment_type == "full-time" or "full time" in description or "full-time" in description:
                 formatted_jobs.append({
                     "major": major,
-                    "title": job.get("title", "N/A"),
-                    "company": job.get("company_name", "N/A"),
-                    "location": job.get("location", "N/A"),
-                    "description": job.get("description", "N/A"),
-                    "url": job.get("url", "N/A")
+                    "title": job_data.get("title", "N/A"),
+                    "company": job_data.get("company_name", "N/A"),
+                    "location": job_data.get("location", "N/A"),
+                    "description": job_data.get("description", "N/A"),
+                    "url": job_data.get("url", "N/A")
                 })
+            # Add delay to respect rate limits
+            time.sleep(1)  # 1 second delay between requests
 
         print(f"Extracted {len(formatted_jobs)} jobs for {major}")
         return formatted_jobs
@@ -507,7 +509,7 @@ with st.container():
                         email_input = st.text_input("Enter your email address:", key="email_live")
                         if st.button("Send Data", key="send_live"):
                             if email_input:
-                                email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA.Z0-9-.]+$'
+                                email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA.Z0-9-]+\.[a-zA.Z0-9-.]+$'
                                 if not re.match(email_regex, email_input):
                                     st.error("Invalid email address format.")
                                 else:
