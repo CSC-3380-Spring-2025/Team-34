@@ -279,8 +279,8 @@ with st.container():
         majors = ["software_engineering", "cloud_computing", "data_science"]
         selected_major = st.selectbox("Filter by Major:", majors, format_func=lambda x: x.replace("_", " ").capitalize())
     with col2:
-        categories = ["jobs", "courses", "research"]
-        selected_category = st.selectbox("Filter by Category:", categories, format_func=lambda x: x.capitalize())
+        categories = ["jobs", "courses", "research", "lsu"]
+        selected_category = st.selectbox("Filter by Category:", categories, format_func=lambda x: x.upper() if x == "lsu" else x.capitalize())
     st.markdown('</div>', unsafe_allow_html=True)
 
     # Summary Section
@@ -307,7 +307,7 @@ with st.container():
 
     # Livestream Data Store Section with Filters and Calendar
     st.subheader("LSU Datastore - Livestream Data Store")
-    st.markdown("Select a date to view Jobs, Courses, and Research Projects for that day.")
+    st.markdown("Select a date to view Jobs, Courses, Research Projects, or LSU-specific data for that day.")
 
     # Calendar widget for date selection
     selected_date = st.date_input("Select a date:", value=datetime.now(), key="date_select")
@@ -317,9 +317,19 @@ with st.container():
     if files:
         file_options = {}
         for file_id, filename, _, _, _ in files:
-            # Check if the filename contains the selected date, major, and category
-            if formatted_date in filename and selected_major in filename and selected_category in filename:
-                file_options[file_id] = filename
+            # Check if the filename matches the selected date, major, and category
+            if selected_category == "lsu":
+                # For "lsu" category, match files starting with "lsu"
+                if (filename.lower().startswith("lsu") and 
+                    formatted_date in filename and 
+                    selected_major in filename):
+                    file_options[file_id] = filename
+            else:
+                # For other categories, match as before
+                if (selected_category in filename and 
+                    formatted_date in filename and 
+                    selected_major in filename):
+                    file_options[file_id] = filename
 
         if file_options:
             col1, col2 = st.columns([3, 1])
@@ -385,7 +395,7 @@ with st.container():
                 except FileNotFoundError:
                     st.warning("Image not found. Please add 'lsu_logo.png' to your project directory.")
         else:
-            st.warning(f"No {selected_category.capitalize()} data available for {selected_major.replace('_', ' ').capitalize()} on {formatted_date}.")
+            st.warning(f"No {selected_category.upper() if selected_category == 'lsu' else selected_category.capitalize()} data available for {selected_major.replace('_', ' ').capitalize()} on {formatted_date}.")
     else:
         st.warning("No datasets uploaded yet.")
 
