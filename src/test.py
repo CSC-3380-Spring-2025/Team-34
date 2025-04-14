@@ -39,13 +39,13 @@ if st.session_state.get('logged_in', False):
     text_light_color = "#666666"
 else:
     # LSU Purple and Gold for pre-login state
-    background_color = "url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80')"  # Correct ocean background with gradient sky
-    main_background = "rgba(255, 255, 255, 0.9)"  # Semi-transparent white for readability
-    sidebar_background = "#461D7C"  # LSU Purple
-    primary_color = "#461D7C"  # LSU Purple
-    secondary_color = "#FABD00"  # LSU Gold for hover
-    text_color = "#000000"  # Black for better contrast
-    text_light_color = "#461D7C"  # LSU Purple for secondary text
+    background_color = "url('bck.jpg')"  # Local image background
+    main_background = "rgba(255, 255, 255, 0.9)"  # Semi-transparent white
+    sidebar_background = "#461D7C"
+    primary_color = "#461D7C"
+    secondary_color = "#FABD00"
+    text_color = "#000000"
+    text_light_color = "#461D7C"
 
 # Custom CSS with dynamic color scheme
 st.markdown(f"""
