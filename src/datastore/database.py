@@ -72,17 +72,22 @@ def save_csv_data(filename, content, file_size, file_format, user_id):
     cursor.execute("INSERT INTO files (filename, file_size, file_format, user_id) VALUES (?, ?, ?, ?)",
                    (filename, file_size, file_format, user_id))
     file_id = cursor.lastrowid
-
     # Read CSV content into Pandas
     csv_data = io.BytesIO(content)
     df = pd.read_csv(csv_data)
-
+    df.replace("emptyvalue","N/A",inplace=True)
     # Insert CSV data into csv_data table
     for row_idx, row in df.iterrows():
         for col_name, value in row.items():
             cursor.execute("INSERT INTO csv_data (file_id, row_number, column_name, value) VALUES (?, ?, ?, ?)",
                            (file_id, row_idx, col_name, str(value)))
-
+    cursor.execute("""CREATE TABLE IF NOT EXISTS csv_columns (
+    file_id INTEGER,
+    column_index INTEGER,
+    column_name TEXT
+    )""")
+    for col_idx, col_name in enumerate(df.columns):
+        cursor.execute("INSERT INTO csv_columns (file_id, column_index, column_name) VALUES (?, ?, ?)",(file_id, col_idx, col_name))
     conn.commit()
     conn.close()
 
@@ -102,11 +107,36 @@ def get_csv_preview(file_id):
     cursor.execute("SELECT row_number, column_name, value FROM csv_data WHERE file_id = ? ORDER BY row_number",
                    (file_id,))
     rows = cursor.fetchall()
-
     # Convert to DataFrame
     df = pd.DataFrame(rows, columns=["row_number", "column_name", "value"]).pivot(index="row_number",
                                                                                   columns="column_name",
                                                                                   values="value")
+    df=df.reset_index(drop=True)
+    cursor.execute("""
+    SELECT name FROM sqlite_master
+    WHERE type='table' AND name='csv_columns'
+    """)
+    table_exists = cursor.fetchone() is not None
+    has_column_order = False
+    if table_exists:
+        cursor.execute("""
+            SELECT COUNT(*) FROM csv_columns WHERE file_id = ?
+        """, (file_id,))
+        has_column_order = cursor.fetchone()[0] > 0
+    if has_column_order:
+        cursor.execute("""
+        SELECT column_name FROM csv_columns
+        WHERE file_id = ?
+        ORDER BY column_index
+        """, (file_id,))
+        ordered_columns = [row[0] for row in cursor.fetchall()]
+        df=df[ordered_columns]
+    df.columns = [col.replace("_", " ").title() for col in df.columns]
+    for col in df.columns:
+        non_na_values = df[col][df[col] != "N/A"]
+        converted = pd.to_numeric(non_na_values, errors="coerce")
+        if not converted.isna().any():
+            df[col] = pd.to_numeric(df[col],errors="coerce")
     conn.close()
     return df
 

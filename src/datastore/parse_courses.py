@@ -42,7 +42,6 @@ def parse_data(course_page):
         elif 'SESSION  C' in line:
             session='C'
             continue
-        print("got here")
         current_course: dict[str, str]={
             "available_spots": line[0:5].strip(),
             "capacity": line[5:11].strip(),
@@ -56,13 +55,15 @@ def parse_data(course_page):
             "days": line[72:79].strip(),
             "room": line[79:84].strip(),
             "building": line[84:100].strip(),
-            "spec": line[100:117].strip(),
+            "special_info": line[100:117].strip(),
             "instructor": line[117:].strip(),
             "session": session,
             "additional_meet_times":'',
             "additional_meet_days":'',
             "additional_notes":''
         }
+        if current_course['available_spots']=="(F)":
+            current_course['available_spots']=0
         course_string=current_course['prefix'] + ' ' + current_course['title']
         if course_string in queued_notes:
             current_course['additional_notes']=add_list_string(current_course['additional_notes'],queued_notes[course_string],' + ')
@@ -72,8 +73,8 @@ def parse_data(course_page):
                 course_data[-1]['type']=='LECLAB'
                 course_data[-1]['additional_meet_times']=add_list_string(course_data[-1]['additional_meet_times'],current_course['time'], ' + ')
                 course_data[-1]['additional_meet_days']=add_list_string(course_data[-1]['additional_meet_days'],current_course['days'], ' + ')
-            elif current_course['spec']!='':
-                course_data[-1]['spec'] = add_list_string(course_data[-1]['spec'],current_course['spec'], ' + ')
+            elif current_course['special_info']!='':
+                course_data[-1]['special_info'] = add_list_string(course_data[-1]['special_info'],current_course['special_info'], ' + ')
         else:
             course_data.append(current_course)
     return course_data
@@ -89,4 +90,4 @@ def create_csv(data,name):
     df.to_csv("{}.csv".format(name),index=False)
 
 if __name__ == '__main__':
-    create_parquet(parse_page('https://appl101.lsu.edu/booklet2.nsf/All/67FD57ECBF3676C486258BAC002C42AB?OpenDocument'), 'csc_courses')
+    create_csv(parse_page('https://appl101.lsu.edu/booklet2.nsf/All/67FD57ECBF3676C486258BAC002C42AB?OpenDocument'), 'csc_courses')
