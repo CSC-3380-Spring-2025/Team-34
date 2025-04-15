@@ -344,7 +344,7 @@ with st.container():
                     df = get_csv_preview(selected_file_id)
                     if not df.empty:
                         st.write(f"**Preview of {file_options[selected_file_id]}:**")
-                        st.dataframe(df)
+                        st.dataframe(df,hide_index=True)
 
                         # Email functionality
                         st.subheader("Share Data via Email")

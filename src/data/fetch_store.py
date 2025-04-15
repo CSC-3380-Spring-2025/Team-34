@@ -81,6 +81,7 @@ def save_to_db_only(dataframe, filename, user_id=1):
     if dataframe.empty:
         print(f"No data to save for {filename}")
         return
+    dataframe.replace('', "emptyvalue", inplace=True)
     file_content = dataframe.to_csv(index=False).encode("utf-8")
     save_csv_data(filename, file_content, len(file_content), "csv", user_id)
     print(f"Stored {filename} in database")
