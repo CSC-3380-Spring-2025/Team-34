@@ -86,8 +86,8 @@ st.markdown(f"""
             font-weight: bold !important;
         }}
         .stSidebar a, .stSidebar .stSelectbox label {{
-            color: {primary_color} !important;
-            text-decoration: none !important;
+            color: {secondary_color} !important;
+            text-decoration: underline !important;
             font-size: 14px !important;
         }}
         .stSidebar a:hover {{
@@ -137,7 +137,19 @@ st.markdown(f"""
         .stButton>button:hover {{
             background-color: {secondary_color};
         }}
-
+        /* Ensure sidebar buttons are always visible and yellow */
+        section[data-testid="stSidebar"] .stButton>button {{
+            background-color: {secondary_color} !important;  /* Yellow color for sidebar buttons */
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            margin-bottom: 10px !important;
+        }}
+        section[data-testid="stSidebar"] .stButton>button:hover {{
+            background-color: {secondary_color} !important;  /* Keep yellow on hover */
+            opacity: 1 !important;
+            visibility: visible !important;
+        }}
         /* Filter Dropdowns */
         .filter-container {{
             display: flex;
