@@ -329,6 +329,8 @@ with st.sidebar:
             st.session_state.username = username
             st.session_state.show_lsu_datastore = (username == "admin" and password == "NewSecurePassword123")
             st.sidebar.success(f"Logged in as {username}!")
+            # Debug session state
+            st.sidebar.write(f"Debug: logged_in={st.session_state.logged_in}, show_lsu_datastore={st.session_state.show_lsu_datastore}")
             st.rerun()
         else:
             st.sidebar.error("❌ Invalid credentials")
@@ -723,7 +725,7 @@ with st.container():
                         st.download_button("📅 Download Excel", data=excel_data, file_name=f"{file_options[selected_file_id]}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
                     if st.button("🗑 Delete This File"):
-                        delete_file(selected_file_id)
+                        delete_file(selected_file_idGeomery
                         st.success(f"File '{file_options[selected_file_id]}' deleted!")
                         st.rerun()
                 else:
