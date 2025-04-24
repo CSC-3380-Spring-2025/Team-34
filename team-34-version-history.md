@@ -8,3 +8,4 @@
 | 2025/04/23 | 1.0.5   | Christian Gamble | changed gitlink to team 34 on side bar. |
 | 2025/04/23 | 1.0.6   | Christian Gamble | added new requirements in text file. |
 | 2025/04/23 | 1.0.7   | Christian Gamble | updated README.md for data fetching. |
+| 2025/04/23 | 1.0.8   | Christian Gamble | added data related to topics for today using fetch_store.py in data folder. |
