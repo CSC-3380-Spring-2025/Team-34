@@ -7,6 +7,8 @@ from logging.handlers import TimedRotatingFileHandler
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
+
+
 import streamlit as st
 import pandas as pd
 import io
@@ -22,6 +24,8 @@ import base64
 import re
 
 
+
+
 # Custom MemoryHandler to store logs in memory for live display
 class MemoryHandler(logging.Handler):
     def __init__(self, capacity=1000):
@@ -31,6 +35,8 @@ class MemoryHandler(logging.Handler):
         self.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
 
 
+
+
     def emit(self, record):
         log_entry = self.format(record)
         self.logs.append(log_entry)
@@ -38,8 +44,12 @@ class MemoryHandler(logging.Handler):
             self.logs.pop(0)  # Remove oldest log to maintain capacity
 
 
+
+
     def get_logs(self):
         return self.logs
+
+
 
 
 # Setup logging
@@ -47,8 +57,12 @@ log_dir = os.path.join(os.path.dirname(__file__), "logs")
 os.makedirs(log_dir, exist_ok=True)  # Create logs directory if it doesn't exist
 
 
+
+
 logger = logging.getLogger("LiveFeedLogger")
 logger.setLevel(logging.INFO)
+
+
 
 
 # CSV formatter for logs (for file handler)
@@ -63,6 +77,8 @@ class CSVFormatter(logging.Formatter):
         return f"{timestamp},{username},{action},{details}"
 
 
+
+
 # Daily rotating file handler with header
 class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
     def doRollover(self):
@@ -72,11 +88,15 @@ class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
             f.write("Timestamp,Username,Action,Details\n")
 
 
+
+
 # File handler for CSV logs
 log_file = os.path.join(log_dir, "live_feed_log")
 file_handler = CustomTimedRotatingFileHandler(log_file, when="midnight", interval=1, backupCount=30, encoding="utf-8")
 file_handler.setFormatter(CSVFormatter())
 file_handler.suffix = "%Y-%m-%d.csv"  # Append date to log file
+
+
 
 
 # Write header to initial log file if it doesn't exist
@@ -85,19 +105,27 @@ if not os.path.exists(log_file + f".{datetime.now().strftime('%Y-%m-%d')}.csv"):
         f.write("Timestamp,Username,Action,Details\n")
 
 
+
+
 # StreamHandler for terminal output
 stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+
+
 
 
 # MemoryHandler for live display in Streamlit
 memory_handler = MemoryHandler(capacity=1000)
 
 
+
+
 # Add all handlers to logger
 logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 logger.addHandler(memory_handler)
+
+
 
 
 # Load environment variables from .env file (for local development only)
@@ -109,8 +137,12 @@ if not os.getenv("IS_STREAMLIT_CLOUD", False):
         pass
 
 
+
+
 # Set page configuration
 st.set_page_config(page_title="📊 LSU Datastore", layout="wide")
+
+
 
 
 # Determine color scheme based on login status
@@ -134,11 +166,15 @@ else:
     text_light_color = "#461D7C"
 
 
+
+
 # Custom CSS with dynamic color scheme and terminal styling
 st.markdown(f"""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+
 
 
         /* General Styling */
@@ -151,6 +187,8 @@ st.markdown(f"""
         }}
 
 
+
+
         /* Main content area */
         .main {{
             background-color: {main_background};
@@ -159,6 +197,8 @@ st.markdown(f"""
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }}
+
+
 
 
         /* Sidebar */
@@ -186,6 +226,8 @@ st.markdown(f"""
         }}
 
 
+
+
         /* Headers and text */
         h1, h2, h3 {{
             color: {text_color} !important;
@@ -209,12 +251,16 @@ st.markdown(f"""
         }}
 
 
+
+
         /* Images */
         .ras-image {{
             max-width: 100%;
             border: 2px solid {primary_color};
             border-radius: 8px;
         }}
+
+
 
 
         /* Buttons */
@@ -249,6 +295,8 @@ st.markdown(f"""
             gap: 20px;
             margin-bottom: 20px;
         }}
+
+
 
 
         /* Demo Label */
@@ -294,6 +342,8 @@ st.markdown(f"""
         }}
 
 
+
+
         /* Terminal-like log display */
         .terminal-log {{
             background-color: #000000;
@@ -313,6 +363,8 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 
+
+
 # Session state
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
@@ -322,10 +374,14 @@ if 'show_lsu_datastore' not in st.session_state:
     st.session_state.show_lsu_datastore = False
 
 
+
+
 # Sidebar Navigation (mimicking RasCore with updated links)
 with st.sidebar:
     st.header("DATABASE-RELATED LINKS")
-    st.markdown("[GitHub Page](https://github.com)")
+    st.markdown("[GitHub Page](https://github.com/CSC-3380-Spring-2025/Team-34)")
+
+
 
 
     st.header("SOFTWARE-RELATED LINKS")
@@ -342,6 +398,8 @@ with st.sidebar:
     st.markdown("[matplotlib](https://matplotlib.org/)")
     st.markdown("[seaborn](https://seaborn.pydata.org/)")
     st.markdown("[streamlit](https://streamlit.io/)")
+
+
 
 
     # Sidebar Login Panel
@@ -364,6 +422,8 @@ with st.sidebar:
             st.rerun()
 
 
+
+
     if st.session_state.logged_in:
         if st.button("Logout"):
             # Clear the page and show a loading spinner for 3 seconds
@@ -374,6 +434,8 @@ with st.sidebar:
             st.session_state.username = None
             st.session_state.show_lsu_datastore = False
             st.rerun()
+
+
 
 
 # Main Content Area
@@ -387,7 +449,11 @@ with st.container():
     """, unsafe_allow_html=True)
 
 
+
+
     st.markdown('<div class="main">', unsafe_allow_html=True)
+
+
 
 
     # Header Section
@@ -397,12 +463,16 @@ with st.container():
     st.markdown("Powered by Streamlit", unsafe_allow_html=True)
 
 
+
+
     # Placeholder for an image (replace with your actual image path)
     base_dir = os.path.dirname(__file__)
     try:
         st.image(os.path.join(base_dir, "lsu_data_icon.png"), caption="LSU Datastore Visualization", use_container_width=True, output_format="PNG")
     except FileNotFoundError:
         st.warning("Image not found. Please add 'lsu_data_icon.png' to your project directory.")
+
+
 
 
     # Filter Dropdowns (top left)
@@ -417,6 +487,8 @@ with st.container():
     st.markdown('</div>', unsafe_allow_html=True)
 
 
+
+
     # Summary Section
     st.subheader("Summary")
     st.markdown("""
@@ -427,10 +499,14 @@ with st.container():
     """)
 
 
+
+
     # Usage Section
     st.subheader("Usage")
     st.markdown("""
         To the left is a dropdown menu for navigating the LSU Datastore features:
+
+
 
 
         - **Home Page**: Overview of the LSU Datastore platform.
@@ -442,14 +518,20 @@ with st.container():
     """)
 
 
+
+
     # Livestream Data Store Section with Filters and Calendar
     st.subheader("LSU Datastore - Livestream Data Store")
     st.markdown("Select a date to view Jobs, Courses, Research Projects, or LSU-specific data for that day.")
 
 
+
+
     # Calendar widget for date selection
     selected_date = st.date_input("Select a date:", value=datetime.now(), key="date_select")
     formatted_date = selected_date.strftime("%Y-%m-%d")
+
+
 
 
     files = get_files()
@@ -469,6 +551,8 @@ with st.container():
                     formatted_date in filename and
                     selected_major in filename):
                     file_options[file_id] = filename
+
+
 
 
         if file_options:
@@ -494,6 +578,8 @@ with st.container():
                     if not df.empty:
                         st.write(f"**Preview of {file_options[selected_file_id]}:**")
                         st.dataframe(df, hide_index=True)
+
+
 
 
                         # Download Data Section
@@ -539,6 +625,8 @@ with st.container():
                                 )
 
 
+
+
                         # Email functionality
                         st.subheader("Share Data via Email")
                         email_input = st.text_input("Enter your email address:", key="email_live")
@@ -564,12 +652,16 @@ with st.container():
                                         encoded_file = base64.b64encode(csv_data).decode()
 
 
+
+
                                         message = Mail(
                                             from_email='bdav213@lsu.edu',
                                             to_emails=email_input,
                                             subject=f'LSU Datastore: {file_options[selected_file_id]} Data',
                                             html_content=f'<p>Attached is the data from {file_options[selected_file_id]} as viewed on the LSU Datastore Dashboard.</p>'
                                         )
+
+
 
 
                                         attachment = Attachment(
@@ -581,8 +673,12 @@ with st.container():
                                         message.attachment = attachment
 
 
+
+
                                         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
                                         response = sg.send(message)
+
+
 
 
                                         if response.status_code == 202:
@@ -642,6 +738,8 @@ with st.container():
         st.warning("No datasets uploaded yet.")
 
 
+
+
     # Data Visualization Section
     if files and file_options and selected_file_id and not df.empty:
         st.subheader("Visualize Data")
@@ -655,6 +753,8 @@ with st.container():
             st.warning("No numerical columns found for visualization.")
 
 
+
+
     # Search Data Section
     st.subheader("Search Data")
     global_search = st.text_input("Search across all datasets:")
@@ -664,6 +764,8 @@ with st.container():
             st.dataframe(pd.DataFrame(results, columns=["File ID", "Row", "Column", "Value"]))
         else:
             st.warning("No matches found.")
+
+
 
 
     # System Performance Metrics Section
@@ -678,6 +780,8 @@ with st.container():
                 st.metric("CPU Usage", f"{cpu_usage}%")
             with col2:
                 st.metric("Memory Usage", f"{memory_usage}%")
+
+
 
 
     # Live Feed Logs Section (visible after login)
@@ -711,6 +815,8 @@ with st.container():
             st.warning("No log files available.")
 
 
+
+
     # Live Terminal Logs Section (visible after login)
     if st.session_state.logged_in:
         st.subheader("Live Terminal Logs")
@@ -726,6 +832,8 @@ with st.container():
             time.sleep(1)  # Update every second
 
 
+
+
     # Manage Data Section (visible after login)
     if st.session_state.logged_in:
         st.subheader("Manage Data")
@@ -735,6 +843,8 @@ with st.container():
                 save_csv_data(uploaded_file.name, uploaded_file.getvalue(), len(uploaded_file.getvalue()), "csv", 1)
                 time.sleep(1)
             st.success(f"{uploaded_file.name} saved to the database!")
+
+
 
 
         if files:
@@ -747,11 +857,15 @@ with st.container():
                     st.dataframe(manage_df)
 
 
+
+
                     st.subheader("Edit Data")
                     edited_df = st.data_editor(manage_df)
                     if st.button("Save Changes"):
                         update_csv_data(manage_file_id, edited_df)
                         st.success("Changes saved!")
+
+
 
 
                     csv_data = manage_df.to_csv(index=False).encode("utf-8")
@@ -762,6 +876,8 @@ with st.container():
                     excel_data = output.getvalue()
 
 
+
+
                     col1, col2, col3 = st.columns(3)
                     with col1:
                         st.download_button("Download CSV", data=csv_data, file_name=f"{file_options[manage_file_id]}.csv", mime="text/csv")
@@ -769,6 +885,8 @@ with st.container():
                         st.download_button("Download JSON", data=json_data, file_name=f"{file_options[manage_file_id]}.json", mime="application/json")
                     with col3:
                         st.download_button("Download Excel", data=excel_data, file_name=f"{file_options[manage_file_id]}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+
 
 
                     if st.button("Delete This Dataset"):
@@ -781,7 +899,11 @@ with st.container():
             st.warning("No datasets uploaded yet.")
 
 
+
+
     st.markdown('</div>', unsafe_allow_html=True)
+
+
 
 
 # Link to DAG Grid
