@@ -64,10 +64,9 @@ def parse_data(course_page):
         }
         if current_course['available_spots']=="(F)":
             current_course['available_spots']=0
-        course_string=current_course['prefix'] + ' ' + current_course['title']
+        course_string=current_course['prefix'] + ' ' + current_course['course_number']
         if course_string in queued_notes:
-            current_course['additional_notes']=add_list_string(current_course['additional_notes'],queued_notes[course_string],' + ')
-            queued_notes.remove(course_string)
+            current_course['additional_notes']=add_list_string(current_course['additional_notes'],queued_notes.pop(course_string),' + ')
         if current_course['course_number']=='':
             if current_course['type']=='LAB':
                 course_data[-1]['type']=='LECLAB'
