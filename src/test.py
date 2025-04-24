@@ -725,7 +725,7 @@ with st.container():
                         st.download_button("📅 Download Excel", data=excel_data, file_name=f"{file_options[selected_file_id]}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
                     if st.button("🗑 Delete This File"):
-                        delete_file(selected_file_idGeomery
+                        delete_file(selected_file_idGeomery)
                         st.success(f"File '{file_options[selected_file_id]}' deleted!")
                         st.rerun()
                 else:
