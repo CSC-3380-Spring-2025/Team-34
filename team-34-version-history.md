@@ -12,3 +12,4 @@
 | 2025/04/23 | 1.0.9   | Jason Gonzales | Updated requirements.txt by adding schedule dependency. |
 | 2025/04/23 | 1.1.0   | Jason Gonzales | Fixed hidden Send Data button on pre-login status. |
 | 2025/04/23 | 1.1.1   | Felix Schafer | fixed lsu data collect not collecting some additonal notes. |
+| 2025/04/23 | 1.1.2   | Baron Davis | added secret key for login features b/c our login info use to be hardcoded in our test.py. |
