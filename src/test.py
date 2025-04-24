@@ -350,7 +350,7 @@ with st.sidebar:
 with st.container():
     st.markdown(f"""
         <div class="demo-info">
-            <span class="demo-text">Demo 1.0.0</span>
+            <span class="demo-text">Demo 1.1.3</span>
             <span class="live-demo-badge"><i class="fas fa-rocket"></i> Live Demo</span>
         </div>
     """, unsafe_allow_html=True)
