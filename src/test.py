@@ -265,7 +265,7 @@ st.markdown(f"""
 
         /* Buttons */
         .stButton>button {{
-            background-color: {primary_color};
+            background-color: {secondary_color};
             color: #FFFFFF;
             border-radius: 5px;
             padding: 8px 16px;
