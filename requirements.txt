@@ -5,4 +5,6 @@ xlsxwriter==3.2.0
 sendgrid==6.11.0
 pandas==2.2.3
 requests==2.32.3
-bs4==0.0.2  # Added BeautifulSoup
+bs4==0.0.2
+psutil==6.1.0
+pyarrow==17.0.0
