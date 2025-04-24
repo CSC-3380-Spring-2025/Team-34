@@ -626,7 +626,6 @@ with st.container():
 
 
 
-
                         # Email functionality
                         st.subheader("Share Data via Email")
                         email_input = st.text_input("Enter your email address:", key="email_live")
