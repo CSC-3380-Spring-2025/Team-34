@@ -1,6 +1,7 @@
 import os
 import sys
 import psutil  # Added for system metrics
+import pyarrow  # Added for Parquet support
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
@@ -386,7 +387,33 @@ with st.container():
                     df = get_csv_preview(selected_file_id)
                     if not df.empty:
                         st.write(f"**Preview of {file_options[selected_file_id]}:**")
-                        st.dataframe(df,hide_index=True)
+                        st.dataframe(df, hide_index=True)
+
+
+                        # Download Data Section
+                        st.subheader("Download Data")
+                        col_dl1, col_dl2 = st.columns(2)
+                        with col_dl1:
+                            csv_data = df.to_csv(index=False).encode("utf-8")
+                            st.download_button(
+                                label="Download CSV",
+                                data=csv_data,
+                                file_name=f"{file_options[selected_file_id]}.csv",
+                                mime="text/csv",
+                                key="download_csv_live"
+                            )
+                        with col_dl2:
+                            parquet_buffer = io.BytesIO()
+                            df.to_parquet(parquet_buffer, engine="pyarrow", index=False)
+                            parquet_data = parquet_buffer.getvalue()
+                            st.download_button(
+                                label="Download Parquet",
+                                data=parquet_data,
+                                file_name=f"{file_options[selected_file_id]}.parquet",
+                                mime="application/octet-stream",
+                                key="download_parquet_live"
+                            )
+
 
 
                         # Email functionality
