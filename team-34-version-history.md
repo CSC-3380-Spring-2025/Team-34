@@ -6,4 +6,4 @@
 | 2025/04/23 | 1.0.3   | Christian Gamble | csv and parquet download option. |
 | 2025/04/23 | 1.0.4   | Christian Gamble | added daily live feed logs. |
 | 2025/04/23 | 1.0.5   | Christian Gamble | changed gitlink to team 34 on side bar. |
-| 2025/04/23 | 1.0.6   | Christian Gamble | added new requirements. |
+| 2025/04/23 | 1.0.6   | Christian Gamble | added new requirements in text file. |
