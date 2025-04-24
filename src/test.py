@@ -2,6 +2,8 @@ import os
 import sys
 import psutil  # Added for system metrics
 import pyarrow  # Added for Parquet support
+import logging  # Added for logging
+from logging.handlers import TimedRotatingFileHandler
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
@@ -18,6 +20,84 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
 import base64
 import re
+
+
+# Custom MemoryHandler to store logs in memory for live display
+class MemoryHandler(logging.Handler):
+    def __init__(self, capacity=1000):
+        super().__init__()
+        self.capacity = capacity
+        self.logs = []
+        self.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.logs.append(log_entry)
+        if len(self.logs) > self.capacity:
+            self.logs.pop(0)  # Remove oldest log to maintain capacity
+
+
+    def get_logs(self):
+        return self.logs
+
+
+# Setup logging
+log_dir = os.path.join(os.path.dirname(__file__), "logs")
+os.makedirs(log_dir, exist_ok=True)  # Create logs directory if it doesn't exist
+
+
+logger = logging.getLogger("LiveFeedLogger")
+logger.setLevel(logging.INFO)
+
+
+# CSV formatter for logs (for file handler)
+class CSVFormatter(logging.Formatter):
+    def format(self, record):
+        # Generate timestamp using formatTime
+        timestamp = self.formatTime(record)
+        # Safely access custom attributes with defaults
+        username = getattr(record, 'username', 'Unknown')
+        action = getattr(record, 'action', 'Unknown')
+        details = getattr(record, 'details', 'No details')
+        return f"{timestamp},{username},{action},{details}"
+
+
+# Daily rotating file handler with header
+class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
+    def doRollover(self):
+        super().doRollover()
+        # Write header to new log file
+        with open(self.baseFilename, 'a') as f:
+            f.write("Timestamp,Username,Action,Details\n")
+
+
+# File handler for CSV logs
+log_file = os.path.join(log_dir, "live_feed_log")
+file_handler = CustomTimedRotatingFileHandler(log_file, when="midnight", interval=1, backupCount=30, encoding="utf-8")
+file_handler.setFormatter(CSVFormatter())
+file_handler.suffix = "%Y-%m-%d.csv"  # Append date to log file
+
+
+# Write header to initial log file if it doesn't exist
+if not os.path.exists(log_file + f".{datetime.now().strftime('%Y-%m-%d')}.csv"):
+    with open(log_file + f".{datetime.now().strftime('%Y-%m-%d')}.csv", 'a') as f:
+        f.write("Timestamp,Username,Action,Details\n")
+
+
+# StreamHandler for terminal output
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+
+
+# MemoryHandler for live display in Streamlit
+memory_handler = MemoryHandler(capacity=1000)
+
+
+# Add all handlers to logger
+logger.addHandler(file_handler)
+logger.addHandler(stream_handler)
+logger.addHandler(memory_handler)
 
 
 # Load environment variables from .env file (for local development only)
@@ -54,7 +134,7 @@ else:
     text_light_color = "#461D7C"
 
 
-# Custom CSS with dynamic color scheme
+# Custom CSS with dynamic color scheme and terminal styling
 st.markdown(f"""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
@@ -211,6 +291,23 @@ st.markdown(f"""
             100% {{
                 box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
             }}
+        }}
+
+
+        /* Terminal-like log display */
+        .terminal-log {{
+            background-color: #000000;
+            color: #FFFFFF;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            padding: 15px;
+            border-radius: 5px;
+            height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border: 1px solid #333;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }}
     </style>
 """, unsafe_allow_html=True)
@@ -384,6 +481,15 @@ with st.container():
                     key="live_select"
                 )
                 if selected_file_id:
+                    # Log dataset selection
+                    logger.info(
+                        "Dataset Selected",
+                        extra={
+                            "username": st.session_state.username or "Anonymous",
+                            "action": "select_dataset",
+                            "details": f"Selected dataset: {file_options[selected_file_id]}"
+                        }
+                    )
                     df = get_csv_preview(selected_file_id)
                     if not df.empty:
                         st.write(f"**Preview of {file_options[selected_file_id]}:**")
@@ -395,24 +501,42 @@ with st.container():
                         col_dl1, col_dl2 = st.columns(2)
                         with col_dl1:
                             csv_data = df.to_csv(index=False).encode("utf-8")
-                            st.download_button(
+                            if st.download_button(
                                 label="Download CSV",
                                 data=csv_data,
                                 file_name=f"{file_options[selected_file_id]}.csv",
                                 mime="text/csv",
                                 key="download_csv_live"
-                            )
+                            ):
+                                # Log CSV download
+                                logger.info(
+                                    "CSV Downloaded",
+                                    extra={
+                                        "username": st.session_state.username or "Anonymous",
+                                        "action": "download_csv",
+                                        "details": f"Downloaded: {file_options[selected_file_id]}.csv"
+                                    }
+                                )
                         with col_dl2:
                             parquet_buffer = io.BytesIO()
                             df.to_parquet(parquet_buffer, engine="pyarrow", index=False)
                             parquet_data = parquet_buffer.getvalue()
-                            st.download_button(
+                            if st.download_button(
                                 label="Download Parquet",
                                 data=parquet_data,
                                 file_name=f"{file_options[selected_file_id]}.parquet",
                                 mime="application/octet-stream",
                                 key="download_parquet_live"
-                            )
+                            ):
+                                # Log Parquet download
+                                logger.info(
+                                    "Parquet Downloaded",
+                                    extra={
+                                        "username": st.session_state.username or "Anonymous",
+                                        "action": "download_parquet",
+                                        "details": f"Downloaded: {file_options[selected_file_id]}.parquet"
+                                    }
+                                )
 
 
 
@@ -424,6 +548,15 @@ with st.container():
                                 email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
                                 if not re.match(email_regex, email_input):
                                     st.error("Invalid email address format.")
+                                    # Log invalid email attempt
+                                    logger.info(
+                                        "Email Share Failed",
+                                        extra={
+                                            "username": st.session_state.username or "Anonymous",
+                                            "action": "email_share",
+                                            "details": f"Invalid email format: {email_input}"
+                                        }
+                                    )
                                 else:
                                     try:
                                         csv_buffer = io.StringIO()
@@ -455,12 +588,48 @@ with st.container():
 
                                         if response.status_code == 202:
                                             st.success(f"Data sent to {email_input}!")
+                                            # Log successful email share
+                                            logger.info(
+                                                "Email Share Success",
+                                                extra={
+                                                    "username": st.session_state.username or "Anonymous",
+                                                    "action": "email_share",
+                                                    "details": f"Sent to: {email_input}, Dataset: {file_options[selected_file_id]}"
+                                                }
+                                            )
                                         else:
                                             st.error(f"Failed to send email. Status code: {response.status_code}")
+                                            # Log failed email share
+                                            logger.info(
+                                                "Email Share Failed",
+                                                extra={
+                                                    "username": st.session_state.username or "Anonymous",
+                                                    "action": "email_share",
+                                                    "details": f"Failed, Status code: {response.status_code}, Dataset: {file_options[selected_file_id]}"
+                                                }
+                                            )
                                     except Exception as e:
                                         st.error(f"Error sending email: {str(e)}")
+                                        # Log email share error
+                                        logger.info(
+                                            "Email Share Error",
+                                            extra={
+                                                "username": st.session_state.username or "Anonymous",
+                                                "action": "email_share",
+                                                "details": f"Error: {str(e)}, Dataset: {file_options[selected_file_id]}"
+                                            }
+                                        )
                             else:
                                 st.warning("Please enter an email address.")
+                                # Log empty email attempt
+                                logger.info(
+                                    "Email Share Failed",
+                                    extra={
+                                        "username": st.session_state.username or "Anonymous",
+                                        "action": "email_share",
+                                        "details": "No email address provided"
+                                    }
+                                )
                     else:
                         st.error("No data found in the selected dataset.")
             with col2:
@@ -510,6 +679,52 @@ with st.container():
                 st.metric("CPU Usage", f"{cpu_usage}%")
             with col2:
                 st.metric("Memory Usage", f"{memory_usage}%")
+
+
+    # Live Feed Logs Section (visible after login)
+    if st.session_state.logged_in:
+        st.subheader("Live Feed Logs")
+        st.markdown("View and download daily logs of live feed activities for testing and optimization.")
+       
+        # List available log files
+        log_files = [f for f in os.listdir(log_dir) if f.startswith("live_feed_log") and f.endswith(".csv")]
+        if log_files:
+            selected_log = st.selectbox("Select a log file to view:", log_files, key="log_select")
+            if selected_log:
+                log_path = os.path.join(log_dir, selected_log)
+                try:
+                    log_df = pd.read_csv(log_path)
+                    st.write(f"**Log: {selected_log}**")
+                    st.dataframe(log_df, hide_index=True)
+                   
+                    # Download log as CSV
+                    log_csv = log_df.to_csv(index=False).encode("utf-8")
+                    st.download_button(
+                        label="Download Log as CSV",
+                        data=log_csv,
+                        file_name=selected_log,
+                        mime="text/csv",
+                        key="download_log_csv"
+                    )
+                except Exception as e:
+                    st.error(f"Error reading log file: {str(e)}")
+        else:
+            st.warning("No log files available.")
+
+
+    # Live Terminal Logs Section (visible after login)
+    if st.session_state.logged_in:
+        st.subheader("Live Terminal Logs")
+        st.markdown("View live logs in a terminal-like interface.")
+        log_placeholder = st.empty()
+        for _ in range(60):  # Update for 60 seconds
+            logs = memory_handler.get_logs()
+            log_text = "\n".join(logs[-20:])  # Show last 20 logs for brevity
+            log_placeholder.markdown(
+                f'<div class="terminal-log">{log_text}</div>',
+                unsafe_allow_html=True
+            )
+            time.sleep(1)  # Update every second
 
 
     # Manage Data Section (visible after login)
