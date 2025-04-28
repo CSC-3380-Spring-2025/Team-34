@@ -1,7 +1,7 @@
 # LSU Datastore Dashboard : Team-34
 
 ## Members
-- **Project Manager:** Felix Schafer (bdogdavis)  
+- **Project Manager:** Felix Schafer (fschaf2)  
 - **Communications Lead:** Christian Gamble (Christianfft)  
 - **Git Master:** Baron Davis (bdogdavis)  
 - **Design Lead:** Jason Gonzales (JasonGonzo123)
