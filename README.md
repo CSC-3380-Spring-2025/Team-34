@@ -4,7 +4,7 @@
 - **Project Manager:** Felix Schafer (bdogdavis)  
 - **Communications Lead:** Christian Gamble (cgamble)  
 - **Git Master:** Baron K. Davis (bdogdavis)  
-- **Design Lead:** _Not specified_  
+- **Design Lead:** Jason Gonzales (JasonGonzalo123)
 - **Quality Assurance Tester:** _Not specified_  
 
 ## About Our Software
