@@ -36,11 +36,11 @@ A Streamlit-based dashboard for uploading, previewing, and managing CSV datasets
 - `schedule==1.2.2`  
 
 ### Downloading Dependencies
-```bash
+
 pip install -r requirements.txt
 
 
-Commands
+### Commands
 Start the app locally:
 
 streamlit run src/test.py \
