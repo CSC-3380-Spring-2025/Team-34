@@ -50,7 +50,8 @@ streamlit run src/test.py \
 Run tests:
 pytest tests/
 
-Update datastore.db and Push to chef-master-v2 Step-by-Step Instructions
+
+### Update datastore.db and Push to chef-master-v2 Step-by-Step Instructions
 1. Navigate to the folder where fetch_store.py is located:
 cd Team-34/src/data
 2. Install the required package:
