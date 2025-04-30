@@ -49,7 +49,7 @@ def fetch_jobs(major):
             "posted_date": job.get("posted_date", "")
         } for job in jobs] if jobs else []
         return pd.DataFrame(job_data)
-    except requests.RequestException as e:
+    except Exception as e:
         print(f"Error fetching jobs for {major}: {e}")
         return pd.DataFrame()
 
