@@ -15,3 +15,4 @@
 | 2025/04/23 | 1.1.2   | Baron Davis | added secret key for login features b/c our login info use to be hardcoded in our test.py. |
 | 2025/04/23 | 1.1.3   | Baron Davis | added new demo verison number to the live test.py so that website verison is up to date with our verison number of chef-master-v2. |
 | 2025/04/28 | 1.1.4   | Baron Davis | added correct format template to README.md |
+| 2025/04/29 | 1.2.8   | Felix Schafer | added API collection of course and job data |
