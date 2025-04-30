@@ -15,30 +15,38 @@ import time
 load_dotenv()
 
 # API keys
-LINKED_JOBS_API = "https://linkedin-data-api.p.rapidapi.com/get-jobs"
-CORE_API_KEY = "XSfGz97ZsArORei8W6ov2EDyT0alhupm"
-RAPIDAPI_KEY = "52b85dc6885msh339b181109c6d5p11beabjsnf61b2676da3"
+LINKED_JOBS_API = "linkedin-jobs-search.p.rapidapi.com"
+UDEMY_API = "udemy-api2.p.rapidapi.com"
+CORE_API_KEY = "eXSfGz97ZsArORei8W6ov2EDyT0alhupm"
+RAPIDAPI_KEY = "bff529ced6mshe878b4a3ba0937fp18edbcjsn98c41db5431e"
 
 MAJORS = ["software engineering", "cloud computing", "data science"]
 
 def fetch_jobs(major):
+    #return pd.DataFrame()
+    #USE THIS IF NOT TESTING THIS FEATURE TO SAVE API CALLS
     try:
-        headers = {
-            "x-rapidapi-host": "linkedin-data-api.p.rapidapi.com",
-            "x-rapidapi-key": RAPIDAPI_KEY
+        url = "https://linkedin-jobs-search.p.rapidapi.com/"
+        payload = {
+            "search_terms": major,
+            "location": "United States",
+            "page": "1"
         }
-        params = {"description": major, "full_time": True}
-        response = requests.get(LINKED_JOBS_API, headers=headers, params=params)
-        response.raise_for_status()
-        jobs = response.json()
+        headers = {
+            "x-rapidapi-key": RAPIDAPI_KEY,
+            "x-rapidapi-host": LINKED_JOBS_API,
+            "Content-Type": "application/json"
+        }
 
+        response = requests.post(url, json=payload, headers=headers)
+
+        jobs=response.json()
         job_data = [{
-            "title": job.get("title", ""),
-            "company": job.get("company", ""),
-            "location": job.get("location", ""),
-            "description": job.get("description", ""),
-            "url": job.get("url", ""),
-            "posted_date": job.get("created_at", "")
+            "title": job.get("job_title", ""),
+            "company": job.get("company_name", ""),
+            "location": job.get("job_location", ""),
+            "url": job.get("job_url", ""),
+            "posted_date": job.get("posted_date", "")
         } for job in jobs] if jobs else []
         return pd.DataFrame(job_data)
     except requests.RequestException as e:
@@ -46,11 +54,44 @@ def fetch_jobs(major):
         return pd.DataFrame()
 
 def fetch_courses(major):
+    #return pd.Dataframe()
+    #USE THIS IF NOT TESTING THIS FEATURE TO SAVE API CALLS
+    category=major
+    if (major=="cloud computing" or major=="cybersecurity"):
+        category="network_and_security"
     try:
-        return pd.DataFrame([
-            {"title": f"{major.capitalize()} Basics", "platform": "Coursera", "duration": "4 weeks", "url": "https://example.com"},
-            {"title": f"Advanced {major.capitalize()}", "platform": "Udemy", "duration": "6 weeks", "url": "https://example.com"}
-        ])
+        url=f"https://udemy-api2.p.rapidapi.com/v1/udemy/category/{category.lower().replace(' ', '_')}"
+        payload = {
+            "page": 1,
+            "page_size": 10,
+            "ratings": "",
+            "instructional_level": [],
+            "lang": [],
+            "price": [],
+            "duration": [],
+            "subtitles_lang": [],
+            "sort": "popularity",
+            "features": [],
+            "locale": "en_US",
+            "extract_pricing": True
+        }
+        headers = {
+            "x-rapidapi-key": RAPIDAPI_KEY,
+            "x-rapidapi-host": UDEMY_API,
+            "Content-Type": "application/json"
+        }
+
+        response = requests.post(url, json=payload, headers=headers)
+        data=response.json()
+        courses = data["data"]["courses"]
+        course_data = [{
+            "title": course.get("title", ""),
+            "instructor": ", ".join([instr.get("display_name", "") for instr in course.get("instructors", [])]),
+            "price": course["purchase"]["price"].get("price_string"),
+            "url": "https://www.udemy.com" + course.get("url", ""),
+            "last_updated_date": course.get("last_update_date", "")
+        } for course in courses] if courses else []
+        return pd.DataFrame(course_data)
     except Exception as e:
         print(f"Error fetching courses for {major}: {e}")
         return pd.DataFrame()
