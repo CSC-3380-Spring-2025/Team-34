@@ -56,11 +56,15 @@ def fetch_jobs(major):
 def fetch_courses(major):
     #return pd.Dataframe()
     #USE THIS IF NOT TESTING THIS FEATURE TO SAVE API CALLS
-    category=major
-    if (major=="cloud computing" or major=="cybersecurity"):
-        category="network_and_security"
+    match(major):
+        case "cybersecurity":
+            category="network_and_security"
+        case "cloud computing":
+            category="web_development"
+        case _:
+            category=major.lower().replace(' ', '_')
     try:
-        url=f"https://udemy-api2.p.rapidapi.com/v1/udemy/category/{category.lower().replace(' ', '_')}"
+        url=f"https://udemy-api2.p.rapidapi.com/v1/udemy/category/{category}"
         payload = {
             "page": 1,
             "page_size": 10,
