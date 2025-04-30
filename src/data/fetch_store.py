@@ -54,7 +54,7 @@ def fetch_jobs(major):
         return pd.DataFrame()
 
 def fetch_courses(major):
-    #return pd.Dataframe()
+    #return pd.DataFrame()
     #USE THIS IF NOT TESTING THIS FEATURE TO SAVE API CALLS
     match(major):
         case "cybersecurity":
@@ -118,7 +118,7 @@ def fetch_research(major):
         print(f"Error fetching research for {major}: {e}")
         return pd.DataFrame()
 
-def fetch_lsu_courses(major):
+def fetch_lsu_courses():
     course_data = lsudata.collect_default_data()
     return pd.DataFrame(course_data)
 
@@ -144,9 +144,9 @@ def fetch_and_store_data():
         research_df = fetch_research(major)
         if not research_df.empty:
             save_to_db_only(research_df, f"research_{major.replace(' ', '_')}_{today}.csv")
-        lsu_df = fetch_lsu_courses(major)
-        if not lsu_df.empty:
-            save_to_db_only(lsu_df, f"lsu_{major.replace(' ', '_')}_{today}.csv")
+    lsu_df = fetch_lsu_courses()
+    if not lsu_df.empty:
+        save_to_db_only(lsu_df, f"lsu_relevant_{today}.csv")
 
 def schedule_daily_fetch():
     schedule.every().day.at("08:00").do(fetch_and_store_data)

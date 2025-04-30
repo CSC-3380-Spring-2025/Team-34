@@ -411,7 +411,7 @@ with st.container():
             if selected_category == "lsu":
                 if (filename.lower().startswith("lsu") and
                     formatted_date in filename and
-                    selected_major in filename):
+                    (selected_major in filename or "relevant" in filename)):
                     file_options[file_id] = filename
             else:
                 if (selected_category in filename and
