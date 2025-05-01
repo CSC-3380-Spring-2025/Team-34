@@ -15,5 +15,7 @@ def make_multi_parquet(links):
 
 def collect_default_data():
     links = ['https://appl101.lsu.edu/booklet2.nsf/All/67FD57ECBF3676C486258BAC002C42AB?OpenDocument',
-             'https://appl101.lsu.edu/booklet2.nsf/All/2719C3AEB8F7AE3986258BAC002C42D6?OpenDocument']
+             'https://appl101.lsu.edu/booklet2.nsf/All/2719C3AEB8F7AE3986258BAC002C42D6?OpenDocument',
+             'https://appl101.lsu.edu/booklet2.nsf/All/D61BDEBE0037080E86258BAC002C42B1?OpenDocument',
+             'https://appl101.lsu.edu/booklet2.nsf/All/2C01DE7970FAE7E386258BAC002C42CA?OpenDocument']
     return collect_multi_department_data(links)
