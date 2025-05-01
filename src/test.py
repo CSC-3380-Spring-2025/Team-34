@@ -82,11 +82,11 @@ logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 logger.addHandler(memory_handler)
 
-# Load environment variables from .env file (for local development only)
+# Load environment variables from .env file (for local development only, excluding credentials)
 if not os.getenv("IS_STREAMLIT_CLOUD", False):
     try:
         from dotenv import load_dotenv
-        load_dotenv()
+        load_dotenv()  # Only for non-credential env vars like SENDGRID_API_KEY locally
     except ImportError:
         pass
 
@@ -313,20 +313,23 @@ with st.sidebar:
         st.empty()
         with st.spinner("Logging in..."):
             time.sleep(3)
-        # Check credentials against environment variables as a fallback
-        env_username = os.environ.get("USERNAME")
-        env_password = os.environ.get("PASSWORD")
+        # Use credentials from TOML file via st.secrets
+        try:
+            toml_username = st.secrets["USERNAME"]
+            toml_password = st.secrets["PASSWORD"]
+        except KeyError as e:
+            st.error(f"Missing secret in TOML file: {str(e)}. Please ensure USERNAME and PASSWORD are defined.")
+            st.rerun()
+        # First attempt authentication using authenticate_user
         auth_success = authenticate_user(username, password)
-        # Fallback: if authenticate_user fails, check against env vars
-        if not auth_success and env_username and env_password:
-            auth_success = (username == env_username and password == env_password)
+        # Fallback: compare against TOML secrets if authenticate_user fails
+        if not auth_success:
+            auth_success = (username == toml_username and password == toml_password)
         if auth_success:
             st.session_state.logged_in = True
             st.session_state.username = username
-            # Use environment variables for the admin check if available
-            admin_username = env_username if env_username else "admin"
-            admin_password = env_password if env_password else "NewSecurePassword123"
-            st.session_state.show_lsu_datastore = (username == admin_username and password == admin_password)
+            # Check if the user matches the TOML credentials for special access
+            st.session_state.show_lsu_datastore = (username == toml_username and password == toml_password)
             st.success(f"Logged in as {username}!")
             st.rerun()
         else:
@@ -347,7 +350,7 @@ with st.sidebar:
 with st.container():
     st.markdown(f"""
         <div class="demo-info">
-            <span class="demo-text">Demo 1.0.0</span>
+            <span class="demo-text">Demo 1.1.3</span>
             <span class="live-demo-badge"><i class="fas fa-rocket"></i> Live Demo</span>
         </div>
     """, unsafe_allow_html=True)
@@ -482,7 +485,7 @@ with st.container():
                         email_input = st.text_input("Enter your email address:", key="email_live")
                         if st.button("Send Data", key="send_live"):
                             if email_input:
-                                email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+                                email_regex = r'^[a-zA-Z0.9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
                                 if not re.match(email_regex, email_input):
                                     st.error("Invalid email address format.")
                                     logger.info(
