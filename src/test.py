@@ -301,20 +301,32 @@ with st.sidebar:
     st.header("DATABASE-RELATED LINKS")
     st.markdown("[GitHub Page](https://github.com/CSC-3380-Spring-2025/Team-34)")
 
-    st.header("SOFTWARE-RELATED LINKS")
-    st.markdown("[BioPython](https://biopython.org/)")
-    st.markdown("[RDKit](https://www.rdkit.org/)")
-    st.markdown("[PDBrenum](https://pdbrenumbering.org/)")
-    st.markdown("[fpocket](https://github.com/Discngine/fpocket)")
-    st.markdown("[PyMOL](https://pymol.org/)")
-    st.markdown("[3dmol](https://3dmol.csb.pitt.edu/)")
-    st.markdown("[pandas](https://pandas.pydata.org/)")
-    st.markdown("[NumPy](https://numpy.org/)")
-    st.markdown("[SciPy](https://scipy.org/)")
-    st.markdown("[sklearn](https://scikit-learn.org/)")
-    st.markdown("[matplotlib](https://matplotlib.org/)")
-    st.markdown("[seaborn](https://seaborn.pydata.org/)")
-    st.markdown("[streamlit](https://streamlit.io/)")
+    # Navigation selectbox (replacing SOFTWARE-RELATED LINKS)
+    st.header("NAVIGATION")
+    page = st.selectbox(
+        "Navigate to:",
+        ["Home", "Blank Page"],
+        key="page_select",
+        index=["Home", "Blank Page"].index(st.session_state.page)
+    )
+    st.session_state.page = page
+
+    # Show SOFTWARE-RELATED LINKS only after login
+    if st.session_state.logged_in:
+        st.header("SOFTWARE-RELATED LINKS")
+        st.markdown("[BioPython](https://biopython.org/)")
+        st.markdown("[RDKit](https://www.rdkit.org/)")
+        st.markdown("[PDBrenum](https://pdbrenumbering.org/)")
+        st.markdown("[fpocket](https://github.com/Discngine/fpocket)")
+        st.markdown("[PyMOL](https://pymol.org/)")
+        st.markdown("[3dmol](https://3dmol.csb.pitt.edu/)")
+        st.markdown("[pandas](https://pandas.pydata.org/)")
+        st.markdown("[NumPy](https://numpy.org/)")
+        st.markdown("[SciPy](https://scipy.org/)")
+        st.markdown("[sklearn](https://scikit-learn.org/)")
+        st.markdown("[matplotlib](https://matplotlib.org/)")
+        st.markdown("[seaborn](https://seaborn.pydata.org/)")
+        st.markdown("[streamlit](https://streamlit.io/)")
 
     # Sidebar Login Panel
     st.header("USER LOGIN")
@@ -365,15 +377,6 @@ with st.container():
             <span class="live-demo-badge"><i class="fas fa-rocket"></i> Live Demo</span>
         </div>
     """, unsafe_allow_html=True)
-
-    # Navigation selectbox for page switching
-    page = st.selectbox(
-        "Navigate to:",
-        ["Home", "Blank Page"],
-        key="page_select",
-        index=["Home", "Blank Page"].index(st.session_state.page)
-    )
-    st.session_state.page = page
 
     if page == "Blank Page":
         st.markdown('<div class="main">', unsafe_allow_html=True)

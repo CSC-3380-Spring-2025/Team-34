@@ -22,3 +22,4 @@
 | 2025/05/01 | 1.2.8   | Baron Davis | updated ci.yml pipeline to ensure code quality and app functionality before merging into dev. |
 | 2025/05/01 | 1.2.9   | Baron Davis | Fix Sendgrid bug because cant send emails of the data to @lsu.edu emails all other emails work. |
 | 2025/05/01 | 1.3.0   | Jason Gonzales | Added Blank Page to see all files in database. |
+| 2025/05/01 | 1.3.1   | Jason Gonzales | Change side bar feature on pre login page to not include software based links, instead navigation link. |
