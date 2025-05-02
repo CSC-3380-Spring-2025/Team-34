@@ -18,3 +18,4 @@
 | 2025/05/01 | 1.1.5   | Felix Schafer | Added EE and IE LSU data. |
 | 2025/05/01 | 1.2.5   | Felix Schafer | added API collection of course and job data. |
 | 2025/05/01 | 1.2.6   | Felix Schafer | refactored lsu data collection to avoid collecting and storing unneeded repeat data. |
+| 2025/05/01 | 1.2.7   | Jason Gonzales | Fixed logo size. |
