@@ -91,7 +91,7 @@ if not os.getenv("IS_STREAMLIT_CLOUD", False):
         pass
 
 # Set page configuration
-st.set_page_config(page_title="📊 LSU Datastore", layout="wide")
+st.set_page_config(page_title="📊 LSU Datastore", layout="centered")
 
 # Determine color scheme based on login status
 if st.session_state.get('logged_in', False):
@@ -184,6 +184,15 @@ st.markdown(f"""
         /* Images */
         .ras-image {{
             max-width: 100%;
+            border: 2px solid {primary_color};
+            border-radius: 8px;
+        }}
+
+        /* Logo Image */
+        .logo-image {{
+            max-width: 50%; /* Smaller size, proportional to container */
+            display: block;
+            margin: 0 auto;
             border: 2px solid {primary_color};
             border-radius: 8px;
         }}
@@ -565,7 +574,11 @@ with st.container():
                         st.error("No data found in the selected dataset.")
             with col2:
                 try:
-                    st.image(os.path.join(base_dir, "lsu_logo.png"), caption="LSU Datastore Process", use_container_width=True, output_format="PNG")
+                    st.markdown(
+                        f'<div class="logo-image"><img src="data:image/png;base64,{base64.b64encode(open(os.path.join(base_dir, "lsu_logo.png"), "rb").read()).decode()}" alt="LSU Datastore Process" style="width:100%;"></div>',
+                        unsafe_allow_html=True
+                    )
+                    st.caption("LSU Datastore Process")
                 except FileNotFoundError:
                     st.warning("Image not found. Please add 'lsu_logo.png' to your project directory.")
         else:
