@@ -337,7 +337,7 @@ with st.sidebar:
         if auth_success:
             st.session_state.logged_in = True
             st.session_state.username = username
-            # Check if the user matches the TOML secrets for special access
+            # Check if the user matches the TOML credentials for special access
             st.session_state.show_lsu_datastore = (username == toml_username and password == toml_password)
             st.success(f"Logged in as {username}!")
             st.rerun()
@@ -359,7 +359,7 @@ with st.sidebar:
 with st.container():
     st.markdown(f"""
         <div class="demo-info">
-            <span class="demo-text">Demo 1.2.6</span>
+            <span class="demo-text">Demo 1.2.7</span>
             <span class="live-demo-badge"><i class="fas fa-rocket"></i> Live Demo</span>
         </div>
     """, unsafe_allow_html=True)
@@ -494,7 +494,7 @@ with st.container():
                         email_input = st.text_input("Enter your email address:", key="email_live")
                         if st.button("Send Data", key="send_live"):
                             if email_input:
-                                email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+                                email_regex = r'^[a-zA-Z0.9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
                                 if not re.match(email_regex, email_input):
                                     st.error("Invalid email address format.")
                                     logger.info(
