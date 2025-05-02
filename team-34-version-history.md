@@ -19,3 +19,4 @@
 | 2025/05/01 | 1.2.5   | Felix Schafer | added API collection of course and job data. |
 | 2025/05/01 | 1.2.6   | Felix Schafer | refactored lsu data collection to avoid collecting and storing unneeded repeat data. |
 | 2025/05/01 | 1.2.7   | Jason Gonzales | Fixed logo size. |
+| 2025/05/01 | 1.2.8   | Baron Davis | updated ci.yml pipeline to ensure code quality and app functionality before merging into dev. |

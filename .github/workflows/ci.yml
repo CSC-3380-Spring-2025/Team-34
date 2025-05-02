@@ -8,36 +8,45 @@ on:
     branches:
       - dev
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: src
 
     steps:
-      - name: 📥 Checkout Repository
+      - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🐍 Set up Python
+      - name: 🐍 Set up Python with pip cache
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+          cache: 'pip'
 
-      - name: 📦 Install Dependencies
+      - name: 📦 Install all dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install pylint pytest jakejarvis/wait-action streamlit -r requirements.txt
 
-      - name: 🔍 Run Linting (pylint)
-        run: |
-          pip install pylint
-          pylint src/ tests/
+      - name: 🔍 Lint code (pylint)
+        run: pylint src/ tests/
 
-      - name: 🧪 Run Unit Tests (pytest)
-        run: |
-          pip install pytest
-          pytest tests/
+      - name: 🧪 Run unit tests (pytest)
+        run: pytest tests/
 
-      - name: 🚀 Validate Streamlit App Runs
-        run: |
-          nohup streamlit run src/test.py --server.headless true &
-          sleep 10
-          curl -I http://localhost:8501 || exit 1
+      - name: 🚀 Launch Streamlit in background
+        run: nohup streamlit run src/test.py --server.headless true &
+
+      - name: ⏳ Wait for Streamlit to be ready
+        uses: jakejarvis/wait-action@v1
+        with:
+          url: http://localhost:8501
+          timeout: 60
+
+      - name: ✅ Verify Streamlit endpoint
+        run: curl --fail -I http://localhost:8501
