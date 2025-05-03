@@ -486,7 +486,7 @@ with st.container():
             selected_major = st.selectbox("Filter by Major:", majors, format_func=lambda x: x.replace("_", " ").title())
         with col2:
             categories = ["jobs", "courses", "research", "lsu"]
-            selected_category = st.selectbox("Filter by Category:", categories, format_func=lambda x: x.title() if x == "lsu" else x.capitalize())
+            selected_category = st.selectbox("Filter by Category:", categories, format_func=lambda x: x.upper() if x == "lsu" else x.title())
         st.markdown('</div>', unsafe_allow_html=True)
 
         st.subheader("Summary")
