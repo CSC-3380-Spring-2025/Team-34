@@ -20,7 +20,7 @@ UDEMY_API = "udemy-api2.p.rapidapi.com"
 CORE_API_KEY = "eXSfGz97ZsArORei8W6ov2EDyT0alhupm"
 RAPIDAPI_KEY = "bff529ced6mshe878b4a3ba0937fp18edbcjsn98c41db5431e"
 
-MAJORS = ["software engineering", "cloud computing", "data science"]
+MAJORS = ["software engineering", "cloud computing", "data science", "cybersecurity"]
 
 def fetch_jobs(major):
     #return pd.DataFrame()
