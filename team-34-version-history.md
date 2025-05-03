@@ -24,3 +24,4 @@
 | 2025/05/01 | 1.3.0   | Jason Gonzales | Added Blank Page to see all files in database. |
 | 2025/05/01 | 1.3.1   | Jason Gonzales | Change side bar feature on pre login page to not include software based links, instead navigation link. |
 | 2025/05/01 | 1.3.2   | Felix Schafer | Added cybersecurity to majors. |
+| 2025/05/01 | 1.3.3   | Felix Schafer | Fixed page styling. |
