@@ -177,6 +177,12 @@ st.markdown(f"""
         p {{
             font-size: 16px !important;
             line-height: 1.6 !important;
+            color: {secondary_color} !important;
+            font-weight: bold !important;
+        }}
+        .stButton p {{
+            font-size: 16px !important;
+            line-height: 1.6 !important;
             color: {text_light_color} !important;
             font-weight: bold !important;
         }}
