@@ -387,7 +387,7 @@ with st.sidebar:
 with st.container():
     st.markdown(f"""
         <div class="demo-info">
-            <span class="demo-text">Demo 1.3.3</span>
+            <span class="demo-text">Demo 1.3.4</span>
             <span class="live-demo-badge"><i class="fas fa-rocket"></i> Live Demo</span>
         </div>
     """, unsafe_allow_html=True)
@@ -692,11 +692,13 @@ with st.container():
         if files and file_options and selected_file_id and not df.empty:
             st.subheader("Visualize Data")
             numerical_cols = df.select_dtypes(include=["number"]).columns
-            if len(numerical_cols) > 0:
-                x_axis = st.selectbox("Select X-Axis:", numerical_cols, key="x_axis")
-                y_axis = st.selectbox("Select Y-Axis:", numerical_cols, key="y_axis")
+            if len(numerical_cols) > 1:
+                x_axis = st.selectbox("Select X-Axis:", numerical_cols, index=1, key="x_axis")
+                y_axis = st.selectbox("Select Y-Axis:", numerical_cols, index=0, key="y_axis")
                 fig = px.scatter(df, x=x_axis, y=y_axis, title=f"{x_axis} vs {y_axis}")
                 st.plotly_chart(fig, use_container_width=True)
+            elif len(numerical_cols == 1):
+                st.warning("Only one numerical column was found; cannot plot.")
             else:
                 st.warning("No numerical columns found for visualization.")
 
