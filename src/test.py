@@ -193,7 +193,6 @@ st.markdown(f"""
             margin-top: 30px !important;
             margin-bottom: 15px !important;
         }}
-        
 
         /* Images */
         .ras-image {{
@@ -310,18 +309,91 @@ if 'show_lsu_datastore' not in st.session_state:
 if 'page' not in st.session_state:
     st.session_state.page = "Home"  # Default page
 
+# Helper function for email sending
+def send_email(email, filename, df):
+    email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if not re.match(email_regex, email):
+        st.error("Invalid email address format.")
+        logger.info(
+            "Email Share Failed",
+            extra={
+                "username": st.session_state.username or "Anonymous",
+                "action": "email_share",
+                "details": f"Invalid email format: {email}"
+            }
+        )
+        return False
+
+    try:
+        csv_buffer = io.StringIO()
+        df.to_csv(csv_buffer, index=False)
+        csv_data = csv_buffer.getvalue().encode('utf-8')
+        encoded_file = base64.b64encode(csv_data).decode()
+
+        message = Mail(
+            from_email='bdav213@lsu.edu',
+            to_emails=email,
+            subject=f'LSU Datastore: {filename} Data',
+            html_content=f'<p>Attached is the data from {filename} as viewed on the LSU Datastore Dashboard.</p>'
+        )
+
+        attachment = Attachment(
+            FileContent(encoded_file),
+            FileName(filename),
+            FileType('text/csv'),
+            Disposition('attachment')
+        )
+        message.attachment = attachment
+
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(message)
+
+        if response.status_code == 202:
+            st.success(f"Data sent to {email}!")
+            logger.info(
+                "Email Share Success",
+                extra={
+                    "username": st.session_state.username or "Anonymous",
+                    "action": "email_share",
+                    "details": f"Sent to: {email}, Dataset: {filename}"
+                }
+            )
+            return True
+        else:
+            st.error(f"Failed to send email. Status code: {response.status_code}")
+            logger.info(
+                "Email Share Failed",
+                extra={
+                    "username": st.session_state.username or "Anonymous",
+                    "action": "email_share",
+                    "details": f"Failed, Status code: {response.status_code}, Dataset: {filename}"
+                }
+            )
+            return False
+    except Exception as e:
+        st.error(f"Error sending email: {str(e)}")
+        logger.info(
+            "Email Share Error",
+            extra={
+                "username": st.session_state.username or "Anonymous",
+                "action": "email_share",
+                "details": f"Error: {str(e)}, Dataset: {filename}"
+            }
+        )
+        return False
+
 # Sidebar Navigation
 with st.sidebar:
     st.header("DATABASE-RELATED LINKS")
     st.markdown("[GitHub Page](https://github.com/CSC-3380-Spring-2025/Team-34)")
 
-    # Navigation selectbox (replacing SOFTWARE-RELATED LINKS)
+    # Navigation selectbox
     st.header("NAVIGATION")
     page = st.selectbox(
         "Navigate to:",
-        ["Home", "Blank Page"],
+        ["Home", "Blank Page", "🔍 Search Data", "📊 Visualize Data", "📤 Share Data"],
         key="page_select",
-        index=["Home", "Blank Page"].index(st.session_state.page)
+        index=["Home", "Blank Page", "🔍 Search Data", "📊 Visualize Data", "📤 Share Data"].index(st.session_state.page)
     )
     st.session_state.page = page
 
@@ -356,22 +428,23 @@ with st.sidebar:
             toml_password = st.secrets["PASSWORD"]
         except KeyError as e:
             st.error(f"Missing secret in TOML file: {str(e)}. Please ensure USERNAME and PASSWORD are defined.")
-            st.rerun()
-        # First attempt authentication using authenticate_user
-        auth_success = authenticate_user(username, password)
-        # Fallback: compare against TOML secrets if authenticate_user fails
-        if not auth_success:
-            auth_success = (username == toml_username and password == toml_password)
-        if auth_success:
-            st.session_state.logged_in = True
-            st.session_state.username = username
-            # Check if the user matches the TOML secrets for special access
-            st.session_state.show_lsu_datastore = (username == toml_username and password == toml_password)
-            st.success(f"Logged in as {username}!")
-            st.rerun()
+            # Removed 'return' to fix SyntaxError
         else:
-            st.error("Invalid credentials")
-            st.rerun()
+            # First attempt authentication using authenticate_user
+            auth_success = authenticate_user(username, password)
+            # Fallback: compare against TOML secrets if authenticate_user fails
+            if not auth_success:
+                auth_success = (username == toml_username and password == toml_password)
+            if auth_success:
+                st.session_state.logged_in = True
+                st.session_state.username = username
+                # Check if the user matches the TOML secrets for special access
+                st.session_state.show_lsu_datastore = (username == toml_username and password == toml_password)
+                st.success(f"Logged in as {username}!")
+                st.rerun()
+            else:
+                st.error("Invalid credentials")
+                st.rerun()
 
     if st.session_state.logged_in:
         if st.button("Logout"):
@@ -465,6 +538,87 @@ with st.container():
             st.warning("No CSV files available in the database.")
         st.markdown('</div>', unsafe_allow_html=True)
 
+    elif page == "🔍 Search Data":
+        st.markdown('<div class="main">', unsafe_allow_html=True)
+        st.header("Search Data")
+        st.subheader("Search across all datasets")
+        global_search = st.text_input("Search across all datasets:", key="global_search")
+        if global_search:
+            results = search_csv_data(global_search)
+            if results:
+                st.dataframe(pd.DataFrame(results, columns=["File ID", "Row", "Column", "Value"]))
+            else:
+                st.warning("No matches found.")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    elif page == "📊 Visualize Data":
+        st.markdown('<div class="main">', unsafe_allow_html=True)
+        st.header("Visualize Data")
+        st.subheader("Explore data visualizations")
+        files = get_files()
+        if files:
+            file_options = {file_id: filename for file_id, filename, _, _, _ in files}
+            selected_file_id = st.selectbox(
+                "Select a dataset to visualize:",
+                options=file_options.keys(),
+                format_func=lambda x: file_options[x],
+                key="visualize_select"
+            )
+            if selected_file_id:
+                df = get_csv_preview(selected_file_id)
+                if not df.empty:
+                    numerical_cols = df.select_dtypes(include=["number"]).columns
+                    if len(numerical_cols) > 1:
+                        x_axis = st.selectbox("Select X-Axis:", numerical_cols, index=1, key="x_axis")
+                        y_axis = st.selectbox("Select Y-Axis:", numerical_cols, index=0, key="y_axis")
+                        fig = px.scatter(df, x=x_axis, y=y_axis, title=f"{x_axis} vs {y_axis}")
+                        st.plotly_chart(fig, use_container_width=True)
+                    elif len(numerical_cols) == 1:
+                        st.warning("Only one numerical column was found; cannot plot.")
+                    else:
+                        st.warning("No numerical columns found for visualization.")
+                else:
+                    st.error("No data found in the selected dataset.")
+        else:
+            st.warning("No datasets uploaded yet.")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    elif page == "📤 Share Data":
+        st.markdown('<div class="main">', unsafe_allow_html=True)
+        st.header("Share Data")
+        st.subheader("Share datasets via email")
+        files = get_files()
+        if files:
+            file_options = {file_id: filename for file_id, filename, _, _, _ in files}
+            selected_file_id = st.selectbox(
+                "Select a dataset to share:",
+                options=file_options.keys(),
+                format_func=lambda x: file_options[x],
+                key="share_select"
+            )
+            if selected_file_id:
+                df = get_csv_preview(selected_file_id)
+                if not df.empty:
+                    email_input = st.text_input("Enter your email address:", key="email_share")
+                    if st.button("Send Data", key="send_share"):
+                        if email_input:
+                            send_email(email_input, file_options[selected_file_id], df)
+                        else:
+                            st.warning("Please enter an email address.")
+                            logger.info(
+                                "Email Share Failed",
+                                extra={
+                                    "username": st.session_state.username or "Anonymous",
+                                    "action": "email_share",
+                                    "details": "No email address provided"
+                                }
+                            )
+                else:
+                    st.error("No data found in the selected dataset.")
+        else:
+            st.warning("No datasets uploaded yet.")
+        st.markdown('</div>', unsafe_allow_html=True)
+
     else:  # Home page
         st.markdown('<div class="main">', unsafe_allow_html=True)
 
@@ -503,7 +657,6 @@ with st.container():
 
             - **Home Page**: Overview of the LSU Datastore platform.
             - **Blank Page**: View all CSV files in the LSU Datastore (no login required).
-            - **Database Overview**: View and manage datasets stored in the LSU Datastore.
             - **Search Data**: Search for specific entries across all datasets.
             - **Visualize Data**: Explore data visualizations for numerical datasets.
             - **Share Data**: Share datasets via email with collaborators.
@@ -597,72 +750,7 @@ with st.container():
                             email_input = st.text_input("Enter your email address:", key="email_live")
                             if st.button("Send Data", key="send_live"):
                                 if email_input:
-                                    email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-                                    if not re.match(email_regex, email_input):
-                                        st.error("Invalid email address format.")
-                                        logger.info(
-                                            "Email Share Failed",
-                                            extra={
-                                                "username": st.session_state.username or "Anonymous",
-                                                "action": "email_share",
-                                                "details": f"Invalid email format: {email_input}"
-                                            }
-                                        )
-                                    else:
-                                        try:
-                                            csv_buffer = io.StringIO()
-                                            df.to_csv(csv_buffer, index=False)
-                                            csv_data = csv_buffer.getvalue().encode('utf-8')
-                                            encoded_file = base64.b64encode(csv_data).decode()
-
-                                            message = Mail(
-                                                from_email='bdav213@lsu.edu',
-                                                to_emails=email_input,
-                                                subject=f'LSU Datastore: {file_options[selected_file_id]} Data',
-                                                html_content=f'<p>Attached is the data from {file_options[selected_file_id]} as viewed on the LSU Datastore Dashboard.</p>'
-                                            )
-
-                                            attachment = Attachment(
-                                                FileContent(encoded_file),
-                                                FileName(file_options[selected_file_id]),
-                                                FileType('text/csv'),
-                                                Disposition('attachment')
-                                            )
-                                            message.attachment = attachment
-
-                                            sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-                                            response = sg.send(message)
-
-                                            if response.status_code == 202:
-                                                st.success(f"Data sent to {email_input}!")
-                                                logger.info(
-                                                    "Email Share Success",
-                                                    extra={
-                                                        "username": st.session_state.username or "Anonymous",
-                                                        "action": "email_share",
-                                                        "details": f"Sent to: {email_input}, Dataset: {file_options[selected_file_id]}"
-                                                    }
-                                                )
-                                            else:
-                                                st.error(f"Failed to send email. Status code: {response.status_code}")
-                                                logger.info(
-                                                    "Email Share Failed",
-                                                    extra={
-                                                        "username": st.session_state.username or "Anonymous",
-                                                        "action": "email_share",
-                                                        "details": f"Failed, Status code: {response.status_code}, Dataset: {file_options[selected_file_id]}"
-                                                    }
-                                                )
-                                        except Exception as e:
-                                            st.error(f"Error sending email: {str(e)}")
-                                            logger.info(
-                                                "Email Share Error",
-                                                extra={
-                                                    "username": st.session_state.username or "Anonymous",
-                                                    "action": "email_share",
-                                                    "details": f"Error: {str(e)}, Dataset: {file_options[selected_file_id]}"
-                                                }
-                                            )
+                                    send_email(email_input, file_options[selected_file_id], df)
                                 else:
                                     st.warning("Please enter an email address.")
                                     logger.info(
@@ -693,17 +781,17 @@ with st.container():
             st.subheader("Visualize Data")
             numerical_cols = df.select_dtypes(include=["number"]).columns
             if len(numerical_cols) > 1:
-                x_axis = st.selectbox("Select X-Axis:", numerical_cols, index=1, key="x_axis")
-                y_axis = st.selectbox("Select Y-Axis:", numerical_cols, index=0, key="y_axis")
+                x_axis = st.selectbox("Select X-Axis:", numerical_cols, index=1, key="x_axis_home")
+                y_axis = st.selectbox("Select Y-Axis:", numerical_cols, index=0, key="y_axis_home")
                 fig = px.scatter(df, x=x_axis, y=y_axis, title=f"{x_axis} vs {y_axis}")
                 st.plotly_chart(fig, use_container_width=True)
-            elif len(numerical_cols == 1):
+            elif len(numerical_cols) == 1:
                 st.warning("Only one numerical column was found; cannot plot.")
             else:
                 st.warning("No numerical columns found for visualization.")
 
         st.subheader("Search Data")
-        global_search = st.text_input("Search across all datasets:")
+        global_search = st.text_input("Search across all datasets:", key="global_search_home")
         if global_search:
             results = search_csv_data(global_search)
             if results:
