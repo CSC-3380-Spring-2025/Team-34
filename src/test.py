@@ -135,6 +135,13 @@ st.markdown(f"""
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }}
 
+        p {{
+            font-size: 16px !important;
+            line-height: 1.6 !important;
+            color: {text_light_color} !important;
+            font-weight: bold !important;
+        }}
+
         /* Sidebar */
         .stSidebar {{
             background-color: {sidebar_background} !important;
@@ -158,6 +165,18 @@ st.markdown(f"""
             color: {secondary_color} !important;
             text-decoration: underline !important;
         }}
+        .stSidebar p {{
+            font-size: 16px !important;
+            line-height: 1.6 !important;
+            color: {secondary_color} !important;
+            font-weight: bold !important;
+        }}
+        .stSidebar .stButton p {{
+            font-size: 16px !important;
+            line-height: 1.6 !important;
+            color: {text_light_color} !important;
+            font-weight: bold !important;
+        }}
 
         /* Headers and text */
         h1, h2, h3 {{
@@ -174,12 +193,7 @@ st.markdown(f"""
             margin-top: 30px !important;
             margin-bottom: 15px !important;
         }}
-        p {{
-            font-size: 16px !important;
-            line-height: 1.6 !important;
-            color: {text_light_color} !important;
-            font-weight: bold !important;
-        }}
+        
 
         /* Images */
         .ras-image {{
@@ -198,7 +212,7 @@ st.markdown(f"""
         }}
 
         /* Buttons */
-        .stButton>button {{
+        .stButton>button, .stDownloadButton>button{{
             background-color: {secondary_color};
             color: #FFFFFF;
             border-radius: 5px;
@@ -207,7 +221,7 @@ st.markdown(f"""
             border: none;
             transition: background-color 0.3s;
         }}
-        .stButton>button:hover {{
+        .stButton>button:hover, .stDownloadButton>button:hover {{
             background-color: {secondary_color};
         }}
         section[data-testid="stSidebar"] .stButton>button {{
@@ -373,7 +387,7 @@ with st.sidebar:
 with st.container():
     st.markdown(f"""
         <div class="demo-info">
-            <span class="demo-text">Demo 1.3.1</span>
+            <span class="demo-text">Demo 1.3.3</span>
             <span class="live-demo-badge"><i class="fas fa-rocket"></i> Live Demo</span>
         </div>
     """, unsafe_allow_html=True)
@@ -469,10 +483,10 @@ with st.container():
         col1, col2, _ = st.columns([1, 1, 3])
         with col1:
             majors = ["software_engineering", "cloud_computing", "data_science", "cybersecurity"]
-            selected_major = st.selectbox("Filter by Major:", majors, format_func=lambda x: x.replace("_", " ").capitalize())
+            selected_major = st.selectbox("Filter by Major:", majors, format_func=lambda x: x.replace("_", " ").title())
         with col2:
             categories = ["jobs", "courses", "research", "lsu"]
-            selected_category = st.selectbox("Filter by Category:", categories, format_func=lambda x: x.upper() if x == "lsu" else x.capitalize())
+            selected_category = st.selectbox("Filter by Category:", categories, format_func=lambda x: x.upper() if x == "lsu" else x.title())
         st.markdown('</div>', unsafe_allow_html=True)
 
         st.subheader("Summary")
