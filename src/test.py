@@ -468,7 +468,7 @@ with st.container():
         st.markdown('<div class="filter-container">', unsafe_allow_html=True)
         col1, col2, _ = st.columns([1, 1, 3])
         with col1:
-            majors = ["software_engineering", "cloud_computing", "data_science"]
+            majors = ["software_engineering", "cloud_computing", "data_science", "cybersecurity"]
             selected_major = st.selectbox("Filter by Major:", majors, format_func=lambda x: x.replace("_", " ").capitalize())
         with col2:
             categories = ["jobs", "courses", "research", "lsu"]
