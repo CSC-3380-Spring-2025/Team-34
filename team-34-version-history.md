@@ -27,3 +27,4 @@
 | 2025/05/01 | 1.3.3   | Felix Schafer | Fixed page styling. |
 | 2025/05/01 | 1.3.4   | Felix Schafer | Changed graph axes to show different data |
 | 2025/05/04 | 1.3.5   | Baron Davis | Add Search Data, Visualize Data, Share data, to the sidebar navigate to dropdown menu. |
+| 2025/05/04 | 1.3.6   | Baron Davis | add back the edit data feature on login status page. |
