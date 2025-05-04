@@ -633,76 +633,6 @@ with st.container():
         except FileNotFoundError:
             st.warning("Image not found. Please add 'lsu_data_icon.png' to your project directory.")
 
-        # Manage Data section for logged-in users
-        if st.session_state.logged_in:
-            st.subheader("Manage Data")
-            uploaded_file = st.file_uploader("Upload dataset (CSV)", type=["csv"], key="upload_csv")
-            if uploaded_file:
-                with st.spinner("Uploading dataset..."):
-                    save_csv_data(uploaded_file.name, uploaded_file.getvalue(), len(uploaded_file.getvalue()), "csv", 1)
-                    time.sleep(1)
-                st.success(f"{uploaded_file.name} saved to the database!")
-
-            manage_files = get_files()
-            if manage_files:
-                manage_file_options = {file_id: filename for file_id, filename, _, _, _ in manage_files}
-                manage_file_id = st.selectbox(
-                    "Select a dataset to manage:",
-                    options=manage_file_options.keys(),
-                    format_func=lambda x: manage_file_options[x],
-                    key="manage_select"
-                )
-                if manage_file_id:
-                    manage_df = get_csv_preview(manage_file_id)
-                    if not manage_df.empty:
-                        st.write(f"**Preview of {manage_file_options[manage_file_id]}:**")
-                        st.dataframe(manage_df)
-
-                        st.subheader("Edit Data")
-                        edited_df = st.data_editor(manage_df)
-                        if st.button("Save Changes"):
-                            update_csv_data(manage_file_id, edited_df)
-                            st.success("Changes saved!")
-
-                        csv_data = manage_df.to_csv(index=False).encode("utf-8")
-                        json_data = manage_df.to_json(orient="records")
-                        output = io.BytesIO()
-                        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                            manage_df.to_excel(writer, index=False)
-                        excel_data = output.getvalue()
-
-                        col1, col2, col3 = st.columns(3)
-                        with col1:
-                            st.download_button(
-                                "Download CSV",
-                                data=csv_data,
-                                file_name=f"{manage_file_options[manage_file_id]}.csv",
-                                mime="text/csv"
-                            )
-                        with col2:
-                            st.download_button(
-                                "Download JSON",
-                                data=json_data,
-                                file_name=f"{manage_file_options[manage_file_id]}.json",
-                                mime="application/json"
-                            )
-                        with col3:
-                            st.download_button(
-                                "Download Excel",
-                                data=excel_data,
-                                file_name=f"{manage_file_options[manage_file_id]}.xlsx",
-                                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                            )
-
-                        if st.button("Delete This Dataset"):
-                            delete_file(manage_file_id)
-                            st.success(f"Dataset '{manage_file_options[manage_file_id]}' deleted!")
-                            st.rerun()
-                    else:
-                        st.error("No data found in the selected dataset.")
-            else:
-                st.warning("No datasets uploaded yet.")
-
         st.markdown('<div class="filter-container">', unsafe_allow_html=True)
         col1, col2, _ = st.columns([1, 1, 3])
         with col1:
@@ -869,6 +799,18 @@ with st.container():
             else:
                 st.warning("No matches found.")
 
+        st.subheader("System Performance Metrics")
+        placeholder = st.empty()
+        for _ in range(60):
+            cpu_usage = psutil.cpu_percent(interval=1)
+            memory_usage = psutil.virtual_memory().percent
+            with placeholder.container():
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.metric("CPU Usage", f"{cpu_usage}%")
+                with col2:
+                    st.metric("Memory Usage", f"{memory_usage}%")
+
         if st.session_state.logged_in:
             st.subheader("Live Feed Logs")
             st.markdown("View and download daily logs of live feed activities for testing and optimization.")
@@ -909,17 +851,53 @@ with st.container():
                 )
                 time.sleep(1)
 
-        st.subheader("System Performance Metrics")
-        placeholder = st.empty()
-        for _ in range(60):
-            cpu_usage = psutil.cpu_percent(interval=1)
-            memory_usage = psutil.virtual_memory().percent
-            with placeholder.container():
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.metric("CPU Usage", f"{cpu_usage}%")
-                with col2:
-                    st.metric("Memory Usage", f"{memory_usage}%")
+        if st.session_state.logged_in:
+            st.subheader("Manage Data")
+            uploaded_file = st.file_uploader("Upload dataset (CSV)", type=["csv"])
+            if uploaded_file:
+                with st.spinner("Uploading dataset..."):
+                    save_csv_data(uploaded_file.name, uploaded_file.getvalue(), len(uploaded_file.getvalue()), "csv", 1)
+                    time.sleep(1)
+                st.success(f"{uploaded_file.name} saved to the database!")
+
+            if files:
+                st.write("**Manage Stored Datasets:**")
+                manage_file_id = st.selectbox("Select a dataset to manage:", options=file_options.keys(), format_func=lambda x: file_options[x], key="manage_select")
+                if manage_file_id:
+                    manage_df = get_csv_preview(manage_file_id)
+                    if not manage_df.empty:
+                        st.write(f"**Preview of {file_options[manage_file_id]}:**")
+                        st.dataframe(manage_df)
+
+                        st.subheader("Edit Data")
+                        edited_df = st.data_editor(manage_df)
+                        if st.button("Save Changes"):
+                            update_csv_data(manage_file_id, edited_df)
+                            st.success("Changes saved!")
+
+                        csv_data = manage_df.to_csv(index=False).encode("utf-8")
+                        json_data = manage_df.to_json(orient="records")
+                        output = io.BytesIO()
+                        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                            manage_df.to_excel(writer, index=False)
+                        excel_data = output.getvalue()
+
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.download_button("Download CSV", data=csv_data, file_name=f"{file_options[manage_file_id]}.csv", mime="text/csv")
+                        with col2:
+                            st.download_button("Download JSON", data=json_data, file_name=f"{file_options[manage_file_id]}.json", mime="application/json")
+                        with col3:
+                            st.download_button("Download Excel", data=excel_data, file_name=f"{file_options[manage_file_id]}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+                        if st.button("Delete This Dataset"):
+                            delete_file(manage_file_id)
+                            st.success(f"Dataset '{file_options[manage_file_id]}' deleted!")
+                            st.rerun()
+                    else:
+                        st.error("No data found in the selected dataset.")
+            else:
+                st.warning("No datasets uploaded yet.")
 
         st.markdown('</div>', unsafe_allow_html=True)
 
