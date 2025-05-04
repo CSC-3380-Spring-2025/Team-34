@@ -26,3 +26,4 @@
 | 2025/05/01 | 1.3.2   | Felix Schafer | Added cybersecurity to majors. |
 | 2025/05/01 | 1.3.3   | Felix Schafer | Fixed page styling. |
 | 2025/05/01 | 1.3.4   | Felix Schafer | Changed graph axes to show different data |
+| 2025/05/04 | 1.3.5   | Baron Davis | Add Search Data, Visualize Data, Share data, to the sidebar navigate to dropdown menu. |
