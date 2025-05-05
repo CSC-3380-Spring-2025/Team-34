@@ -701,7 +701,18 @@ def render_share_data_page() -> None:
             df = cached_get_csv_preview(selected_file_id)
             if not df.empty:
                 email_input = st.text_input('Enter your email address:', key='email_share')
-                sendgrid_api_key = st.text_input('Enter your SendGrid API key:', type='password', key='sendgrid_api_key_share')
+                
+                # Check if SendGrid API key exists in Streamlit secrets
+                sendgrid_api_key = None
+                if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
+                    sendgrid_api_key = st.secrets['SENDGRID_API_KEY']
+                else:
+                    sendgrid_api_key = st.text_input(
+                        'Enter your SendGrid API key:', 
+                        type='password', 
+                        key='sendgrid_api_key_share'
+                    )
+
                 if st.button('Send Data', key='send_share'):
                     if email_input:
                         if not sendgrid_api_key:
@@ -731,7 +742,7 @@ def render_share_data_page() -> None:
     else:
         st.warning('No datasets uploaded yet.')
     st.markdown('</div>', unsafe_allow_html=True)
-
+    
 def render_home_page() -> None:
     """Render the Home page with data management and live features."""
     st.markdown('<div class="main">', unsafe_allow_html=True)
