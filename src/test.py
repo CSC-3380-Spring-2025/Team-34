@@ -337,14 +337,15 @@ if 'show_lsu_datastore' not in st.session_state:
 if 'page' not in st.session_state:
     st.session_state.page = 'Home'
 
-def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_key: str) -> bool:
+def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_key: str = None) -> bool:
     """Send a dataset as a CSV attachment via email using SendGrid.
 
     Args:
         email (str): Recipient email address.
         filename (str): Name of the dataset file.
         df (DataFrame): DataFrame containing the dataset.
-        sendgrid_api_key (str): SendGrid API key for authentication.
+        sendgrid_api_key (str, optional): SendGrid API key for authentication. If not provided, 
+                                         attempts to use the key from Streamlit secrets.
 
     Returns:
         bool: True if the email was sent successfully, False otherwise.
@@ -358,6 +359,24 @@ def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_ke
                 'username': st.session_state.username or 'Anonymous',
                 'action': 'email_share',
                 'details': f'Invalid email format: {email}',
+            },
+        )
+        return False
+
+    # Check for SendGrid API key: use secrets if available, otherwise use provided key
+    api_key = None
+    if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
+        api_key = st.secrets['SENDGRID_API_KEY']
+    elif sendgrid_api_key:
+        api_key = sendgrid_api_key
+    else:
+        st.error("No SendGrid API key provided or found in Streamlit secrets.")
+        logger.error(
+            'Email Share Failed',
+            extra={
+                'username': st.session_state.username or 'Anonymous',
+                'action': 'email_share',
+                'details': 'No SendGrid API key provided or found in secrets',
             },
         )
         return False
@@ -391,7 +410,7 @@ def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_ke
 
         # First attempt: Try with SSL verification enabled
         headers = {
-            "Authorization": f"Bearer {sendgrid_api_key}",
+            "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
         }
         try:
@@ -726,7 +745,16 @@ def render_share_data_page() -> None:
                                 },
                             )
                         else:
-                            send_dataset_email(email_input, file_options[selected_file_id], df, sendgrid_api_key)
+                            success = send_dataset_email(
+                                email_input,
+                                file_options[selected_file_id],
+                                df,
+                                sendgrid_api_key
+                            )
+                            if success:
+                                st.success(f"Data sent to {email_input}!")
+                            else:
+                                st.error("Failed to send email.")
                     else:
                         st.warning('Please enter an email address.')
                         logger.error(
@@ -742,7 +770,7 @@ def render_share_data_page() -> None:
     else:
         st.warning('No datasets uploaded yet.')
     st.markdown('</div>', unsafe_allow_html=True)
-    
+
 def render_home_page() -> None:
     """Render the Home page with data management and live features."""
     st.markdown('<div class="main">', unsafe_allow_html=True)
@@ -954,79 +982,76 @@ def render_home_page() -> None:
                                     },
                                 )
                         with col_dl2:
-    parquet_buffer = io.BytesIO()
-    df.to_parquet(parquet_buffer, engine='pyarrow', index=False)
-    parquet_data = parquet_buffer.getvalue()
-    if st.download_button(
-        label='Download Parquet',
-        data=parquet_data,
-        file_name=f'{file_options.get(selected_file_id, "dataset")}.parquet',
-        mime='application/octet-stream',
-        key='download_parquet_live',
-    ):
-        logger.info(
-            'Parquet Downloaded',
-            extra={
-                'username': st.session_state.username or 'Anonymous',
-                'action': 'download_parquet',
-                'details': f'Downloaded: {file_options.get(selected_file_id, "dataset")}.parquet',
-            },
-        )
+                            parquet_buffer = io.BytesIO()
+                            df.to_parquet(parquet_buffer, engine='pyarrow', index=False)
+                            parquet_data = parquet_buffer.getvalue()
+                            if st.download_button(
+                                label='Download Parquet',
+                                data=parquet_data,
+                                file_name=f'{file_options.get(selected_file_id, "dataset")}.parquet',
+                                mime='application/octet-stream',
+                                key='download_parquet_live',
+                            ):
+                                logger.info(
+                                    'Parquet Downloaded',
+                                    extra={
+                                        'username': st.session_state.username or 'Anonymous',
+                                        'action': 'download_parquet',
+                                        'details': f'Downloaded: {file_options.get(selected_file_id, "dataset")}.parquet',
+                                    },
+                                )
 
-st.subheader('Share Data via Email')
-email_input = st.text_input(
-    'Enter your email address:', key='email_live'
-)
+                        st.subheader('Share Data via Email')
+                        email_input = st.text_input(
+                            'Enter your email address:', key='email_live'
+                        )
 
-# Check if SendGrid API key exists in Streamlit secrets
-sendgrid_api_key = None
-if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
-    sendgrid_api_key = st.secrets['SENDGRID_API_KEY']
-else:
-    sendgrid_api_key = st.text_input(
-        'Enter your SendGrid API key:',
-        type='password',
-        key='sendgrid_api_key_live'
-    )
+                        # Check if SendGrid API key exists in Streamlit secrets
+                        sendgrid_api_key = None
+                        if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
+                            sendgrid_api_key = st.secrets['SENDGRID_API_KEY']
+                        else:
+                            sendgrid_api_key = st.text_input(
+                                'Enter your SendGrid API key:',
+                                type='password',
+                                key='sendgrid_api_key_live'
+                            )
 
-if st.button('Send Data', key='send_live'):
-    if email_input:
-        if not sendgrid_api_key:
-            st.error("Please provide a SendGrid API key.")
-            logger.error(
-                'Email Share Failed',
-                extra={
-                    'username': st.session_state.username or 'Anonymous',
-                    'action': 'email_share',
-                    'details': 'No SendGrid API key provided',
-                },
-            )
-        else:
-            # Assuming send_dataset_email is defined elsewhere
-            success = send_dataset_email(
-                email_input,
-                file_options.get(selected_file_id, "dataset"),
-                df,
-                sendgrid_api_key
-            )
-            if success:
-                st.success(f"Data sent to {email_input}!")
-            else:
-                st.error("Failed to send email.")
-    else:
-        st.warning('Please enter an email address.')
-        logger.error(
-            'Email Share Failed',
-            extra={
-                'username': st.session_state.username or 'Anonymous',
-                'action': 'email_share',
-                'details': 'No email address provided',
-            },
-        )
-
-if files:
-    if file_options and selected_file_id:
-        if not df.empty:
+                        if st.button('Send Data', key='send_live'):
+                            if email_input:
+                                if not sendgrid_api_key:
+                                    st.error("Please provide a SendGrid API key.")
+                                    logger.error(
+                                        'Email Share Failed',
+                                        extra={
+                                            'username': st.session_state.username or 'Anonymous',
+                                            'action': 'email_share',
+                                            'details': 'No SendGrid API key provided',
+                                        },
+                                    )
+                                else:
+                                    success = send_dataset_email(
+                                        email_input,
+                                        file_options.get(selected_file_id, "dataset"),
+                                        df,
+                                        sendgrid_api_key
+                                    )
+                                    if success:
+                                        st.success(f"Data sent to {email_input}!")
+                                    else:
+                                        st.error("Failed to send email.")
+                            else:
+                                st.warning('Please enter an email address.')
+                                logger.error(
+                                    'Email Share Failed',
+                                    extra={
+                                        'username': st.session_state.username or 'Anonymous',
+                                        'action': 'email_share',
+                                        'details': 'No email address provided',
+                                    },
+                                )
+                    else:
+                        st.error('No data found in the selected dataset.')
             with col2:
                 try:
                     st.markdown(
@@ -1039,42 +1064,40 @@ if files:
                 except FileNotFoundError:
                     st.warning("Image not found. Please add 'lsu_logo.png' to your project directory.")
         else:
-            st.error('No data found in the selected dataset.')
+            st.warning(
+                f"No {selected_category.upper() if selected_category == 'lsu' else selected_category.capitalize()} "
+                f"data available for {selected_major.replace('_', ' ').capitalize()} on {formatted_date}."
+            )
     else:
-        st.warning(
-            f"No {selected_category.upper() if selected_category == 'lsu' else selected_category.capitalize()} "
-            f"data available for {selected_major.replace('_', ' ').capitalize()} on {formatted_date}."
-        )
-else:
-    st.warning('No datasets uploaded yet.')
+        st.warning('No datasets uploaded yet.')
 
-if files and file_options and selected_file_id and not df.empty:
-    st.subheader('Visualize Data')
-    numerical_cols = df.select_dtypes(include=['number']).columns
-    if len(numerical_cols) > 1:
-        x_axis = st.selectbox(
-            'Select X-Axis:', numerical_cols, index=1, key='x_axis_home'
-        )
-        y_axis = st.selectbox(
-            'Select Y-Axis:', numerical_cols, index=0, key='y_axis_home'
-        )
-        fig = px.scatter(df, x=x_axis, y=y_axis, title=f'{x_axis} vs {y_axis}')
-        st.plotly_chart(fig, use_container_width=True)
-    elif len(numerical_cols) == 1:
+    if files and file_options and selected_file_id and not df.empty:
+        st.subheader('Visualize Data')
+        numerical_cols = df.select_dtypes(include=['number']).columns
+        if len(numerical_cols) > 1:
+            x_axis = st.selectbox(
+                'Select X-Axis:', numerical_cols, index=1, key='x_axis_home'
+            )
+            y_axis = st.selectbox(
+                'Select Y-Axis:', numerical_cols, index=0, key='y_axis_home'
+            )
+            fig = px.scatter(df, x=x_axis, y=y_axis, title=f'{x_axis} vs {y_axis}')
+            st.plotly_chart(fig, use_container_width=True)
+        elif len(numerical_cols) == 1:
             st.warning('Only one numerical column was found; cannot plot.')
         else:
             st.warning('No numerical columns found for visualization.')
 
-    st.subheader('Search Data')
-    global_search = st.text_input('Search across all datasets:', key='global_search_home')
-    if global_search:
-        results = search_csv_data(global_search)
-        if results:
-            st.dataframe(
-                pd.DataFrame(results, columns=['File ID', 'Row', 'Column', 'Value'])
-            )
-        else:
-            st.warning('No matches found.')
+        st.subheader('Search Data')
+        global_search = st.text_input('Search across all datasets:', key='global_search_home')
+        if global_search:
+            results = search_csv_data(global_search)
+            if results:
+                st.dataframe(
+                    pd.DataFrame(results, columns=['File ID', 'Row', 'Column', 'Value'])
+                )
+            else:
+                st.warning('No matches found.')
 
     if st.session_state.logged_in:
         st.subheader('Live Feed Logs')
