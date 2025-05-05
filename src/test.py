@@ -348,9 +348,9 @@ def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
     Returns:
         bool: True if the email was sent successfully, False otherwise.
     """
-    email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0.9.-]+\.[a.zA.Z]{2,}$'
+    email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if not re.match(email_regex, email):
-        st.error('Invalid email address format.')
+        st.error(f'Invalid email address format: {email}')
         logger.error(
             'Email Share Failed',
             extra={
