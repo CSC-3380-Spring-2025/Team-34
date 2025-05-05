@@ -14,11 +14,11 @@ A Streamlit-based dashboard for uploading, previewing, and managing CSV datasets
 - MacOS  
 - Linux (Ubuntu)  
 - Windows  
-
+- Streamlit Cloud
 ## Important Links
 - **Kanban Board:** https://github.com/CSC-3380-Spring-2025/Team-34/projects  
 - **Designs:** _N/A_  
-- **Styles Guide(s):** _N/A_  
+- **Styles Guide(s):** PEP 8, PEP 257, pylint (enforced via CI/CD pipeline)
 
 ## How to Run Dev and Test Environment
 
@@ -35,7 +35,7 @@ A Streamlit-based dashboard for uploading, previewing, and managing CSV datasets
 - `pyarrow==17.0.0`  
 - `schedule==1.2.2`  
 
-### Downloading Dependencies
+### Downloading Dependencies (Must be in Team-34 Directory)
 
 pip install -r requirements.txt
 
