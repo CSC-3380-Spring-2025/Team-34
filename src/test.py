@@ -3,7 +3,7 @@
 Provides a web interface for managing, visualizing, and sharing datasets at LSU,
 with user authentication, data upload, search, and live logging features.
 """
-
+import requests
 import base64
 import io
 import logging
@@ -22,7 +22,7 @@ import pyarrow
 import streamlit as st
 from pandas import DataFrame
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Attachment, Disposition, FileContent, FileName, FileType
+from sendgrid.helpers.mail import Mail,Attachment, Disposition, FileContent, FileName, FileType
 
 # Load environment variables from .env file
 from dotenv import load_dotenv
@@ -337,17 +337,20 @@ if 'show_lsu_datastore' not in st.session_state:
 if 'page' not in st.session_state:
     st.session_state.page = 'Home'
 
-def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
+def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_key: str) -> bool:
     """Send a dataset as a CSV attachment via email using SendGrid.
 
     Args:
         email (str): Recipient email address.
         filename (str): Name of the dataset file.
         df (DataFrame): DataFrame containing the dataset.
+        sendgrid_api_key (str): SendGrid API key for authentication.
 
     Returns:
         bool: True if the email was sent successfully, False otherwise.
     """
+    import requests  # Add this import at the top of the file if not already present
+
     email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if not re.match(email_regex, email):
         st.error(f'Invalid email address format: {email}')
@@ -362,28 +365,66 @@ def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
         return False
 
     try:
+        # Prepare the email data
         csv_buffer = io.StringIO()
         df.to_csv(csv_buffer, index=False)
         csv_data = csv_buffer.getvalue().encode('utf-8')
         encoded_file = base64.b64encode(csv_data).decode()
 
-        message = Mail(
-            from_email=get_secret("FROM_EMAIL", "default@example.com"),
-            to_emails=email,
-            subject=f'LSU Datastore: {filename} Data',
-            html_content=f'<p>Attached is the data from {filename} as viewed on the LSU Datastore Dashboard.</p>',
-        )
+        email_data = {
+            "personalizations": [{"to": [{"email": email}]}],
+            "from": {"email": get_secret("FROM_EMAIL", "default@example.com")},
+            "subject": f"LSU Datastore: {filename} Data",
+            "content": [
+                {
+                    "type": "text/html",
+                    "value": f"<p>Attached is the data from {filename} as viewed on the LSU Datastore Dashboard.</p>",
+                }
+            ],
+            "attachments": [
+                {
+                    "content": encoded_file,
+                    "filename": filename,
+                    "type": "text/csv",
+                    "disposition": "attachment",
+                }
+            ],
+        }
 
-        attachment = Attachment(
-            FileContent(encoded_file),
-            FileName(filename),
-            FileType('text/csv'),
-            Disposition('attachment'),
-        )
-        message.attachment = attachment
-
-        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY', ""))
-        response = sg.send(message)
+        # First attempt: Try with SSL verification enabled
+        headers = {
+            "Authorization": f"Bearer {sendgrid_api_key}",
+            "Content-Type": "application/json",
+        }
+        try:
+            response = requests.post(
+                "https://api.sendgrid.com/v3/mail/send",
+                json=email_data,
+                headers=headers,
+            )
+            response.raise_for_status()  # Raise an exception for HTTP errors
+        except requests.exceptions.SSLError as ssl_err:
+            # SSL verification failed; retry with verification disabled
+            st.warning(
+                "SSL certificate verification failed. Retrying with SSL verification disabled. "
+                "This is less secure and should be fixed by updating your system's CA certificates "
+                "or configuring your network proxy certificates."
+            )
+            logger.warning(
+                'SSL Verification Failed - Retrying with Disabled Verification',
+                extra={
+                    'username': st.session_state.username or 'Anonymous',
+                    'action': 'email_share',
+                    'details': f'SSL error: {str(ssl_err)}, retrying without verification',
+                },
+            )
+            response = requests.post(
+                "https://api.sendgrid.com/v3/mail/send",
+                json=email_data,
+                headers=headers,
+                verify=False,  # Disable SSL verification
+            )
+            response.raise_for_status()
 
         if response.status_code == 202:
             st.success(f'Data sent to {email}!')
@@ -651,9 +692,21 @@ def render_share_data_page() -> None:
             df = cached_get_csv_preview(selected_file_id)
             if not df.empty:
                 email_input = st.text_input('Enter your email address:', key='email_share')
+                sendgrid_api_key = st.text_input('Enter your SendGrid API key:', type='password', key='sendgrid_api_key_share')
                 if st.button('Send Data', key='send_share'):
                     if email_input:
-                        send_dataset_email(email_input, file_options[selected_file_id], df)
+                        if not sendgrid_api_key:
+                            st.error("Please provide a SendGrid API key.")
+                            logger.error(
+                                'Email Share Failed',
+                                extra={
+                                    'username': st.session_state.username or 'Anonymous',
+                                    'action': 'email_share',
+                                    'details': 'No SendGrid API key provided',
+                                },
+                            )
+                        else:
+                            send_dataset_email(email_input, file_options[selected_file_id], df, sendgrid_api_key)
                     else:
                         st.warning('Please enter an email address.')
                         logger.error(
@@ -904,11 +957,23 @@ def render_home_page() -> None:
                         email_input = st.text_input(
                             'Enter your email address:', key='email_live'
                         )
+                        sendgrid_api_key = st.text_input('Enter your SendGrid API key:', type='password', key='sendgrid_api_key_live')
                         if st.button('Send Data', key='send_live'):
                             if email_input:
-                                send_dataset_email(
-                                    email_input, file_options[selected_file_id], df
-                                )
+                                if not sendgrid_api_key:
+                                    st.error("Please provide a SendGrid API key.")
+                                    logger.error(
+                                        'Email Share Failed',
+                                        extra={
+                                            'username': st.session_state.username or 'Anonymous',
+                                            'action': 'email_share',
+                                            'details': 'No SendGrid API key provided',
+                                        },
+                                    )
+                                else:
+                                    send_dataset_email(
+                                        email_input, file_options[selected_file_id], df, sendgrid_api_key
+                                    )
                             else:
                                 st.warning('Please enter an email address.')
                                 logger.error(
