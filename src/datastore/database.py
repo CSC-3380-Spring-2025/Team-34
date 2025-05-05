@@ -19,7 +19,7 @@ load_dotenv()
 
 # Database path configuration
 BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
-DB_NAME = os.path.join(BASE_DIR, os.getenv("DATABASE_NAME", st.secrets.get("DATABASE_NAME", "datastore.db")))
+DB_NAME = os.path.join(BASE_DIR, os.getenv("DATABASE_NAME", "datastore.db"))
 
 
 def init_db() -> None:
