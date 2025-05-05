@@ -954,26 +954,26 @@ def render_home_page() -> None:
                                     },
                                 )
                         with col_dl2:
-                            parquet_buffer = io.BytesIO()
-                            df.to_parquet(parquet_buffer, engine='pyarrow', index=False)
-                            parquet_data = parquet_buffer.getvalue()
-                            if st.download_button(
-                                label='Download Parquet',
-                                data=parquet_data,
-                                file_name=f'{file_options[selected_file_id]}.parquet',
-                                mime='application/octet-stream',
-                                key='download_parquet_live',
-                            ):
-                                logger.info(
-                                    'Parquet Downloaded',
-                                    extra={
-                                        'username': st.session_state.username or 'Anonymous',
-                                        'action': 'download_parquet',
-                                        'details': f'Downloaded: {file_options[selected_file_id]}.parquet',
-                                    },
-                                )
+    parquet_buffer = io.BytesIO()
+    df.to_parquet(parquet_buffer, engine='pyarrow', index=False)
+    parquet_data = parquet_buffer.getvalue()
+    if st.download_button(
+        label='Download Parquet',
+        data=parquet_data,
+        file_name=f'{file_options.get(selected_file_id, "dataset")}.parquet',
+        mime='application/octet-stream',
+        key='download_parquet_live',
+    ):
+        logger.info(
+            'Parquet Downloaded',
+            extra={
+                'username': st.session_state.username or 'Anonymous',
+                'action': 'download_parquet',
+                'details': f'Downloaded: {file_options.get(selected_file_id, "dataset")}.parquet',
+            },
+        )
 
-                        st.subheader('Share Data via Email')
+st.subheader('Share Data via Email')
 email_input = st.text_input(
     'Enter your email address:', key='email_live'
 )
@@ -984,8 +984,8 @@ if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
     sendgrid_api_key = st.secrets['SENDGRID_API_KEY']
 else:
     sendgrid_api_key = st.text_input(
-        'Enter your SendGrid API key:', 
-        type='password', 
+        'Enter your SendGrid API key:',
+        type='password',
         key='sendgrid_api_key_live'
     )
 
@@ -1001,6 +1001,18 @@ if st.button('Send Data', key='send_live'):
                     'details': 'No SendGrid API key provided',
                 },
             )
+        else:
+            # Assuming send_dataset_email is defined elsewhere
+            success = send_dataset_email(
+                email_input,
+                file_options.get(selected_file_id, "dataset"),
+                df,
+                sendgrid_api_key
+            )
+            if success:
+                st.success(f"Data sent to {email_input}!")
+            else:
+                st.error("Failed to send email.")
     else:
         st.warning('Please enter an email address.')
         logger.error(
@@ -1011,8 +1023,10 @@ if st.button('Send Data', key='send_live'):
                 'details': 'No email address provided',
             },
         )
-                    else:
-                        st.error('No data found in the selected dataset.')
+
+if files:
+    if file_options and selected_file_id:
+        if not df.empty:
             with col2:
                 try:
                     st.markdown(
@@ -1025,26 +1039,28 @@ if st.button('Send Data', key='send_live'):
                 except FileNotFoundError:
                     st.warning("Image not found. Please add 'lsu_logo.png' to your project directory.")
         else:
-            st.warning(
-                f"No {selected_category.upper() if selected_category == 'lsu' else selected_category.capitalize()} "
-                f"data available for {selected_major.replace('_', ' ').capitalize()} on {formatted_date}."
-            )
+            st.error('No data found in the selected dataset.')
     else:
-        st.warning('No datasets uploaded yet.')
+        st.warning(
+            f"No {selected_category.upper() if selected_category == 'lsu' else selected_category.capitalize()} "
+            f"data available for {selected_major.replace('_', ' ').capitalize()} on {formatted_date}."
+        )
+else:
+    st.warning('No datasets uploaded yet.')
 
-    if files and file_options and selected_file_id and not df.empty:
-        st.subheader('Visualize Data')
-        numerical_cols = df.select_dtypes(include=['number']).columns
-        if len(numerical_cols) > 1:
-            x_axis = st.selectbox(
-                'Select X-Axis:', numerical_cols, index=1, key='x_axis_home'
-            )
-            y_axis = st.selectbox(
-                'Select Y-Axis:', numerical_cols, index=0, key='y_axis_home'
-            )
-            fig = px.scatter(df, x=x_axis, y=y_axis, title=f'{x_axis} vs {y_axis}')
-            st.plotly_chart(fig, use_container_width=True)
-        elif len(numerical_cols) == 1:
+if files and file_options and selected_file_id and not df.empty:
+    st.subheader('Visualize Data')
+    numerical_cols = df.select_dtypes(include=['number']).columns
+    if len(numerical_cols) > 1:
+        x_axis = st.selectbox(
+            'Select X-Axis:', numerical_cols, index=1, key='x_axis_home'
+        )
+        y_axis = st.selectbox(
+            'Select Y-Axis:', numerical_cols, index=0, key='y_axis_home'
+        )
+        fig = px.scatter(df, x=x_axis, y=y_axis, title=f'{x_axis} vs {y_axis}')
+        st.plotly_chart(fig, use_container_width=True)
+    elif len(numerical_cols) == 1:
             st.warning('Only one numerical column was found; cannot plot.')
         else:
             st.warning('No numerical columns found for visualization.')
