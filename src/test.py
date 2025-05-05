@@ -554,7 +554,7 @@ def render_sidebar() -> None:
                 st.session_state.logged_in = False
                 st.session_state.username = None
                 st.session_state.show_lsu_datastore = False
-                main()
+                st.rerun()
 
 def render_blank_page() -> None:
     """Render the Blank Page for viewing CSV files."""
