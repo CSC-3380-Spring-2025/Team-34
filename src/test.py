@@ -22,7 +22,7 @@ import pyarrow
 import streamlit as st
 from pandas import DataFrame
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail,Attachment, Disposition, FileContent, FileName, FileType
+from sendgrid.helpers.mail import Mail, Attachment, Disposition, FileContent, FileName, FileType
 
 # Load environment variables from .env file
 from dotenv import load_dotenv
@@ -349,8 +349,6 @@ def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_ke
     Returns:
         bool: True if the email was sent successfully, False otherwise.
     """
-    import requests  # Add this import at the top of the file if not already present
-
     email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if not re.match(email_regex, email):
         st.error(f'Invalid email address format: {email}')
@@ -488,13 +486,23 @@ def render_sidebar() -> None:
 
         st.header('NAVIGATION')
         pages = ['Home', 'Blank Page', '🔍 Search Data', '📊 Visualize Data', '📤 Share Data']
+        
+        # Initialize session state if not already set
+        if 'page' not in st.session_state:
+            st.session_state.page = 'Home'
+
+        # Use selectbox to navigate
         page = st.selectbox(
             'Navigate to:',
             pages,
             index=pages.index(st.session_state.page),
             key='page_select',
         )
-        st.session_state.page = page
+
+        # Update session state only if the selection changes
+        if page != st.session_state.page:
+            st.session_state.page = page
+            st.rerun()  # Force rerun to reflect the new page immediately
 
         if st.session_state.logged_in:
             st.header('SOFTWARE-RELATED LINKS')
