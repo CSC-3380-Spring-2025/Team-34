@@ -24,6 +24,11 @@ from pandas import DataFrame
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Attachment, Disposition, FileContent, FileName, FileType
 
+# Load environment variables from .env file
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # Add project root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -34,9 +39,8 @@ from src.datastore.database import (
     get_files,
     search_csv_data,
     update_csv_data,
-    save_csv_to_database,  # Updated from save_csv_data
+    save_csv_to_database,
 )
-
 
 # Custom MemoryHandler for live log display
 class MemoryHandler(logging.Handler):
@@ -57,7 +61,6 @@ class MemoryHandler(logging.Handler):
     def get_logs(self) -> List[str]:
         return self.logs
 
-
 # CSV formatter for file logs
 class CSVFormatter(logging.Formatter):
     """Format logs as CSV for file storage."""
@@ -69,7 +72,6 @@ class CSVFormatter(logging.Formatter):
         details = getattr(record, 'details', 'No details')
         return f'{timestamp},{username},{action},{details}'
 
-
 # Daily rotating file handler with header
 class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
     """Rotate log files daily and add CSV header on rollover."""
@@ -79,15 +81,36 @@ class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
         with open(self.baseFilename, 'a') as f:
             f.write('Timestamp,Username,Action,Details\n')
 
+# Helper function to safely get secrets
+def get_secret(key: str, default: str) -> str:
+    """Safely retrieve a secret from environment variables or st.secrets.
+
+    Args:
+        key (str): The key to look up.
+        default (str): The default value if the key is not found.
+
+    Returns:
+        str: The value of the key or the default.
+    """
+    # First, try os.getenv (local .env file)
+    value = os.getenv(key)
+    if value is not None:
+        return value
+    # If running in Streamlit Cloud, try st.secrets
+    try:
+        return st.secrets.get(key, default)
+    except (AttributeError, FileNotFoundError):
+        # If st.secrets is not available or secrets.toml is missing, use default
+        return default
 
 # Setup logging
-log_dir = os.path.join(os.path.dirname(__file__), 'logs')
+log_dir = os.path.join(os.path.dirname(__file__), get_secret("LOG_DIR", "logs"))
 os.makedirs(log_dir, exist_ok=True)
 
 logger = logging.getLogger('LiveFeedLogger')
 logger.setLevel(logging.INFO)
 
-log_file = os.path.join(log_dir, 'live_feed_log')
+log_file = os.path.join(log_dir, get_secret("LOG_FILE", "live_feed_log"))
 file_handler = CustomTimedRotatingFileHandler(
     log_file, when='midnight', interval=1, backupCount=30, encoding='utf-8'
 )
@@ -108,19 +131,8 @@ logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 logger.addHandler(memory_handler)
 
-# Load environment variables (non-credential, local only)
-if not os.getenv('IS_STREAMLIT_CLOUD', False):
-    try:
-        from dotenv import load_dotenv
-
-        load_dotenv()
-    except ImportError:
-        pass
-
-
 # Set page configuration
 st.set_page_config(page_title='📊 LSU Datastore', layout='centered')
-
 
 # Color scheme based on login status
 if st.session_state.get('logged_in', False):
@@ -315,7 +327,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
 # Session state initialization
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
@@ -326,8 +337,17 @@ if 'show_lsu_datastore' not in st.session_state:
 if 'page' not in st.session_state:
     st.session_state.page = 'Home'
 
-
 def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
+    """Send a dataset as a CSV attachment via email using SendGrid.
+
+    Args:
+        email (str): Recipient email address.
+        filename (str): Name of the dataset file.
+        df (DataFrame): DataFrame containing the dataset.
+
+    Returns:
+        bool: True if the email was sent successfully, False otherwise.
+    """
     email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0.9.-]+\.[a.zA.Z]{2,}$'
     if not re.match(email_regex, email):
         st.error('Invalid email address format.')
@@ -348,7 +368,7 @@ def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
         encoded_file = base64.b64encode(csv_data).decode()
 
         message = Mail(
-            from_email=os.getenv("FROM_EMAIL", st.secrets.get("FROM_EMAIL", "default@example.com")),
+            from_email=get_secret("FROM_EMAIL", "default@example.com"),
             to_emails=email,
             subject=f'LSU Datastore: {filename} Data',
             html_content=f'<p>Attached is the data from {filename} as viewed on the LSU Datastore Dashboard.</p>',
@@ -362,10 +382,9 @@ def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
         )
         message.attachment = attachment
 
-        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY', st.secrets.get("SENDGRID_API_KEY", "")))
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY', ""))
         response = sg.send(message)
 
-        # Rest of the function remains unchanged
         if response.status_code == 202:
             st.success(f'Data sent to {email}!')
             logger.info(
@@ -399,10 +418,6 @@ def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
         )
         return False
 
-# Update log setup
-log_dir = os.path.join(os.path.dirname(__file__), os.getenv("LOG_DIR", st.secrets.get("LOG_DIR", "logs")))
-log_file = os.path.join(log_dir, os.getenv("LOG_FILE", st.secrets.get("LOG_FILE", "live_feed_log")))
-
 @st.cache_data
 def cached_get_files() -> List[Tuple[int, str, int, str, datetime]]:
     """Retrieve cached file metadata from the database.
@@ -411,7 +426,6 @@ def cached_get_files() -> List[Tuple[int, str, int, str, datetime]]:
         List[Tuple[int, str, int, str, datetime]]: List of file metadata tuples.
     """
     return get_files()
-
 
 @st.cache_data
 def cached_get_csv_preview(file_id: int) -> DataFrame:
@@ -424,7 +438,6 @@ def cached_get_csv_preview(file_id: int) -> DataFrame:
         DataFrame: Preview DataFrame or empty if no data.
     """
     return get_csv_preview(file_id)
-
 
 def render_sidebar() -> None:
     """Render the sidebar with navigation and login panel."""
@@ -465,10 +478,10 @@ def render_sidebar() -> None:
             with st.spinner('Logging in...'):
                 time.sleep(3)
             try:
-                toml_username = st.secrets['USERNAME']
-                toml_password = st.secrets['PASSWORD']
+                toml_username = get_secret("USERNAME", "admin")
+                toml_password = get_secret("PASSWORD", "NewSecurePassword123")
             except KeyError as e:
-                st.error(f'Missing secret in TOML file: {str(e)}. Ensure USERNAME and PASSWORD are defined.')
+                st.error(f'Missing secret: {str(e)}. Ensure USERNAME and PASSWORD are defined.')
             else:
                 auth_success = authenticate_user(username, password) or (
                     username == toml_username and password == toml_password
@@ -493,7 +506,6 @@ def render_sidebar() -> None:
                 st.session_state.username = None
                 st.session_state.show_lsu_datastore = False
                 st.rerun()
-
 
 def render_blank_page() -> None:
     """Render the Blank Page for viewing CSV files."""
@@ -568,7 +580,6 @@ def render_blank_page() -> None:
         st.warning('No CSV files available in the database.')
     st.markdown('</div>', unsafe_allow_html=True)
 
-
 def render_search_data_page() -> None:
     """Render the Search Data page for searching across datasets."""
     st.markdown('<div class="main">', unsafe_allow_html=True)
@@ -584,7 +595,6 @@ def render_search_data_page() -> None:
         else:
             st.warning('No matches found.')
     st.markdown('</div>', unsafe_allow_html=True)
-
 
 def render_visualize_data_page() -> None:
     """Render the Visualize Data page for exploring data visualizations."""
@@ -623,7 +633,6 @@ def render_visualize_data_page() -> None:
         st.warning('No datasets uploaded yet.')
     st.markdown('</div>', unsafe_allow_html=True)
 
-
 def render_share_data_page() -> None:
     """Render the Share Data page for emailing datasets."""
     st.markdown('<div class="main">', unsafe_allow_html=True)
@@ -660,7 +669,6 @@ def render_share_data_page() -> None:
     else:
         st.warning('No datasets uploaded yet.')
     st.markdown('</div>', unsafe_allow_html=True)
-
 
 def render_home_page() -> None:
     """Render the Home page with data management and live features."""
@@ -1022,7 +1030,6 @@ def render_home_page() -> None:
         '[Link to DAG Grid](https://animated-train-jjvx5x4q9g73p5v5-8080.app.github.dev/dags/fetch_store_dag/grid)'
     )
 
-
 # Main rendering
 def main() -> None:
     """Render the main Streamlit application."""
@@ -1046,7 +1053,6 @@ def main() -> None:
         render_share_data_page()
     else:
         render_home_page()
-
 
 if __name__ == '__main__':
     main()
