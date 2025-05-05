@@ -8,6 +8,7 @@ from typing import Any, Dict, List
 
 import pandas as pd
 import requests
+import urllib3
 
 
 def concatenate_strings(list_str: str, added_str: str, separator: str) -> str:
@@ -35,11 +36,11 @@ def parse_data(course_page: str) -> List[Dict[str, str]]:
     Returns:
         List[Dict[str, str]]: List of dictionaries containing course data.
     """
-    lines = course_page.split('\n')
+    lines: list[str] = course_page.split('\n')
     course_data: List[Dict[str, str]] = []
-    session = 'Normal'
+    session: str = 'Normal'
     queued_notes: Dict[str, str] = {}
-    i = 0
+    i: int = 0
     while not lines[i].startswith('------------'):
         i += 1
     i += 1
@@ -100,7 +101,7 @@ def parse_data(course_page: str) -> List[Dict[str, str]]:
         if current_course['available_spots'] == '(F)':
             current_course['available_spots'] = '0'
 
-        course_string = current_course['prefix'] + ' ' + current_course['course_number']
+        course_string : str = current_course['prefix'] + ' ' + current_course['course_number']
         if course_string in queued_notes:
             current_course['additional_notes'] = concatenate_strings(
                 current_course['additional_notes'], queued_notes.pop(course_string), ' + '
@@ -138,7 +139,8 @@ def parse_course_page(url: str) -> List[Dict[str, str]]:
         requests.RequestException: If the HTTP request fails.
     """
     try:
-        response = requests.get(url, verify=False)
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        response : requests.Response = requests.get(url, verify=False)
         response.raise_for_status()
         return parse_data(response.text)
     except requests.RequestException as e:
@@ -153,7 +155,7 @@ def create_csv(data: List[Dict[str, str]], name: str) -> None:
         data (List[Dict[str, str]]): List of course data dictionaries.
         name (str): Base name for the CSV file (without extension).
     """
-    df = pd.DataFrame(data)
+    df : pd.DataFrame = pd.DataFrame(data)
     df.to_csv(f'{name}.csv', index=False)
 
 
@@ -164,7 +166,7 @@ def create_parquet(data: List[Dict[str, str]], name: str) -> None:
         data (List[Dict[str, str]]): List of course data dictionaries.
         name (str): Base name for the Parquet file (without extension).
     """
-    df = pd.DataFrame(data)
+    df : pd.DataFrame = pd.DataFrame(data)
     df.to_parquet(f'{name}.parquet', engine='pyarrow')
 
 
