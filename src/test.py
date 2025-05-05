@@ -974,36 +974,43 @@ def render_home_page() -> None:
                                 )
 
                         st.subheader('Share Data via Email')
-                        email_input = st.text_input(
-                            'Enter your email address:', key='email_live'
-                        )
-                        sendgrid_api_key = st.text_input('Enter your SendGrid API key:', type='password', key='sendgrid_api_key_live')
-                        if st.button('Send Data', key='send_live'):
-                            if email_input:
-                                if not sendgrid_api_key:
-                                    st.error("Please provide a SendGrid API key.")
-                                    logger.error(
-                                        'Email Share Failed',
-                                        extra={
-                                            'username': st.session_state.username or 'Anonymous',
-                                            'action': 'email_share',
-                                            'details': 'No SendGrid API key provided',
-                                        },
-                                    )
-                                else:
-                                    send_dataset_email(
-                                        email_input, file_options[selected_file_id], df, sendgrid_api_key
-                                    )
-                            else:
-                                st.warning('Please enter an email address.')
-                                logger.error(
-                                    'Email Share Failed',
-                                    extra={
-                                        'username': st.session_state.username or 'Anonymous',
-                                        'action': 'email_share',
-                                        'details': 'No email address provided',
-                                    },
-                                )
+email_input = st.text_input(
+    'Enter your email address:', key='email_live'
+)
+
+# Check if SendGrid API key exists in Streamlit secrets
+sendgrid_api_key = None
+if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
+    sendgrid_api_key = st.secrets['SENDGRID_API_KEY']
+else:
+    sendgrid_api_key = st.text_input(
+        'Enter your SendGrid API key:', 
+        type='password', 
+        key='sendgrid_api_key_live'
+    )
+
+if st.button('Send Data', key='send_live'):
+    if email_input:
+        if not sendgrid_api_key:
+            st.error("Please provide a SendGrid API key.")
+            logger.error(
+                'Email Share Failed',
+                extra={
+                    'username': st.session_state.username or 'Anonymous',
+                    'action': 'email_share',
+                    'details': 'No SendGrid API key provided',
+                },
+            )
+    else:
+        st.warning('Please enter an email address.')
+        logger.error(
+            'Email Share Failed',
+            extra={
+                'username': st.session_state.username or 'Anonymous',
+                'action': 'email_share',
+                'details': 'No email address provided',
+            },
+        )
                     else:
                         st.error('No data found in the selected dataset.')
             with col2:
