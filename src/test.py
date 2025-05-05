@@ -1106,11 +1106,6 @@ def render_home_page() -> None:
 # Main rendering
 def main() -> None:
     """Render the main Streamlit application."""
-    # Set default page if not set (ensures home page after logout)
-    if 'page' not in st.session_state:
-        st.session_state.page = 'Home'
-
-    # Render header
     st.markdown(
         """
         <div class="demo-info">
@@ -1120,41 +1115,17 @@ def main() -> None:
         """,
         unsafe_allow_html=True,
     )
-
-    # Render sidebar
     render_sidebar()
-
-    # Render page based on session state
-    match st.session_state.page:
-        case 'Blank Page':
-            render_blank_page()
-        case '🔍 Search Data':
-            render_search_data_page()
-        case '📊 Visualize Data':
-            render_visualize_data_page()
-        case '📤 Share Data':
-            render_share_data_page()
-        case _:
-            render_home_page()
-
-# Logout block
-if st.session_state.get('logged_in', False):
-    if st.button('Logout'):
-        with st.spinner('Logging out...'):
-            # Clear session state
-            st.session_state.logged_in = False
-            st.session_state.username = None
-            st.session_state.show_lsu_datastore = False
-            st.session_state.page = 'Home'  # Reset to home page
-            # Clear other session state keys to reduce memory
-            for key in list(st.session_state.keys()):
-                if key not in ['logged_in', 'username', 'show_lsu_datastore', 'page']:
-                    del st.session_state[key]
-            # time.sleep(0.5)  # Minimal delay for UX (optional)
-        st.rerun()
-else:
-    main()
-        
+    if st.session_state.page == 'Blank Page':
+        render_blank_page()
+    elif st.session_state.page == '🔍 Search Data':
+        render_search_data_page()
+    elif st.session_state.page == '📊 Visualize Data':
+        render_visualize_data_page()
+    elif st.session_state.page == '📤 Share Data':
+        render_share_data_page()
+    else:
+        render_home_page()
 
 if __name__ == '__main__':
     main()
