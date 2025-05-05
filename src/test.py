@@ -328,17 +328,7 @@ if 'page' not in st.session_state:
 
 
 def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
-    """Send a dataset as a CSV attachment via email using SendGrid.
-
-    Args:
-        email (str): Recipient email address.
-        filename (str): Name of the dataset file.
-        df (DataFrame): DataFrame containing the dataset.
-
-    Returns:
-        bool: True if the email was sent successfully, False otherwise.
-    """
-    email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0.9.-]+\.[a-zA-Z]{2,}$'
+    email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0.9.-]+\.[a.zA.Z]{2,}$'
     if not re.match(email_regex, email):
         st.error('Invalid email address format.')
         logger.error(
@@ -357,30 +347,25 @@ def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
         csv_data = csv_buffer.getvalue().encode('utf-8')
         encoded_file = base64.b64encode(csv_data).decode()
 
-        # Construct the email payload directly
-        email_data = {
-            'personalizations': [{'to': [{'email': email}]}],
-            'from': {'email': 'bdav213@lsu.edu'},
-            'subject': f'LSU Datastore: {filename} Data',
-            'content': [
-                {
-                    'type': 'text/html',
-                    'value': f'<p>Attached is the data from {filename} as viewed on the LSU Datastore Dashboard.</p>',
-                }
-            ],
-            'attachments': [
-                {
-                    'content': encoded_file,
-                    'filename': filename,
-                    'type': 'text/csv',
-                    'disposition': 'attachment',
-                }
-            ],
-        }
+        message = Mail(
+            from_email=os.getenv("FROM_EMAIL", st.secrets.get("FROM_EMAIL", "default@example.com")),
+            to_emails=email,
+            subject=f'LSU Datastore: {filename} Data',
+            html_content=f'<p>Attached is the data from {filename} as viewed on the LSU Datastore Dashboard.</p>',
+        )
 
-        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-        response = sg.client.mail.send.post(request_body=email_data)
+        attachment = Attachment(
+            FileContent(encoded_file),
+            FileName(filename),
+            FileType('text/csv'),
+            Disposition('attachment'),
+        )
+        message.attachment = attachment
 
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY', st.secrets.get("SENDGRID_API_KEY", "")))
+        response = sg.send(message)
+
+        # Rest of the function remains unchanged
         if response.status_code == 202:
             st.success(f'Data sent to {email}!')
             logger.info(
@@ -413,6 +398,10 @@ def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
             },
         )
         return False
+
+# Update log setup
+log_dir = os.path.join(os.path.dirname(__file__), os.getenv("LOG_DIR", st.secrets.get("LOG_DIR", "logs")))
+log_file = os.path.join(log_dir, os.getenv("LOG_FILE", st.secrets.get("LOG_FILE", "live_feed_log")))
 
 @st.cache_data
 def cached_get_files() -> List[Tuple[int, str, int, str, datetime]]:
