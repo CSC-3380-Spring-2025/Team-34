@@ -83,13 +83,24 @@ class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
 
 # Helper function to safely get secrets
 def get_secret(key: str, default: str) -> str:
-    """Safely retrieve a secret from environment variables or st.secrets."""
+    """Safely retrieve a secret from environment variables or st.secrets.
+
+    Args:
+        key (str): The key to look up.
+        default (str): The default value if the key is not found.
+
+    Returns:
+        str: The value of the key or the default.
+    """
+    # First, try os.getenv (local .env file)
     value = os.getenv(key)
     if value is not None:
         return value
+    # If running in Streamlit Cloud, try st.secrets
     try:
         return st.secrets.get(key, default)
     except (AttributeError, FileNotFoundError):
+        # If st.secrets is not available or secrets.toml is missing, use default
         return default
 
 # Setup logging
@@ -324,10 +335,20 @@ if 'username' not in st.session_state:
 if 'show_lsu_datastore' not in st.session_state:
     st.session_state.show_lsu_datastore = False
 if 'page' not in st.session_state:
-    st.session_state.page = 'Login'
+    st.session_state.page = 'Home'
 
 def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_key: str) -> bool:
-    """Send a dataset as a CSV attachment via email using SendGrid."""
+    """Send a dataset as a CSV attachment via email using SendGrid.
+
+    Args:
+        email (str): Recipient email address.
+        filename (str): Name of the dataset file.
+        df (DataFrame): DataFrame containing the dataset.
+        sendgrid_api_key (str): SendGrid API key for authentication.
+
+    Returns:
+        bool: True if the email was sent successfully, False otherwise.
+    """
     email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if not re.match(email_regex, email):
         st.error(f'Invalid email address format: {email}')
@@ -342,6 +363,7 @@ def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_ke
         return False
 
     try:
+        # Prepare the email data
         csv_buffer = io.StringIO()
         df.to_csv(csv_buffer, index=False)
         csv_data = csv_buffer.getvalue().encode('utf-8')
@@ -367,6 +389,7 @@ def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_ke
             ],
         }
 
+        # First attempt: Try with SSL verification enabled
         headers = {
             "Authorization": f"Bearer {sendgrid_api_key}",
             "Content-Type": "application/json",
@@ -377,8 +400,9 @@ def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_ke
                 json=email_data,
                 headers=headers,
             )
-            response.raise_for_status()
+            response.raise_for_status()  # Raise an exception for HTTP errors
         except requests.exceptions.SSLError as ssl_err:
+            # SSL verification failed; retry with verification disabled
             st.warning(
                 "SSL certificate verification failed. Retrying with SSL verification disabled. "
                 "This is less secure and should be fixed by updating your system's CA certificates "
@@ -396,7 +420,7 @@ def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_ke
                 "https://api.sendgrid.com/v3/mail/send",
                 json=email_data,
                 headers=headers,
-                verify=False,
+                verify=False,  # Disable SSL verification
             )
             response.raise_for_status()
 
@@ -435,72 +459,52 @@ def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_ke
 
 @st.cache_data
 def cached_get_files() -> List[Tuple[int, str, int, str, datetime]]:
-    """Retrieve cached file metadata from the database."""
-    start_time = time.time()
-    files = get_files()
-    logger.info(f"get_files took {time.time() - start_time:.2f} seconds")
-    return files
+    """Retrieve cached file metadata from the database.
+
+    Returns:
+        List[Tuple[int, str, int, str, datetime]]: List of file metadata tuples.
+    """
+    return get_files()
 
 @st.cache_data
 def cached_get_csv_preview(file_id: int) -> DataFrame:
-    """Retrieve cached CSV data preview for a file."""
-    start_time = time.time()
-    df = get_csv_preview(file_id)
-    logger.info(f"get_csv_preview took {time.time() - start_time:.2f} seconds")
-    return df
+    """Retrieve cached CSV data preview for a file.
 
-def render_login_page() -> None:
-    """Render a dedicated login page."""
-    st.markdown('<div class="main">', unsafe_allow_html=True)
-    st.header('LSU Datastore - Login')
-    st.subheader('Please log in to access the dashboard')
+    Args:
+        file_id (int): ID of the file to preview.
 
-    username = st.text_input('Username', key='login_username')
-    password = st.text_input('Password', type='password', key='login_password')
-    if st.button('Login'):
-        with st.spinner('Logging in...'):
-            time.sleep(0.5)  # Minimal delay for UX
-        try:
-            toml_username = get_secret("USERNAME", "admin")
-            toml_password = get_secret("PASSWORD", "NewSecurePassword123")
-        except KeyError as e:
-            st.error(f'Missing secret: {str(e)}. Ensure USERNAME and PASSWORD are defined.')
-        else:
-            auth_success = authenticate_user(username, password) or (
-                username == toml_username and password == toml_password
-            )
-            if auth_success:
-                st.session_state.logged_in = True
-                st.session_state.username = username
-                st.session_state.show_lsu_datastore = (
-                    username == toml_username and password == toml_password
-                )
-                st.session_state.page = 'Home'  # Redirect to home page
-                st.success(f'Logged in as {username}!')
-                st.rerun()
-            else:
-                st.error('Invalid credentials')
-    st.markdown('</div>', unsafe_allow_html=True)
+    Returns:
+        DataFrame: Preview DataFrame or empty if no data.
+    """
+    return get_csv_preview(file_id)
 
 def render_sidebar() -> None:
-    """Render the sidebar with navigation for logged-in users."""
+    """Render the sidebar with navigation and login panel."""
     with st.sidebar:
+        st.header('DATABASE-RELATED LINKS')
+        st.markdown('[GitHub Page](https://github.com/CSC-3380-Spring-2025/Team-34)')
+
+        st.header('NAVIGATION')
+        pages = ['Home', 'Blank Page', '🔍 Search Data', '📊 Visualize Data', '📤 Share Data']
+        
+        # Initialize session state if not already set
+        if 'page' not in st.session_state:
+            st.session_state.page = 'Home'
+
+        # Use selectbox to navigate
+        page = st.selectbox(
+            'Navigate to:',
+            pages,
+            index=pages.index(st.session_state.page),
+            key='page_select',
+        )
+
+        # Update session state only if the selection changes
+        if page != st.session_state.page:
+            st.session_state.page = page
+            st.rerun()  # Force rerun to reflect the new page immediately
+
         if st.session_state.logged_in:
-            st.header('DATABASE-RELATED LINKS')
-            st.markdown('[GitHub Page](https://github.com/CSC-3380-Spring-2025/Team-34)')
-
-            st.header('NAVIGATION')
-            pages = ['Home', 'Blank Page', '🔍 Search Data', '📊 Visualize Data', '📤 Share Data']
-            page = st.selectbox(
-                'Navigate to:',
-                pages,
-                index=pages.index(st.session_state.page) if st.session_state.page in pages else 0,
-                key='page_select',
-            )
-            if page != st.session_state.page:
-                st.session_state.page = page
-                st.rerun()
-
             st.header('SOFTWARE-RELATED LINKS')
             st.markdown('[BioPython](https://biopython.org/)')
             st.markdown('[RDKit](https://www.rdkit.org/)')
@@ -516,18 +520,40 @@ def render_sidebar() -> None:
             st.markdown('[seaborn](https://seaborn.pydata.org/)')
             st.markdown('[streamlit](https://streamlit.io/)')
 
-            st.header('USER ACTIONS')
+        st.header('USER LOGIN')
+        username = st.text_input('Username', key='login_username')
+        password = st.text_input('Password', type='password', key='login_password')
+        if st.button('Login'):
+            with st.spinner('Logging in...'):
+                time.sleep(3)
+            try:
+                toml_username = get_secret("USERNAME", "admin")
+                toml_password = get_secret("PASSWORD", "NewSecurePassword123")
+            except KeyError as e:
+                st.error(f'Missing secret: {str(e)}. Ensure USERNAME and PASSWORD are defined.')
+            else:
+                auth_success = authenticate_user(username, password) or (
+                    username == toml_username and password == toml_password
+                )
+                if auth_success:
+                    st.session_state.logged_in = True
+                    st.session_state.username = username
+                    st.session_state.show_lsu_datastore = (
+                        username == toml_username and password == toml_password
+                    )
+                    st.success(f'Logged in as {username}!')
+                    st.rerun()
+                else:
+                    st.error('Invalid credentials')
+                    st.rerun()
+
+        if st.session_state.logged_in:
             if st.button('Logout'):
                 with st.spinner('Logging out...'):
-                    st.session_state.logged_in = False
-                    st.session_state.username = None
-                    st.session_state.show_lsu_datastore = False
-                    st.session_state.page = 'Login'
-                    for key in list(st.session_state.keys()):
-                        if key not in ['logged_in', 'username', 'show_lsu_datastore', 'page']:
-                            del st.session_state[key]
-                    st.cache_data.clear()  # Clear cached data
-                    time.sleep(0.5)  # Minimal delay for UX
+                    time.sleep(3)
+                st.session_state.logged_in = False
+                st.session_state.username = None
+                st.session_state.show_lsu_datastore = False
                 st.rerun()
 
 def render_blank_page() -> None:
@@ -708,6 +734,7 @@ def render_share_data_page() -> None:
 def render_home_page() -> None:
     """Render the Home page with data management and live features."""
     st.markdown('<div class="main">', unsafe_allow_html=True)
+
     st.header('LSU Datastore')
     st.subheader('A tool for managing and analyzing data at LSU')
     st.markdown('Created by the LSU Data Science Team', unsafe_allow_html=True)
@@ -1016,7 +1043,8 @@ def render_home_page() -> None:
 
     if st.session_state.logged_in:
         st.subheader('Live Feed Logs')
-        st.markdown('View and download daily logs of live feed activities.')
+        st.markdown('View and download daily logs of live feed activities for testing and optimization.')
+
         log_files = [
             f for f in os.listdir(log_dir) if f.startswith('live_feed_log') and f.endswith('.csv')
         ]
@@ -1045,54 +1073,59 @@ def render_home_page() -> None:
             st.warning('No log files available.')
 
         st.subheader('Live Terminal Logs')
-        st.markdown('View recent logs in a terminal-like interface.')
-        logs = memory_handler.get_logs()
-        log_text = '\n'.join(logs[-20:])  # Show last 20 logs
-        st.markdown(
-            f'<div class="terminal-log">{log_text}</div>',
-            unsafe_allow_html=True,
-        )
+        st.markdown('View live logs in a terminal-like interface.')
+        log_placeholder = st.empty()
+        for _ in range(60):
+            logs = memory_handler.get_logs()
+            log_text = '\n'.join(logs[-20:])
+            log_placeholder.markdown(
+                f'<div class="terminal-log">{log_text}</div>',
+                unsafe_allow_html=True,
+            )
+            time.sleep(1)
 
     st.subheader('System Performance Metrics')
-    cpu_usage = psutil.cpu_percent(interval=0.1)
-    memory_usage = psutil.virtual_memory().percent
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric('CPU Usage', f'{cpu_usage}%')
-    with col2:
-        st.metric('Memory Usage', f'{memory_usage}%')
+    placeholder = st.empty()
+    for _ in range(60):
+        cpu_usage = psutil.cpu_percent(interval=1)
+        memory_usage = psutil.virtual_memory().percent
+        with placeholder.container():
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric('CPU Usage', f'{cpu_usage}%')
+            with col2:
+                st.metric('Memory Usage', f'{memory_usage}%')
 
     st.markdown('</div>', unsafe_allow_html=True)
+
     st.markdown('---')
     st.markdown(
         '[Link to DAG Grid](https://animated-train-jjvx5x4q9g73p5v5-8080.app.github.dev/dags/fetch_store_dag/grid)'
     )
 
+# Main rendering
 def main() -> None:
     """Render the main Streamlit application."""
-    if not st.session_state.logged_in:
-        render_login_page()
+    st.markdown(
+        """
+        <div class="demo-info">
+            <span class="demo-text">Demo 1.3.6</span>
+            <span class="live-demo-badge"><i class="fas fa-rocket"></i> Live Demo</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    render_sidebar()
+    if st.session_state.page == 'Blank Page':
+        render_blank_page()
+    elif st.session_state.page == '🔍 Search Data':
+        render_search_data_page()
+    elif st.session_state.page == '📊 Visualize Data':
+        render_visualize_data_page()
+    elif st.session_state.page == '📤 Share Data':
+        render_share_data_page()
     else:
-        st.markdown(
-            """
-            <div class="demo-info">
-                <span class="demo-text">Demo 1.3.6</span>
-                <span class="live-demo-badge"><i class="fas fa-rocket"></i> Live Demo</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        render_sidebar()
-        if st.session_state.page == 'Blank Page':
-            render_blank_page()
-        elif st.session_state.page == '🔍 Search Data':
-            render_search_data_page()
-        elif st.session_state.page == '📊 Visualize Data':
-            render_visualize_data_page()
-        elif st.session_state.page == '📤 Share Data':
-            render_share_data_page()
-        else:
-            render_home_page()
+        render_home_page()
 
 if __name__ == '__main__':
     main()
