@@ -62,7 +62,7 @@ def collect_default_data() -> List[dict[str, str]]:
     Returns:
         List[dict[str, str]]: List of dictionaries containing default course data.
     """
-    links = [
+    links : List[str]= [
         'https://appl101.lsu.edu/booklet2.nsf/All/67FD57ECBF3676C486258BAC002C42AB?OpenDocument',
         'https://appl101.lsu.edu/booklet2.nsf/All/2719C3AEB8F7AE3986258BAC002C42D6?OpenDocument',
         'https://appl101.lsu.edu/booklet2.nsf/All/D61BDEBE0037080E86258BAC002C42B1?OpenDocument',
