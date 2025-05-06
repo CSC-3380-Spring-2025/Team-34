@@ -1009,7 +1009,7 @@ def render_home_page() -> None:
 
                         # Check if SendGrid API key exists in Streamlit secrets
                         sendgrid_api_key = None
-                        if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
+                        if has_secrets and 'SENDGRID_API_KEY' in st.secrets:
                             sendgrid_api_key = st.secrets['SENDGRID_API_KEY']
                         else:
                             sendgrid_api_key = st.text_input(
