@@ -4,7 +4,7 @@ import pandas as pd
 from datastore.processor import process_data
 from typing import Any
 
-def test_process_data():
+def test_process_data() -> None:
     """Test processing function with missing values and duplicates."""
     data : dict[str, Any]= {"A": [1, 2, 2, None], "B": ["X", "Y", "Y", "Z"]}
     df : pd.DataFrame = pd.DataFrame(data)
