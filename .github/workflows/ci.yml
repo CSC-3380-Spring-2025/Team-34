@@ -48,7 +48,7 @@ jobs:
 
       # Launches Streamlit app in the background for endpoint testing.
       - name: Launch Streamlit in background
-        run: nohup streamlit run src/test.py --server.headless true &
+        run: nohup streamlit run src/app.py --server.headless true &
 
       # Waits for Streamlit to be available on port 8501.
       - name: Wait for Streamlit to be ready
