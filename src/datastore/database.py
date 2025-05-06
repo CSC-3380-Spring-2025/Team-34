@@ -7,16 +7,19 @@ storage for the LSU Datastore Dashboard.
 import hashlib
 import io
 import os
+import pandas as pd
 import sqlite3
 from datetime import datetime
 from typing import Any, List, Optional, Tuple
+from dotenv import load_dotenv
 
-import pandas as pd
+
+load_dotenv()
 
 
 # Database path configuration
 BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
-DB_NAME: str = os.path.join(BASE_DIR, 'datastore.db')
+DB_NAME = os.path.join(BASE_DIR, os.getenv("DATABASE_NAME", "datastore.db"))
 
 
 def init_db() -> None:
@@ -339,5 +342,6 @@ def reset_password(username: str, new_password: str) -> None:
 
 if __name__ == '__main__':
     init_db()
-    # Reset admin password only if needed (e.g., first run)
-    reset_password('admin', 'NewSecurePassword123')
+    admin_username = os.getenv("ADMIN_USERNAME", st.secrets.get("ADMIN_USERNAME", "admin"))
+    admin_password = os.getenv("ADMIN_PASSWORD", st.secrets.get("ADMIN_PASSWORD", "default_password"))
+    reset_password(admin_username, admin_password)

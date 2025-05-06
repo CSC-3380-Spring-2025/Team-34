@@ -9,11 +9,12 @@ import os
 import sys
 from datetime import datetime
 from typing import List
-
+from typing import Any
 import pandas as pd
 import requests
 import schedule
 import time
+import streamlit as st
 from dotenv import load_dotenv
 
 # Add project root to sys.path
@@ -26,12 +27,13 @@ import src.datastore.create_multi_department_data as lsudata
 load_dotenv()
 
 # API keys and constants
-LINKED_JOBS_API = 'linkedin-jobs-search.p.rapidapi.com'
-UDEMY_API = 'udemy-api2.p.rapidapi.com'
-CORE_API_KEY = 'eXSfGz97ZsArORei8W6ov2EDyT0alhupm'
-RAPIDAPI_KEY = 'bff529ced6mshe878b4a3ba0937fp18edbcjsn98c41db5431e'
+LINKED_JOBS_API : str = 'linkedin-jobs-search.p.rapidapi.com'
+UDEMY_API : str = 'udemy-api2.p.rapidapi.com'
+CORE_API_KEY : str = os.getenv("CORE_API_KEY")
+#RAPIDAPI_KEY : str = os.getenv("RAPIDAPI_KEY", st.secrets.get("RAPIDAPI_KEY", ""))
+RAPIDAPI_KEY : str = os.getenv("RAPIDAPI_KEY")
 
-MAJORS = ['software engineering', 'cloud computing', 'data science', 'cybersecurity']
+MAJORS : list[str] = ['software engineering', 'cloud computing', 'data science', 'cybersecurity']
 
 def fetch_jobs_data(major: str) -> pd.DataFrame:
     """Fetch job listings for a given major from LinkedIn Jobs API.
@@ -44,19 +46,19 @@ def fetch_jobs_data(major: str) -> pd.DataFrame:
     """
     # return pd.DataFrame()  # USE THIS IF NOT TESTING THIS FEATURE TO SAVE API CALLS
     try:
-        url = 'https://linkedin-jobs-search.p.rapidapi.com/'
-        payload = {
+        url : str = 'https://linkedin-jobs-search.p.rapidapi.com/'
+        payload : dict[str, str]= {
             'search_terms': major,
             'location': 'United States',
             'page': '1'
         }
-        headers = {
+        headers : dict[str, str] = {
             'x-rapidapi-key': RAPIDAPI_KEY,
             'x-rapidapi-host': LINKED_JOBS_API,
             'Content-Type': 'application/json'
         }
 
-        response = requests.post(url, json=payload, headers=headers)
+        response : str = requests.post(url, json=payload, headers=headers)
         response.raise_for_status()
         jobs = response.json()
         job_data = [
@@ -86,14 +88,14 @@ def fetch_courses_data(major: str) -> pd.DataFrame:
     # return pd.DataFrame()  # USE THIS IF NOT TESTING THIS FEATURE TO SAVE API CALLS
     match major:
         case 'cybersecurity':
-            category = 'network_and_security'
+            category : str = 'network_and_security'
         case 'cloud computing':
-            category = 'web_development'
+            category : str = 'web_development'
         case _:
-            category = major.lower().replace(' ', '_')
+            category : str = major.lower().replace(' ', '_')
     try:
-        url = f'https://udemy-api2.p.rapidapi.com/v1/udemy/category/{category}'
-        payload = {
+        url : str = f'https://udemy-api2.p.rapidapi.com/v1/udemy/category/{category}'
+        payload : dict[str,Any] = {
             'page': 1,
             'page_size': 10,
             'ratings': '',
@@ -107,13 +109,13 @@ def fetch_courses_data(major: str) -> pd.DataFrame:
             'locale': 'en_US',
             'extract_pricing': True
         }
-        headers = {
+        headers : dict[str,str] = {
             'x-rapidapi-key': RAPIDAPI_KEY,
             'x-rapidapi-host': UDEMY_API,
             'Content-Type': 'application/json'
         }
 
-        response = requests.post(url, json=payload, headers=headers)
+        response : str = requests.post(url, json=payload, headers=headers)
         response.raise_for_status()
         data = response.json()
         courses = data['data']['courses']
@@ -142,9 +144,9 @@ def fetch_research_data(major: str) -> pd.DataFrame:
         pd.DataFrame: DataFrame containing research data (title, authors, publication_date, url).
     """
     try:
-        headers = {'Authorization': f'Bearer {CORE_API_KEY}'}
-        params = {'q': major, 'limit': 10}
-        response = requests.get('https://api.core.ac.uk/v3/search/works', headers=headers, params=params)
+        headers : dict[str,str]= {'Authorization': f'Bearer {CORE_API_KEY}'}
+        params : dict[str,str] = {'q': major, 'limit': 10}
+        response : str = requests.get('https://api.core.ac.uk/v3/search/works', headers=headers, params=params)
         response.raise_for_status()
         data = response.json()
         research_data = [
@@ -167,7 +169,7 @@ def fetch_lsu_course_data() -> pd.DataFrame:
     Returns:
         pd.DataFrame: DataFrame containing LSU course data.
     """
-    course_data = lsudata.collect_default_data()
+    course_data : List[dict[str,str]] = lsudata.collect_default_data()
     return pd.DataFrame(course_data)
 
 def save_to_database(dataframe: pd.DataFrame, filename: str, user_id: int = 1) -> None:
@@ -182,25 +184,25 @@ def save_to_database(dataframe: pd.DataFrame, filename: str, user_id: int = 1) -
         print(f'No data to save for {filename}')
         return
     dataframe.replace('', 'emptyvalue', inplace=True)
-    file_content = dataframe.to_csv(index=False).encode('utf-8')
+    file_content : bytes = dataframe.to_csv(index=False).encode('utf-8')
     save_csv_to_database(filename, file_content, len(file_content), 'csv', user_id)  # Updated from save_csv_data
     print(f'Stored {filename} in database')
 
 def fetch_and_store_all_data() -> None:
     """Fetch and store job, course, research, and LSU data for all majors."""
-    today = datetime.now().strftime('%Y-%m-%d')
+    today : str = datetime.now().strftime('%Y-%m-%d')
     for major in MAJORS:
         print(f'Fetching data for {major} on {today}...')
-        jobs_df = fetch_jobs_data(major)
+        jobs_df : pd.DataFrame = fetch_jobs_data(major)
         if not jobs_df.empty:
             save_to_database(jobs_df, f'jobs_{major.replace(" ", "_")}_{today}.csv')
-        courses_df = fetch_courses_data(major)
+        courses_df : pd.DataFrame = fetch_courses_data(major)
         if not courses_df.empty:
             save_to_database(courses_df, f'courses_{major.replace(" ", "_")}_{today}.csv')
-        research_df = fetch_research_data(major)
+        research_df : pd.DataFrame = fetch_research_data(major)
         if not research_df.empty:
             save_to_database(research_df, f'research_{major.replace(" ", "_")}_{today}.csv')
-    lsu_df = fetch_lsu_course_data()
+    lsu_df : pd.DataFrame = fetch_lsu_course_data()
     if not lsu_df.empty:
         save_to_database(lsu_df, f'lsu_relevant_{today}.csv')
 

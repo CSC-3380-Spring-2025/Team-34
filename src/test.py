@@ -3,7 +3,7 @@
 Provides a web interface for managing, visualizing, and sharing datasets at LSU,
 with user authentication, data upload, search, and live logging features.
 """
-
+import requests
 import base64
 import io
 import logging
@@ -22,7 +22,12 @@ import pyarrow
 import streamlit as st
 from pandas import DataFrame
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Attachment, Disposition, FileContent, FileName, FileType
+from sendgrid.helpers.mail import Mail, Attachment, Disposition, FileContent, FileName, FileType
+
+# Load environment variables from .env file
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Add project root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -34,9 +39,8 @@ from src.datastore.database import (
     get_files,
     search_csv_data,
     update_csv_data,
-    save_csv_to_database,  # Updated from save_csv_data
+    save_csv_to_database,
 )
-
 
 # Custom MemoryHandler for live log display
 class MemoryHandler(logging.Handler):
@@ -57,7 +61,6 @@ class MemoryHandler(logging.Handler):
     def get_logs(self) -> List[str]:
         return self.logs
 
-
 # CSV formatter for file logs
 class CSVFormatter(logging.Formatter):
     """Format logs as CSV for file storage."""
@@ -69,7 +72,6 @@ class CSVFormatter(logging.Formatter):
         details = getattr(record, 'details', 'No details')
         return f'{timestamp},{username},{action},{details}'
 
-
 # Daily rotating file handler with header
 class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
     """Rotate log files daily and add CSV header on rollover."""
@@ -79,15 +81,36 @@ class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
         with open(self.baseFilename, 'a') as f:
             f.write('Timestamp,Username,Action,Details\n')
 
+# Helper function to safely get secrets
+def get_secret(key: str, default: str) -> str:
+    """Safely retrieve a secret from environment variables or st.secrets.
+
+    Args:
+        key (str): The key to look up.
+        default (str): The default value if the key is not found.
+
+    Returns:
+        str: The value of the key or the default.
+    """
+    # First, try os.getenv (local .env file)
+    value = os.getenv(key)
+    if value is not None:
+        return value
+    # If running in Streamlit Cloud, try st.secrets
+    try:
+        return st.secrets.get(key, default)
+    except (AttributeError, FileNotFoundError):
+        # If st.secrets is not available or secrets.toml is missing, use default
+        return default
 
 # Setup logging
-log_dir = os.path.join(os.path.dirname(__file__), 'logs')
+log_dir = os.path.join(os.path.dirname(__file__), get_secret("LOG_DIR", "logs"))
 os.makedirs(log_dir, exist_ok=True)
 
 logger = logging.getLogger('LiveFeedLogger')
 logger.setLevel(logging.INFO)
 
-log_file = os.path.join(log_dir, 'live_feed_log')
+log_file = os.path.join(log_dir, get_secret("LOG_FILE", "live_feed_log"))
 file_handler = CustomTimedRotatingFileHandler(
     log_file, when='midnight', interval=1, backupCount=30, encoding='utf-8'
 )
@@ -108,19 +131,8 @@ logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 logger.addHandler(memory_handler)
 
-# Load environment variables (non-credential, local only)
-if not os.getenv('IS_STREAMLIT_CLOUD', False):
-    try:
-        from dotenv import load_dotenv
-
-        load_dotenv()
-    except ImportError:
-        pass
-
-
 # Set page configuration
 st.set_page_config(page_title='📊 LSU Datastore', layout='centered')
-
 
 # Color scheme based on login status
 if st.session_state.get('logged_in', False):
@@ -315,7 +327,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
 # Session state initialization
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
@@ -326,21 +337,22 @@ if 'show_lsu_datastore' not in st.session_state:
 if 'page' not in st.session_state:
     st.session_state.page = 'Home'
 
-
-def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
+def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_key: str = None) -> bool:
     """Send a dataset as a CSV attachment via email using SendGrid.
 
     Args:
         email (str): Recipient email address.
         filename (str): Name of the dataset file.
         df (DataFrame): DataFrame containing the dataset.
+        sendgrid_api_key (str, optional): SendGrid API key for authentication. If not provided, 
+                                         attempts to use the key from Streamlit secrets.
 
     Returns:
         bool: True if the email was sent successfully, False otherwise.
     """
-    email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0.9.-]+\.[a-zA-Z]{2,}$'
+    email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if not re.match(email_regex, email):
-        st.error('Invalid email address format.')
+        st.error(f'Invalid email address format: {email}')
         logger.error(
             'Email Share Failed',
             extra={
@@ -351,35 +363,85 @@ def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
         )
         return False
 
+    # Check for SendGrid API key: use secrets if available, otherwise use provided key
+    api_key = None
+    if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
+        api_key = st.secrets['SENDGRID_API_KEY']
+    elif sendgrid_api_key:
+        api_key = sendgrid_api_key
+    else:
+        st.error("No SendGrid API key provided or found in Streamlit secrets.")
+        logger.error(
+            'Email Share Failed',
+            extra={
+                'username': st.session_state.username or 'Anonymous',
+                'action': 'email_share',
+                'details': 'No SendGrid API key provided or found in secrets',
+            },
+        )
+        return False
+
     try:
+        # Prepare the email data
         csv_buffer = io.StringIO()
         df.to_csv(csv_buffer, index=False)
         csv_data = csv_buffer.getvalue().encode('utf-8')
         encoded_file = base64.b64encode(csv_data).decode()
 
-        # Construct the email payload directly
         email_data = {
-            'personalizations': [{'to': [{'email': email}]}],
-            'from': {'email': 'bdav213@lsu.edu'},
-            'subject': f'LSU Datastore: {filename} Data',
-            'content': [
+            "personalizations": [{"to": [{"email": email}]}],
+            "from": {"email": get_secret("FROM_EMAIL", "default@example.com")},
+            "subject": f"LSU Datastore: {filename} Data",
+            "content": [
                 {
-                    'type': 'text/html',
-                    'value': f'<p>Attached is the data from {filename} as viewed on the LSU Datastore Dashboard.</p>',
+                    "type": "text/html",
+                    "value": f"<p>Attached is the data from {filename} as viewed on the LSU Datastore Dashboard.</p>",
                 }
             ],
-            'attachments': [
+            "attachments": [
                 {
-                    'content': encoded_file,
-                    'filename': filename,
-                    'type': 'text/csv',
-                    'disposition': 'attachment',
+                    "content": encoded_file,
+                    "filename": filename,
+                    "type": "text/csv",
+                    "disposition": "attachment",
                 }
             ],
         }
 
-        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-        response = sg.client.mail.send.post(request_body=email_data)
+        # First attempt: Try with SSL verification enabled
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        }
+        try:
+            response = requests.post(
+                "https://api.sendgrid.com/v3/mail/send",
+                json=email_data,
+                headers=headers,
+            )
+            response.raise_for_status()  # Raise an exception for HTTP errors
+        except requests.exceptions.SSLError as ssl_err:
+            # SSL verification failed; retry with verification disabled
+            st.warning(
+                "SSL certificate verification failed. Retrying with SSL verification disabled. "
+                "This is less secure and should be fixed by updating your system's CA certificates "
+                "or configuring your network proxy certificates."
+            )
+            logger.warning(
+                'SSL Verification Failed - Retrying with Disabled Verification',
+                extra={
+                    'username': st.session_state.username or 'Anonymous',
+                    'action': 'email_share',
+                    'details': f'SSL error: {str(ssl_err)}, retrying without verification',
+                },
+            )
+            response = requests.post(
+                "https://api.sendgrid.com/v3/mail/send",
+                json=email_data,
+                headers=headers,
+                verify=False,  # Disable SSL verification
+            )
+            response.raise_for_status()
 
         if response.status_code == 202:
             st.success(f'Data sent to {email}!')
@@ -423,7 +485,6 @@ def cached_get_files() -> List[Tuple[int, str, int, str, datetime]]:
     """
     return get_files()
 
-
 @st.cache_data
 def cached_get_csv_preview(file_id: int) -> DataFrame:
     """Retrieve cached CSV data preview for a file.
@@ -436,7 +497,6 @@ def cached_get_csv_preview(file_id: int) -> DataFrame:
     """
     return get_csv_preview(file_id)
 
-
 def render_sidebar() -> None:
     """Render the sidebar with navigation and login panel."""
     with st.sidebar:
@@ -445,13 +505,23 @@ def render_sidebar() -> None:
 
         st.header('NAVIGATION')
         pages = ['Home', 'Blank Page', '🔍 Search Data', '📊 Visualize Data', '📤 Share Data']
+        
+        # Initialize session state if not already set
+        if 'page' not in st.session_state:
+            st.session_state.page = 'Home'
+
+        # Use selectbox to navigate
         page = st.selectbox(
             'Navigate to:',
             pages,
             index=pages.index(st.session_state.page),
             key='page_select',
         )
-        st.session_state.page = page
+
+        # Update session state only if the selection changes
+        if page != st.session_state.page:
+            st.session_state.page = page
+            st.rerun()  # Force rerun to reflect the new page immediately
 
         if st.session_state.logged_in:
             st.header('SOFTWARE-RELATED LINKS')
@@ -476,10 +546,10 @@ def render_sidebar() -> None:
             with st.spinner('Logging in...'):
                 time.sleep(3)
             try:
-                toml_username = st.secrets['USERNAME']
-                toml_password = st.secrets['PASSWORD']
+                toml_username = get_secret("USERNAME", "admin")
+                toml_password = get_secret("PASSWORD", "NewSecurePassword123")
             except KeyError as e:
-                st.error(f'Missing secret in TOML file: {str(e)}. Ensure USERNAME and PASSWORD are defined.')
+                st.error(f'Missing secret: {str(e)}. Ensure USERNAME and PASSWORD are defined.')
             else:
                 auth_success = authenticate_user(username, password) or (
                     username == toml_username and password == toml_password
@@ -503,8 +573,8 @@ def render_sidebar() -> None:
                 st.session_state.logged_in = False
                 st.session_state.username = None
                 st.session_state.show_lsu_datastore = False
+                st.session_state.page = '🔍 Search Data'
                 st.rerun()
-
 
 def render_blank_page() -> None:
     """Render the Blank Page for viewing CSV files."""
@@ -579,7 +649,6 @@ def render_blank_page() -> None:
         st.warning('No CSV files available in the database.')
     st.markdown('</div>', unsafe_allow_html=True)
 
-
 def render_search_data_page() -> None:
     """Render the Search Data page for searching across datasets."""
     st.markdown('<div class="main">', unsafe_allow_html=True)
@@ -595,7 +664,6 @@ def render_search_data_page() -> None:
         else:
             st.warning('No matches found.')
     st.markdown('</div>', unsafe_allow_html=True)
-
 
 def render_visualize_data_page() -> None:
     """Render the Visualize Data page for exploring data visualizations."""
@@ -634,7 +702,6 @@ def render_visualize_data_page() -> None:
         st.warning('No datasets uploaded yet.')
     st.markdown('</div>', unsafe_allow_html=True)
 
-
 def render_share_data_page() -> None:
     """Render the Share Data page for emailing datasets."""
     st.markdown('<div class="main">', unsafe_allow_html=True)
@@ -653,9 +720,41 @@ def render_share_data_page() -> None:
             df = cached_get_csv_preview(selected_file_id)
             if not df.empty:
                 email_input = st.text_input('Enter your email address:', key='email_share')
+                
+                # Check if SendGrid API key exists in Streamlit secrets
+                sendgrid_api_key = None
+                if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
+                    sendgrid_api_key = st.secrets['SENDGRID_API_KEY']
+                else:
+                    sendgrid_api_key = st.text_input(
+                        'Enter your SendGrid API key:', 
+                        type='password', 
+                        key='sendgrid_api_key_share'
+                    )
+
                 if st.button('Send Data', key='send_share'):
                     if email_input:
-                        send_dataset_email(email_input, file_options[selected_file_id], df)
+                        if not sendgrid_api_key:
+                            st.error("Please provide a SendGrid API key.")
+                            logger.error(
+                                'Email Share Failed',
+                                extra={
+                                    'username': st.session_state.username or 'Anonymous',
+                                    'action': 'email_share',
+                                    'details': 'No SendGrid API key provided',
+                                },
+                            )
+                        else:
+                            success = send_dataset_email(
+                                email_input,
+                                file_options[selected_file_id],
+                                df,
+                                sendgrid_api_key
+                            )
+                            if success:
+                                st.success(f"Data sent to {email_input}!")
+                            else:
+                                st.error("Failed to send email.")
                     else:
                         st.warning('Please enter an email address.')
                         logger.error(
@@ -671,7 +770,6 @@ def render_share_data_page() -> None:
     else:
         st.warning('No datasets uploaded yet.')
     st.markdown('</div>', unsafe_allow_html=True)
-
 
 def render_home_page() -> None:
     """Render the Home page with data management and live features."""
@@ -890,7 +988,7 @@ def render_home_page() -> None:
                             if st.download_button(
                                 label='Download Parquet',
                                 data=parquet_data,
-                                file_name=f'{file_options[selected_file_id]}.parquet',
+                                file_name=f'{file_options.get(selected_file_id, "dataset")}.parquet',
                                 mime='application/octet-stream',
                                 key='download_parquet_live',
                             ):
@@ -899,7 +997,7 @@ def render_home_page() -> None:
                                     extra={
                                         'username': st.session_state.username or 'Anonymous',
                                         'action': 'download_parquet',
-                                        'details': f'Downloaded: {file_options[selected_file_id]}.parquet',
+                                        'details': f'Downloaded: {file_options.get(selected_file_id, "dataset")}.parquet',
                                     },
                                 )
 
@@ -907,11 +1005,41 @@ def render_home_page() -> None:
                         email_input = st.text_input(
                             'Enter your email address:', key='email_live'
                         )
+
+                        # Check if SendGrid API key exists in Streamlit secrets
+                        sendgrid_api_key = None
+                        if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
+                            sendgrid_api_key = st.secrets['SENDGRID_API_KEY']
+                        else:
+                            sendgrid_api_key = st.text_input(
+                                'Enter your SendGrid API key:',
+                                type='password',
+                                key='sendgrid_api_key_live'
+                            )
+
                         if st.button('Send Data', key='send_live'):
                             if email_input:
-                                send_dataset_email(
-                                    email_input, file_options[selected_file_id], df
-                                )
+                                if not sendgrid_api_key:
+                                    st.error("Please provide a SendGrid API key.")
+                                    logger.error(
+                                        'Email Share Failed',
+                                        extra={
+                                            'username': st.session_state.username or 'Anonymous',
+                                            'action': 'email_share',
+                                            'details': 'No SendGrid API key provided',
+                                        },
+                                    )
+                                else:
+                                    success = send_dataset_email(
+                                        email_input,
+                                        file_options.get(selected_file_id, "dataset"),
+                                        df,
+                                        sendgrid_api_key
+                                    )
+                                    if success:
+                                        st.success(f"Data sent to {email_input}!")
+                                    else:
+                                        st.error("Failed to send email.")
                             else:
                                 st.warning('Please enter an email address.')
                                 logger.error(
@@ -960,16 +1088,16 @@ def render_home_page() -> None:
         else:
             st.warning('No numerical columns found for visualization.')
 
-    st.subheader('Search Data')
-    global_search = st.text_input('Search across all datasets:', key='global_search_home')
-    if global_search:
-        results = search_csv_data(global_search)
-        if results:
-            st.dataframe(
-                pd.DataFrame(results, columns=['File ID', 'Row', 'Column', 'Value'])
-            )
-        else:
-            st.warning('No matches found.')
+        st.subheader('Search Data')
+        global_search = st.text_input('Search across all datasets:', key='global_search_home')
+        if global_search:
+            results = search_csv_data(global_search)
+            if results:
+                st.dataframe(
+                    pd.DataFrame(results, columns=['File ID', 'Row', 'Column', 'Value'])
+                )
+            else:
+                st.warning('No matches found.')
 
     if st.session_state.logged_in:
         st.subheader('Live Feed Logs')
@@ -1033,7 +1161,6 @@ def render_home_page() -> None:
         '[Link to DAG Grid](https://animated-train-jjvx5x4q9g73p5v5-8080.app.github.dev/dags/fetch_store_dag/grid)'
     )
 
-
 # Main rendering
 def main() -> None:
     """Render the main Streamlit application."""
@@ -1057,7 +1184,6 @@ def main() -> None:
         render_share_data_page()
     else:
         render_home_page()
-
 
 if __name__ == '__main__':
     main()
