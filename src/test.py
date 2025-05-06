@@ -568,7 +568,7 @@ def render_sidebar() -> None:
                 st.rerun()
 
 def render_data_page() -> None:
-    """Render the data Page for viewing CSV files."""
+    """Render the Data Page for viewing CSV files."""
     st.markdown('<div class="main">', unsafe_allow_html=True)
     st.header('data Page')
     st.subheader('View all CSV files in the LSU Datastore')
@@ -872,7 +872,7 @@ def render_home_page() -> None:
         To the left is a dropdown menu for navigating the LSU Datastore features:
 
         - **Home Page**: Overview of the LSU Datastore platform.
-        - **data Page**: View all CSV files in the LSU Datastore (no login required).
+        - **Data Page**: View all CSV files in the LSU Datastore (no login required).
         - **Search Data**: Search for specific entries across all datasets.
         - **Visualize Data**: Explore data visualizations for numerical datasets.
         - **Share Data**: Share datasets via email with collaborators.
@@ -1119,7 +1119,7 @@ def main() -> None:
         unsafe_allow_html=True,
     )
     render_sidebar()
-    if st.session_state.page == 'data Page':
+    if st.session_state.page == 'Data Page':
         render_data_page()
     elif st.session_state.page == '🔍 Search Data':
         render_search_data_page()
