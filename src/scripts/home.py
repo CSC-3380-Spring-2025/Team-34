@@ -1,3 +1,5 @@
+import base64
+import io
 import os
 import time
 from datetime import datetime
@@ -15,7 +17,7 @@ from src.datastore.database import (
     search_csv_data,
     update_csv_data,
 )
-from src.utils import cached_get_files, cached_get_csv_preview, logger
+from src.utils import cached_get_files, cached_get_csv_preview, logger, send_dataset_email
 
 def render_home_page() -> None:
     """Render the Home page with data management and live features."""
@@ -57,7 +59,7 @@ def render_home_page() -> None:
         manage_files = cached_get_files()
         if manage_files:
             manage_file_options = {
-                file_id: filename for file_id, filename, _, _, _ in manage_files
+                file_id: filename for file_id, filename, size, file_type, created_at in manage_files
             }
             manage_file_id = st.selectbox(
                 'Select a dataset to manage:',
@@ -169,7 +171,7 @@ def render_home_page() -> None:
     files = cached_get_files()
     if files:
         file_options: Dict[int, str] = {}
-        for file_id, filename, _, _, _ in files:
+        for file_id, filename, size, file_type, created_at in files:
             if selected_category == 'lsu':
                 if (
                     filename.lower().startswith('lsu')
