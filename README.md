@@ -68,7 +68,7 @@ The LSU Datastore Dashboard is a Streamlit-based web application for managing, v
    echo $PYTHONPATH
 ### Commands
 1. Start the app locally from the project root:
-  streamlit run src/test.py \
+  streamlit run src/app.py \
   --server.enableCORS false \
   --server.enableXsrfProtection false
 2. Run tests (ensure tests/ directory exists with test files):
@@ -94,7 +94,7 @@ git push origin master --force-with-lease
 1. Fork or push the repository to your GitHub account.
 2. Sign up for a free Streamlit Cloud account at streamlit.io.
 3. Create a new app, linking to your repository’s master branch.
-4. Set the app entry point to src/test.py.
+4. Set the app entry point to src/app.py.
 5. Add secrets in Streamlit Cloud under “Secrets”:
      [general]
      SENDGRID_API_KEY = "your-sendgrid-api-key"
