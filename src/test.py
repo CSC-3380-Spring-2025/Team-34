@@ -495,7 +495,7 @@ def render_sidebar() -> None:
         st.markdown('[GitHub Page](https://github.com/CSC-3380-Spring-2025/Team-34)')
 
         st.header('NAVIGATION')
-        pages = ['Home', 'data Page', '🔍 Search Data', '📊 Visualize Data', '📤 Share Data']
+        pages = ['Home', 'Data Page', '🔍 Search Data', '📊 Visualize Data', '📤 Share Data']
         
         # Initialize session state if not already set
         if 'page' not in st.session_state:
