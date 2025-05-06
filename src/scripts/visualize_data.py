@@ -11,7 +11,7 @@ def render_visualize_data_page() -> None:
     st.subheader('Explore data visualizations')
     files = cached_get_files()
     if files:
-        file_options = {file_id: filename for fileid, filename, , ,  in files}
+        file_options = {file_id: filename for file_id, filename, size, file_type, created_at in files}
         selected_file_id = st.selectbox(
             'Select a dataset to visualize:',
             options=file_options.keys(),
