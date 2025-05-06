@@ -495,7 +495,7 @@ def render_sidebar() -> None:
         st.markdown('[GitHub Page](https://github.com/CSC-3380-Spring-2025/Team-34)')
 
         st.header('NAVIGATION')
-        pages = ['Home', 'Data Page', '🔍 Search Data', '📊 Visualize Data', '📤 Share Data']
+        pages = ['Home', 'Data Page', '🔍 Search Data', '📊 Visualize Data', '📤 Share Data', '📥 Download Data']
         
         # Initialize session state if not already set
         if 'page' not in st.session_state:
@@ -564,7 +564,7 @@ def render_sidebar() -> None:
                 st.session_state.logged_in = False
                 st.session_state.username = None
                 st.session_state.show_lsu_datastore = False
-                st.session_state.page = '🔍 Search Data'
+                st.session_state.page = 'Data Page'
                 st.rerun()
 
 def render_data_page() -> None:
@@ -738,6 +738,66 @@ def render_share_data_page() -> None:
         st.warning('No datasets uploaded yet.')
     st.markdown('</div>', unsafe_allow_html=True)
 
+def render_download_data_page() -> None:
+    """Render the Download Data page for downloading datasets."""
+    st.markdown('<div class="main">', unsafe_allow_html=True)
+    st.header('Download Data')
+    st.subheader('Download datasets as CSV and Parquet files.')
+    files = cached_get_files()
+    if files:
+        file_options = {file_id: filename for file_id, filename, _, _, _ in files}
+        selected_file_id = st.selectbox(
+            'Select a dataset to download:',
+            options=file_options.keys(),
+            format_func=lambda x: file_options[x],
+            key='download_select',
+        )
+        if selected_file_id:
+            df = cached_get_csv_preview(selected_file_id)
+            if not df.empty:
+                col_dl1, col_dl2 = st.columns(2)
+                with col_dl1:
+                    csv_data = df.to_csv(index=False).encode('utf-8')
+                    if st.download_button(
+                        label='Download CSV',
+                        data=csv_data,
+                        file_name=f'{file_options[selected_file_id]}.csv',
+                        mime='text/csv',
+                        key='download_csv_live',
+                    ):
+                        logger.info(
+                            'CSV Downloaded',
+                            extra={
+                                'username': st.session_state.username or 'Anonymous',
+                                    'action': 'download_csv',
+                                    'details': f'Downloaded: {file_options[selected_file_id]}.csv',
+                            },
+                        )
+                with col_dl2:
+                    parquet_buffer = io.BytesIO()
+                    df.to_parquet(parquet_buffer, engine='pyarrow', index=False)
+                    parquet_data = parquet_buffer.getvalue()
+                    if st.download_button(
+                        label='Download Parquet',
+                        data=parquet_data,
+                        file_name=f'{file_options.get(selected_file_id, "dataset")}.parquet',
+                        mime='application/octet-stream',
+                        key='download_parquet_live',
+                    ):
+                        logger.info(
+                            'Parquet Downloaded',
+                            extra={
+                                'username': st.session_state.username or 'Anonymous',
+                                'action': 'download_parquet',
+                                'details': f'Downloaded: {file_options.get(selected_file_id, "dataset")}.parquet',
+                            },
+                        )
+        else:
+            st.error('No data found in the selected dataset.')
+    else:
+        st.warning('No datasets uploaded yet.')
+    st.markdown('</div>', unsafe_allow_html=True)
+
 def render_home_page() -> None:
     """Render the Home page with data management and live features."""
     st.markdown('<div class="main">', unsafe_allow_html=True)
@@ -875,7 +935,7 @@ def render_home_page() -> None:
         - **Search Data**: Search for specific entries across all datasets.
         - **Visualize Data**: Explore data visualizations for numerical datasets.
         - **Share Data**: Share datasets via email with collaborators.
-        - **Manage Data**: Upload, edit, and delete datasets (requires login).
+        - **Download Data**: Download datasets in CSV or Parquet format.
         """
     )
 
@@ -1111,7 +1171,7 @@ def main() -> None:
     st.markdown(
         """
         <div class="demo-info">
-            <span class="demo-text">Demo 1.3.9</span>
+            <span class="demo-text">Demo 1.4.0</span>
             <span class="live-demo-badge"><i class="fas fa-rocket"></i> Live Demo</span>
         </div>
         """,
@@ -1126,6 +1186,8 @@ def main() -> None:
         render_visualize_data_page()
     elif st.session_state.page == '📤 Share Data':
         render_share_data_page()
+    elif st.session_state.page == '📥 Download Data':
+        render_download_data_page()
     else:
         render_home_page()
 
