@@ -30,3 +30,4 @@
 | 2025/05/04 | 1.3.6   | Baron Davis | add back the edit data feature on login status page. |
 | 2025/05/06 | 1.3.7   | Baron Davis | branched off of dev 1.3.6 v branch to create this current master (default) for fianl main branch and also cleaned scripts to follow Coding Standards.  |
 | 2025/05/06 | 1.3.8   | Baron Davis | added Sendgrid api key hardcoded in .env so that you can send emails of data if cloned locally or if you are on streamlit app and add .env to .gitignore . |
+
