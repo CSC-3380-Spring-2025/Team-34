@@ -436,7 +436,6 @@ def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
             response.raise_for_status()
 
         if response.status_code == 202:
-            st.success(f'Data sent to {email}!')
             logger.info(
                 'Email Share Success',
                 extra={
