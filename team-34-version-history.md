@@ -33,3 +33,4 @@
 | 2025/05/06 | 1.3.9   | Baron Davis | Change blank page name to 'Data Page'. |
 | 2025/05/06 | 1.4.0   | Felix Schafer | Added 'Download Data' Page |
 | 2025/05/06 | 1.4.1   | Jason Gonzales | Renamed test.py to app.py and changed README file accordingly. |
+| 2025/05/06 | 1.4.2   | Felix Schafer | Added type hinting to test functions. |

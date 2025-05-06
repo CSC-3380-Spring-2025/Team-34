@@ -1171,7 +1171,7 @@ def main() -> None:
     st.markdown(
         """
         <div class="demo-info">
-            <span class="demo-text">Demo 1.4.1</span>
+            <span class="demo-text">Demo 1.4.2</span>
             <span class="live-demo-badge"><i class="fas fa-rocket"></i> Live Demo</span>
         </div>
         """,
