@@ -80,7 +80,7 @@ class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
         super().doRollover()
         with open(self.baseFilename, 'a') as f:
             f.write('Timestamp,Username,Action,Details\n')
-
+has_secrets: bool = os.path.exists(os.path.expanduser("~/.streamlit/secrets.toml"))
 # Helper function to safely get secrets
 def get_secret(key: str, default: str) -> str:
     """Safely retrieve a secret from environment variables or st.secrets.
@@ -365,11 +365,12 @@ def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_ke
 
     # Check for SendGrid API key: use secrets if available, otherwise use provided key
     api_key = None
-    if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
+    if has_secrets and 'SENDGRID_API_KEY' in st.secrets:
         api_key = st.secrets['SENDGRID_API_KEY']
     elif sendgrid_api_key:
         api_key = sendgrid_api_key
     else:
+        #TODO: replace with box for key like other section
         st.error("No SendGrid API key provided or found in Streamlit secrets.")
         logger.error(
             'Email Share Failed',
@@ -723,7 +724,7 @@ def render_share_data_page() -> None:
                 
                 # Check if SendGrid API key exists in Streamlit secrets
                 sendgrid_api_key = None
-                if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
+                if has_secrets and 'SENDGRID_API_KEY' in st.secrets:
                     sendgrid_api_key = st.secrets['SENDGRID_API_KEY']
                 else:
                     sendgrid_api_key = st.text_input(
