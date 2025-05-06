@@ -83,7 +83,7 @@ class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
 
 # Helper function to safely get secrets
 def get_secret(key: str, default: str) -> str:
-    """Safely retrieve a secret from environment variables or st.secrets.
+    """Retrieve a secret from environment variables.
 
     Args:
         key (str): The key to look up.
@@ -92,16 +92,7 @@ def get_secret(key: str, default: str) -> str:
     Returns:
         str: The value of the key or the default.
     """
-    # First, try os.getenv (local .env file)
-    value = os.getenv(key)
-    if value is not None:
-        return value
-    # If running in Streamlit Cloud, try st.secrets
-    try:
-        return st.secrets.get(key, default)
-    except (AttributeError, FileNotFoundError):
-        # If st.secrets is not available or secrets.toml is missing, use default
-        return default
+    return os.getenv(key, default)
 
 # Setup logging
 log_dir = os.path.join(os.path.dirname(__file__), get_secret("LOG_DIR", "logs"))
@@ -337,15 +328,13 @@ if 'show_lsu_datastore' not in st.session_state:
 if 'page' not in st.session_state:
     st.session_state.page = 'Home'
 
-def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_key: str = None) -> bool:
+def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
     """Send a dataset as a CSV attachment via email using SendGrid.
 
     Args:
         email (str): Recipient email address.
         filename (str): Name of the dataset file.
         df (DataFrame): DataFrame containing the dataset.
-        sendgrid_api_key (str, optional): SendGrid API key for authentication. If not provided, 
-                                         attempts to use the key from Streamlit secrets.
 
     Returns:
         bool: True if the email was sent successfully, False otherwise.
@@ -363,20 +352,16 @@ def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_ke
         )
         return False
 
-    # Check for SendGrid API key: use secrets if available, otherwise use provided key
-    api_key = None
-    if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
-        api_key = st.secrets['SENDGRID_API_KEY']
-    elif sendgrid_api_key:
-        api_key = sendgrid_api_key
-    else:
-        st.error("No SendGrid API key provided or found in Streamlit secrets.")
+    # Retrieve SendGrid API key from environment variables
+    api_key = get_secret('SENDGRID_API_KEY', '')
+    if not api_key:
+        st.error("SendGrid API key not found in environment variables. Please set SENDGRID_API_KEY in .env or Streamlit Cloud settings.")
         logger.error(
             'Email Share Failed',
             extra={
                 'username': st.session_state.username or 'Anonymous',
                 'action': 'email_share',
-                'details': 'No SendGrid API key provided or found in secrets',
+                'details': 'No SendGrid API key found in environment variables',
             },
         )
         return False
@@ -721,40 +706,17 @@ def render_share_data_page() -> None:
             if not df.empty:
                 email_input = st.text_input('Enter your email address:', key='email_share')
                 
-                # Check if SendGrid API key exists in Streamlit secrets
-                sendgrid_api_key = None
-                if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
-                    sendgrid_api_key = st.secrets['SENDGRID_API_KEY']
-                else:
-                    sendgrid_api_key = st.text_input(
-                        'Enter your SendGrid API key:', 
-                        type='password', 
-                        key='sendgrid_api_key_share'
-                    )
-
                 if st.button('Send Data', key='send_share'):
                     if email_input:
-                        if not sendgrid_api_key:
-                            st.error("Please provide a SendGrid API key.")
-                            logger.error(
-                                'Email Share Failed',
-                                extra={
-                                    'username': st.session_state.username or 'Anonymous',
-                                    'action': 'email_share',
-                                    'details': 'No SendGrid API key provided',
-                                },
-                            )
+                        success = send_dataset_email(
+                            email_input,
+                            file_options[selected_file_id],
+                            df
+                        )
+                        if success:
+                            st.success(f"Data sent to {email_input}!")
                         else:
-                            success = send_dataset_email(
-                                email_input,
-                                file_options[selected_file_id],
-                                df,
-                                sendgrid_api_key
-                            )
-                            if success:
-                                st.success(f"Data sent to {email_input}!")
-                            else:
-                                st.error("Failed to send email.")
+                            st.error("Failed to send email.")
                     else:
                         st.warning('Please enter an email address.')
                         logger.error(
@@ -1006,40 +968,17 @@ def render_home_page() -> None:
                             'Enter your email address:', key='email_live'
                         )
 
-                        # Check if SendGrid API key exists in Streamlit secrets
-                        sendgrid_api_key = None
-                        if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
-                            sendgrid_api_key = st.secrets['SENDGRID_API_KEY']
-                        else:
-                            sendgrid_api_key = st.text_input(
-                                'Enter your SendGrid API key:',
-                                type='password',
-                                key='sendgrid_api_key_live'
-                            )
-
                         if st.button('Send Data', key='send_live'):
                             if email_input:
-                                if not sendgrid_api_key:
-                                    st.error("Please provide a SendGrid API key.")
-                                    logger.error(
-                                        'Email Share Failed',
-                                        extra={
-                                            'username': st.session_state.username or 'Anonymous',
-                                            'action': 'email_share',
-                                            'details': 'No SendGrid API key provided',
-                                        },
-                                    )
+                                success = send_dataset_email(
+                                    email_input,
+                                    file_options.get(selected_file_id, "dataset"),
+                                    df
+                                )
+                                if success:
+                                    st.success(f"Data sent to {email_input}!")
                                 else:
-                                    success = send_dataset_email(
-                                        email_input,
-                                        file_options.get(selected_file_id, "dataset"),
-                                        df,
-                                        sendgrid_api_key
-                                    )
-                                    if success:
-                                        st.success(f"Data sent to {email_input}!")
-                                    else:
-                                        st.error("Failed to send email.")
+                                    st.error("Failed to send email.")
                             else:
                                 st.warning('Please enter an email address.')
                                 logger.error(
@@ -1167,7 +1106,8 @@ def main() -> None:
     st.markdown(
         """
         <div class="demo-info">
-            <span class="demo-text">Demo 1.3.7</span>
+
+            <span class="demo-text">Demo 1.3.8</span>
             <span class="live-demo-badge"><i class="fas fa-rocket"></i> Live Demo</span>
         </div>
         """,
