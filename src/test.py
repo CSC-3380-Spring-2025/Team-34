@@ -570,7 +570,6 @@ def render_sidebar() -> None:
 def render_data_page() -> None:
     """Render the Data Page for viewing CSV files."""
     st.markdown('<div class="main">', unsafe_allow_html=True)
-    st.header('Data Page')
     st.subheader('View all CSV files in the LSU Datastore')
 
     files = cached_get_files()
