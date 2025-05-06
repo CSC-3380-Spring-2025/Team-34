@@ -83,7 +83,7 @@ class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
 
 # Helper function to safely get secrets
 def get_secret(key: str, default: str) -> str:
-    """Retrieve a secret from environment variables.
+    """Retrieve a secret from environment variables, concatenating SendGrid API key parts if needed.
 
     Args:
         key (str): The key to look up.
@@ -92,6 +92,13 @@ def get_secret(key: str, default: str) -> str:
     Returns:
         str: The value of the key or the default.
     """
+    if key == 'SENDGRID_API_KEY':
+        part1 = os.getenv('SENDGRID_API_KEY_PART1', '')
+        part2 = os.getenv('SENDGRID_API_KEY_PART2', '')
+        part3 = os.getenv('SENDGRID_API_KEY_PART3', '')
+        if part1 and part2 and part3:
+            return part1 + part2 + part3
+        return default
     return os.getenv(key, default)
 
 # Setup logging
@@ -355,7 +362,7 @@ def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
     # Retrieve SendGrid API key from environment variables
     api_key = get_secret('SENDGRID_API_KEY', '')
     if not api_key:
-        st.error("SendGrid API key not found in environment variables. Please set SENDGRID_API_KEY in .env or Streamlit Cloud settings.")
+        st.error("SendGrid API key not found in environment variables. Please set SENDGRID_API_KEY_PART1, SENDGRID_API_KEY_PART2, and SENDGRID_API_KEY_PART3 in .env.")
         logger.error(
             'Email Share Failed',
             extra={
