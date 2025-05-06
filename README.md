@@ -26,7 +26,7 @@ The LSU Datastore Dashboard is a Streamlit-based web application for managing, v
 
 ## Important Links
 - **Kanban Board:** [https://github.com/CSC-3380-Spring-2025/Team-34/projects](https://github.com/orgs/CSC-3380-Spring-2025/projects/5)  
-- **Designs/Website Here:** (https://team34-lsu-csc-dashboard.streamlit.app/)
+- **Designs/Website Here:** (https://team34-lsu-csc-dashboard-v1.streamlit.app/)
 - **Styles Guide(s):**
   - [PEP 8](https://peps.python.org/pep-0008/) for Python style.
   - [PEP 257](https://peps.python.org/pep-0257/) for docstrings.
