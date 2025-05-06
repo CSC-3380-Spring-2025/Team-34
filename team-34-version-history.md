@@ -28,3 +28,4 @@
 | 2025/05/01 | 1.3.4   | Felix Schafer | Changed graph axes to show different data |
 | 2025/05/04 | 1.3.5   | Baron Davis | Add Search Data, Visualize Data, Share data, to the sidebar navigate to dropdown menu. |
 | 2025/05/04 | 1.3.6   | Baron Davis | add back the edit data feature on login status page. |
+| 2025/05/06 | 1.3.7   | Baron Davis | branched off of dev 1.3.6 v branch to create this current master (default) for fianl main branch and also cleaned scripts to follow Coding Standards.  |
