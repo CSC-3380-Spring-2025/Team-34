@@ -12,7 +12,7 @@ def render_data_page() -> None:
 
     files = cached_get_files()
     if files:
-        file_options = {file_id: filename for fileid, filename, , ,  in files}
+        file_options = {file_id: filename for file_id, filename, size, file_type, created_at in files}
         selected_file_id = st.selectbox(
             'Select a CSV file to preview:',
             options=file_options.keys(),
