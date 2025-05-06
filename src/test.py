@@ -1,5 +1,4 @@
-"""
-Streamlit application for the LSU Datastore Dashboard.
+"""Streamlit application for the LSU Datastore Dashboard.
 
 Provides a web interface for managing, visualizing, and sharing datasets at LSU,
 with user authentication, data upload, search, and live logging features.
@@ -82,29 +81,27 @@ class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
         with open(self.baseFilename, 'a') as f:
             f.write('Timestamp,Username,Action,Details\n')
 
-# Helper function to safely get secrets (excluding SENDGRID_API_KEY)
+# Helper function to safely get secrets
 def get_secret(key: str, default: str) -> str:
-    """Safely retrieve a secret from environment variables.
+    """Safely retrieve a secret from environment variables or st.secrets.
 
     Args:
-        key (str): The key to look up (excluding SENDGRID_API_KEY).
+        key (str): The key to look up.
         default (str): The default value if the key is not found.
 
     Returns:
         str: The value of the key or the default.
     """
-    return os.getenv(key, default)
-
-# Determine if running on Streamlit Cloud by checking for st.secrets
-def is_running_on_streamlit_cloud() -> bool:
-    """Check if the app is running on Streamlit Cloud by attempting to access st.secrets."""
+    # First, try os.getenv (local .env file)
+    value = os.getenv(key)
+    if value is not None:
+        return value
+    # If running in Streamlit Cloud, try st.secrets
     try:
-        # If st.secrets is accessible and doesn't raise a FileNotFoundError, we're on Streamlit Cloud
-        _ = st.secrets
-        return True
-    except FileNotFoundError:
-        # If st.secrets raises a FileNotFoundError, we're running locally
-        return False
+        return st.secrets.get(key, default)
+    except (AttributeError, FileNotFoundError):
+        # If st.secrets is not available or secrets.toml is missing, use default
+        return default
 
 # Setup logging
 log_dir = os.path.join(os.path.dirname(__file__), get_secret("LOG_DIR", "logs"))
@@ -347,8 +344,8 @@ def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_ke
         email (str): Recipient email address.
         filename (str): Name of the dataset file.
         df (DataFrame): DataFrame containing the dataset.
-        sendgrid_api_key (str, optional): SendGrid API key for authentication. If not provided,
-                                         attempts to use the key from Streamlit secrets (on Cloud).
+        sendgrid_api_key (str, optional): SendGrid API key for authentication. If not provided, 
+                                         attempts to use the key from Streamlit secrets.
 
     Returns:
         bool: True if the email was sent successfully, False otherwise.
@@ -366,37 +363,23 @@ def send_dataset_email(email: str, filename: str, df: DataFrame, sendgrid_api_ke
         )
         return False
 
-    # Determine API key based on environment
+    # Check for SendGrid API key: use secrets if available, otherwise use provided key
     api_key = None
-    if is_running_on_streamlit_cloud():
-        # On Streamlit Cloud, use st.secrets
-        try:
-            api_key = st.secrets['SENDGRID_API_KEY']
-        except (KeyError, FileNotFoundError):
-            st.error("SendGrid API key not found in Streamlit secrets.")
-            logger.error(
-                'Email Share Failed',
-                extra={
-                    'username': st.session_state.username or 'Anonymous',
-                    'action': 'email_share',
-                    'details': 'SendGrid API key not found in secrets',
-                },
-            )
-            return False
-    else:
-        # Locally, use the provided sendgrid_api_key
+    if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
+        api_key = st.secrets['SENDGRID_API_KEY']
+    elif sendgrid_api_key:
         api_key = sendgrid_api_key
-        if not api_key:
-            st.error("Please provide a SendGrid API key.")
-            logger.error(
-                'Email Share Failed',
-                extra={
-                    'username': st.session_state.username or 'Anonymous',
-                    'action': 'email_share',
-                    'details': 'No SendGrid API key provided',
-                },
-            )
-            return False
+    else:
+        st.error("No SendGrid API key provided or found in Streamlit secrets.")
+        logger.error(
+            'Email Share Failed',
+            extra={
+                'username': st.session_state.username or 'Anonymous',
+                'action': 'email_share',
+                'details': 'No SendGrid API key provided or found in secrets',
+            },
+        )
+        return False
 
     try:
         # Prepare the email data
@@ -738,17 +721,11 @@ def render_share_data_page() -> None:
             if not df.empty:
                 email_input = st.text_input('Enter your email address:', key='email_share')
                 
-                # Determine if we need to show the SendGrid API key input field
+                # Check if SendGrid API key exists in Streamlit secrets
                 sendgrid_api_key = None
-                if is_running_on_streamlit_cloud():
-                    # On Streamlit Cloud, use st.secrets and don't show the input field
-                    try:
-                        sendgrid_api_key = st.secrets['SENDGRID_API_KEY']
-                    except (KeyError, FileNotFoundError):
-                        st.error("SendGrid API key not found in Streamlit secrets.")
-                        return
+                if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
+                    sendgrid_api_key = st.secrets['SENDGRID_API_KEY']
                 else:
-                    # Locally, show the input field for the SendGrid API key
                     sendgrid_api_key = st.text_input(
                         'Enter your SendGrid API key:', 
                         type='password', 
@@ -1029,17 +1006,11 @@ def render_home_page() -> None:
                             'Enter your email address:', key='email_live'
                         )
 
-                        # Determine if we need to show the SendGrid API key input field
+                        # Check if SendGrid API key exists in Streamlit secrets
                         sendgrid_api_key = None
-                        if is_running_on_streamlit_cloud():
-                            # On Streamlit Cloud, use st.secrets and don't show the input field
-                            try:
-                                sendgrid_api_key = st.secrets['SENDGRID_API_KEY']
-                            except (KeyError, FileNotFoundError):
-                                st.error("SendGrid API key not found in Streamlit secrets.")
-                                return
+                        if hasattr(st, 'secrets') and 'SENDGRID_API_KEY' in st.secrets:
+                            sendgrid_api_key = st.secrets['SENDGRID_API_KEY']
                         else:
-                            # Locally, show the input field for the SendGrid API key
                             sendgrid_api_key = st.text_input(
                                 'Enter your SendGrid API key:',
                                 type='password',
