@@ -495,7 +495,7 @@ def render_sidebar() -> None:
         st.markdown('[GitHub Page](https://github.com/CSC-3380-Spring-2025/Team-34)')
 
         st.header('NAVIGATION')
-        pages = ['Home', 'Blank Page', '🔍 Search Data', '📊 Visualize Data', '📤 Share Data']
+        pages = ['Home', 'data Page', '🔍 Search Data', '📊 Visualize Data', '📤 Share Data']
         
         # Initialize session state if not already set
         if 'page' not in st.session_state:
@@ -567,10 +567,10 @@ def render_sidebar() -> None:
                 st.session_state.page = '🔍 Search Data'
                 st.rerun()
 
-def render_blank_page() -> None:
-    """Render the Blank Page for viewing CSV files."""
+def render_data_page() -> None:
+    """Render the data Page for viewing CSV files."""
     st.markdown('<div class="main">', unsafe_allow_html=True)
-    st.header('Blank Page')
+    st.header('data Page')
     st.subheader('View all CSV files in the LSU Datastore')
 
     files = cached_get_files()
@@ -580,14 +580,14 @@ def render_blank_page() -> None:
             'Select a CSV file to preview:',
             options=file_options.keys(),
             format_func=lambda x: file_options[x],
-            key='blank_page_csv_select',
+            key='data_page_csv_select',
         )
         if selected_file_id:
             logger.info(
                 'CSV File Selected',
                 extra={
                     'username': st.session_state.username or 'Anonymous',
-                    'action': 'blank_page_csv_select',
+                    'action': 'data_page_csv_select',
                     'details': f'Selected dataset: {file_options[selected_file_id]}',
                 },
             )
@@ -605,13 +605,13 @@ def render_blank_page() -> None:
                         data=csv_data,
                         file_name=f'{file_options[selected_file_id]}.csv',
                         mime='text/csv',
-                        key='download_csv_blank_page',
+                        key='download_csv_data_page',
                     ):
                         logger.info(
                             'CSV Downloaded',
                             extra={
                                 'username': st.session_state.username or 'Anonymous',
-                                'action': 'download_csv_blank_page',
+                                'action': 'download_csv_data_page',
                                 'details': f'Downloaded: {file_options[selected_file_id]}.csv',
                             },
                         )
@@ -624,13 +624,13 @@ def render_blank_page() -> None:
                         data=parquet_data,
                         file_name=f'{file_options[selected_file_id]}.parquet',
                         mime='application/octet-stream',
-                        key='download_parquet_blank_page',
+                        key='download_parquet_data_page',
                     ):
                         logger.info(
                             'Parquet Downloaded',
                             extra={
                                 'username': st.session_state.username or 'Anonymous',
-                                'action': 'download_parquet_blank_page',
+                                'action': 'download_parquet_data_page',
                                 'details': f'Downloaded: {file_options[selected_file_id]}.parquet',
                             },
                         )
@@ -872,7 +872,7 @@ def render_home_page() -> None:
         To the left is a dropdown menu for navigating the LSU Datastore features:
 
         - **Home Page**: Overview of the LSU Datastore platform.
-        - **Blank Page**: View all CSV files in the LSU Datastore (no login required).
+        - **data Page**: View all CSV files in the LSU Datastore (no login required).
         - **Search Data**: Search for specific entries across all datasets.
         - **Visualize Data**: Explore data visualizations for numerical datasets.
         - **Share Data**: Share datasets via email with collaborators.
@@ -1119,8 +1119,8 @@ def main() -> None:
         unsafe_allow_html=True,
     )
     render_sidebar()
-    if st.session_state.page == 'Blank Page':
-        render_blank_page()
+    if st.session_state.page == 'data Page':
+        render_data_page()
     elif st.session_state.page == '🔍 Search Data':
         render_search_data_page()
     elif st.session_state.page == '📊 Visualize Data':
