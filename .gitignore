@@ -13,4 +13,10 @@ env/
 # Ignore test cache
 tests/__pycache__/
 
+# Ignore environment variable files
+.env
+.env.local
+.env.development
+.env.production
+
 miniconda.sh
