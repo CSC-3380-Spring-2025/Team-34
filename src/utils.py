@@ -53,9 +53,13 @@ class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
         with open(self.baseFilename, 'a') as f:
             f.write('Timestamp,Username,Action,Details\n')
 
+# Define memory_handler globally
+memory_handler = None
+
 # Setup logging
 def setup_logger(log_dir: str = "logs", log_file: str = "live_feed_log") -> logging.Logger:
     """Configure and return the logger for the application."""
+    global memory_handler
     os.makedirs(log_dir, exist_ok=True)
 
     logger = logging.getLogger('LiveFeedLogger')
