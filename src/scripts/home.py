@@ -437,7 +437,7 @@ def render_home_page() -> None:
         st.markdown("View live logs in a terminal-like interface.")
         log_placeholder = st.empty()
         st.markdown("</div>", unsafe_allow_html=True)
-        while True:
+        for _ in range(60):
             logs = memory_handler.get_logs()
             log_text: str = "\n".join(logs[-20:])
             log_placeholder.markdown(
@@ -454,7 +454,7 @@ def render_home_page() -> None:
     else:
         st.subheader("System Performance Metrics")
         placeholder = st.empty()
-        while True:
+        for _ in range(60):
             cpu_usage: float = psutil.cpu_percent(interval=1)
             memory_usage: float = psutil.virtual_memory().percent
             with placeholder.container():
