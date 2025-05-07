@@ -36,3 +36,4 @@
 | 2025/05/06 | 1.4.2   | Felix Schafer | Added type hinting to test functions. |
 | 2025/05/06 | 1.4.3   | Jason Gonzales | Refactor app.py into five modular scripts in src/scripts. |
 | 2025/05/06 | 1.4.4   | Felix Schafer | Added JSON and Excel downloads to download page. |
+| 2025/05/06 | 1.4.5   | Baron Davis | Ensure PEP 8 layout for all scripts and PEP 257 doctrings to scripts and commented out env-yml scripts. |
