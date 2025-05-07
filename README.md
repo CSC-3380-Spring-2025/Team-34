@@ -53,6 +53,7 @@ The LSU Datastore Dashboard is a Streamlit-based web application for managing, v
 - `psutil==5.9.5`  
 - `pyarrow==14.0.1`  
 - `schedule==1.2.0`
+- `streamlit-autorefresh==1.0.1`
 
 ### Downloading Dependencies
 1. Clone the repository:
