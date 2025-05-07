@@ -167,6 +167,9 @@ def apply_custom_css() -> None:
             margin-top: 30px !important;
             margin-bottom: 15px !important;
         }}
+        .stMetric * {{
+        color: {text_color} !important;
+        }}
         /* Images */
         .ras-image {{
             max-width: 100%;
@@ -262,7 +265,6 @@ def apply_custom_css() -> None:
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)
-
 
 def initialize_session_state() -> None:
     """Initialize Streamlit session state variables."""
@@ -364,7 +366,8 @@ def render_sidebar() -> None:
                 st.session_state.logged_in = False
                 st.session_state.username = None
                 st.session_state.show_lsu_datastore = False
-                st.session_state.page = "Data Page"
+                #Temporarily disable performance metrics to allow page to flush
+                st.session_state.dont_perf = True
                 st.rerun()
 
 

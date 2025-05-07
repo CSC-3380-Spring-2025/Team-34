@@ -28,7 +28,7 @@ from src.utils import cached_get_csv_preview
 from src.utils import logger
 from src.utils import memory_handler
 from src.utils import send_dataset_email
-
+from streamlit_autorefresh import st_autorefresh
 
 def render_home_page() -> None:
     """Render the Home page with data management and live features.
@@ -436,7 +436,8 @@ def render_home_page() -> None:
         st.subheader("Live Terminal Logs")
         st.markdown("View live logs in a terminal-like interface.")
         log_placeholder = st.empty()
-        for _ in range(60):
+        st.markdown("</div>", unsafe_allow_html=True)
+        while True:
             logs = memory_handler.get_logs()
             log_text: str = "\n".join(logs[-20:])
             log_placeholder.markdown(
@@ -444,22 +445,22 @@ def render_home_page() -> None:
                 unsafe_allow_html=True,
             )
             time.sleep(1)
-
-    st.subheader("System Performance Metrics")
-    placeholder = st.empty()
-    for _ in range(60):
-        cpu_usage: float = psutil.cpu_percent(interval=1)
-        memory_usage: float = psutil.virtual_memory().percent
-        with placeholder.container():
-            cpu_col, memory_col = st.columns(2)
-            with cpu_col:
-                st.metric("CPU Usage", f"{cpu_usage}%")
-            with memory_col:
-                st.metric("Memory Usage", f"{memory_usage}%")
-
     st.markdown("</div>", unsafe_allow_html=True)
+    if 'dont_perf' in st.session_state and st.session_state.dont_perf:
+        st.session_state.dont_perf=False
+        #Schedules page to be rerun in 2 seconds, allowing the script
+        #to terminate and thus allow data to flush, while still rerunning to add the metrics.
+        st_autorefresh(interval=2000, key="refresh")
+    else:
+        st.subheader("System Performance Metrics")
+        placeholder = st.empty()
+        while True:
+            cpu_usage: float = psutil.cpu_percent(interval=1)
+            memory_usage: float = psutil.virtual_memory().percent
+            with placeholder.container():
+                cpu_col, memory_col = st.columns(2)
+                with cpu_col:
+                    st.metric("CPU Usage", f"{cpu_usage}%")
+                with memory_col:
+                    st.metric("Memory Usage", f"{memory_usage}%")
 
-    st.markdown("---")
-    st.markdown(
-        "[Link to DAG Grid](https://animated-train-jjvx5x4q9g73p5v5-8080.app.github.dev/dags/fetch_store_dag/grid)"
-    )
