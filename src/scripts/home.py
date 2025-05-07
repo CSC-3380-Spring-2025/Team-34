@@ -17,7 +17,7 @@ from src.datastore.database import (
     search_csv_data,
     update_csv_data,
 )
-from src.utils import cached_get_files, cached_get_csv_preview, logger, send_dataset_email
+from src.utils import cached_get_files, cached_get_csv_preview, logger, send_dataset_email, memory_handler
 
 def render_home_page() -> None:
     """Render the Home page with data management and live features."""
@@ -328,6 +328,7 @@ def render_home_page() -> None:
         st.subheader('Live Feed Logs')
         st.markdown('View and download daily logs of live feed activities for testing and optimization.')
 
+        log_dir = "logs"  # Define log_dir explicitly to match utils.py
         log_files = [
             f for f in os.listdir(log_dir) if f.startswith('live_feed_log') and f.endswith('.csv')
         ]
