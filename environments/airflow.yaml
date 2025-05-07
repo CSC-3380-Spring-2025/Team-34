@@ -1,16 +1,25 @@
-name: airflow-env
-channels:
-  - conda-forge
-  - defaults
-dependencies:
-  - python=3.10
-  - apache-airflow=2.6.0
-  - sqlite3
-  - pandas
-  - sqlalchemy
-  - requests
-  - pip
-  - pip:
-      - schedule
-      - python-dotenv
+# This is a commented-out Conda environment configuration file (airflow-env.yml) for the LSU Datastore Dashboard.
+# It defines dependencies for setting up an Apache Airflow environment, which could be used in the future to
+# manage and schedule data workflows, such as the data-fetching script (fetch_lsu_course_data) or other ETL
+# processes for the dashboard. Airflow can orchestrate tasks like web scraping, data processing, and database
+# updates, providing a robust scheduling and monitoring system. This file could be used to:
+# - Create a Conda environment for Airflow: `conda env create -f airflow-env.yml`
+# - Schedule recurring data collection tasks (e.g., fetching LSU course data daily).
+# - Integrate with the existing GitHub Actions workflow for automated deployment of Airflow DAGs.
+# - Manage dependencies for Airflow DAGs that interact with SQLite, pandas, and external APIs.
 
+#name: airflow-env
+#channels:
+#  - conda-forge
+#  - defaults
+#dependencies:
+#  - python=3.10
+#  - apache-airflow=2.6.0
+#  - sqlite3
+#  - pandas
+#  - sqlalchemy
+#  - requests
+#  - pip
+#  - pip:
+#      - schedule
+#      - python-dotenv
