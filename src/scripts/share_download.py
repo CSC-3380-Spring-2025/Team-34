@@ -54,7 +54,7 @@ def render_download_data_page() -> None:
     """Render the Download Data page for downloading datasets."""
     st.markdown('<div class="main">', unsafe_allow_html=True)
     st.header('Download Data')
-    st.subheader('Download datasets as CSV and Parquet files.')
+    st.subheader('Download datasets as CSV, Parquet, JSON, and Excel files.')
     files = cached_get_files()
     if files:
         file_options = {file_id: filename for file_id, filename, _, _, _ in files}
@@ -68,6 +68,7 @@ def render_download_data_page() -> None:
             df = cached_get_csv_preview(selected_file_id)
             if not df.empty:
                 col_dl1, col_dl2 = st.columns(2)
+                col_dl3, col_dl4 = st.columns(2)
                 with col_dl1:
                     csv_data = df.to_csv(index=False).encode('utf-8')
                     if st.download_button(
@@ -104,6 +105,44 @@ def render_download_data_page() -> None:
                                 'details': f'Downloaded: {file_options.get(selected_file_id, "dataset")}.parquet',
                             },
                         )
+                with col_dl3:
+                    json_data=df.to_json(orient='records', indent=2).encode('utf-8')
+                    if st.download_button(
+                        label='Download JSON',
+                        data=json_data,
+                        file_name=f'{file_options.get(selected_file_id, "dataset")}.json',
+                        mime='application/json',
+                        key='download_json_live',
+                    ):
+                        logger.info(
+                            'JSON Downloaded',
+                            extra={
+                                'username': st.session_state.username or 'Anonymous',
+                                'action': 'download_json',
+                                'details': f'Downloaded: {file_options.get(selected_file_id, "dataset")}.json',
+                            },
+                        )
+                with col_dl4:
+                    excel_buffer = io.BytesIO()
+                    with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
+                        df.to_excel(writer, index=False)
+                    excel_data = excel_buffer.getvalue()
+                    if st.download_button(
+                        label='Download Excel',
+                        data=excel_data,
+                        file_name=f'{file_options.get(selected_file_id, "dataset")}.xlsx',
+                        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        key='download_excel_live',
+                    ):
+                        logger.info(
+                            'Excel Downloaded',
+                            extra={
+                                'username': st.session_state.username or 'Anonymous',
+                                'action': 'download_excel',
+                                'details': f'Downloaded: {file_options.get(selected_file_id, "dataset")}.xlsx',
+                            },
+                        )
+                    
             else:
                 st.error('No data found in the selected dataset.')
     else:
