@@ -1,24 +1,39 @@
-name: prod-env
-channels:
-  - conda-forge
-  - defaults
-dependencies:
-  - python=3.10
-  - pandas
-  - numpy
-  - matplotlib
-  - seaborn
-  - requests
-  - flask  # For API development
-  - fastapi  # Alternative API framework
-  - uvicorn  # FastAPI ASGI server
-  - psycopg2  # PostgreSQL adapter
-  - pymysql  # MySQL adapter
-  - streamlit  # Dashboard support
-  - pyarrow  # High-performance data processing
-  - scikit-learn  # Machine learning utilities
-  - tqdm  # Progress bars for large data processing
-  - boto3  # AWS SDK for cloud interactions
-  - pip  # Ensure pip is available for extra installs
-  - pip:
-      - gunicorn  # Install gunicorn using pip instead of conda
+# This is a commented-out Conda environment configuration file (prod-env.yml) for the LSU Datastore Dashboard.
+# It defines dependencies for a production-ready environment, expanding beyond the current development setup to
+# support advanced features, scalability, and deployment scenarios for the Team-34 project. While not currently used,
+# this file could be leveraged in the future to:
+# - Deploy the dashboard as a production application, either via Streamlit or as a FastAPI/Flask-based API for broader
+#   access (e.g., exposing course data via REST endpoints).
+# - Enable cloud integration with AWS (using boto3) for storage (e.g., S3 for CSV/Parquet files) or hosting (e.g., EC2).
+# - Support advanced data processing and machine learning (using scikit-learn, numpy, pandas, pyarrow) for features like
+#   course recommendation or analytics.
+# - Migrate the database from SQLite to PostgreSQL or MySQL (using psycopg2, pymysql) for better scalability.
+# - Enhance visualization capabilities with matplotlib and seaborn alongside Plotly (already used in visualize_data.py).
+# - Improve performance with tqdm for progress tracking during large data processing tasks.
+# To use this file, create a Conda environment with: `conda env create -f prod-env.yml`, then deploy the app using
+# gunicorn (e.g., `gunicorn -w 4 app:app` for a Flask app) or uvicorn (e.g., `uvicorn app:app` for a FastAPI app).
+
+#name: prod-env
+#channels:
+#  - conda-forge
+#  - defaults
+#dependencies:
+#  - python=3.10
+#  - pandas
+#  - numpy
+#  - matplotlib
+#  - seaborn
+#  - requests
+#  - flask  # For API development
+#  - fastapi  # Alternative API framework
+#  - uvicorn  # FastAPI ASGI server
+#  - psycopg2  # PostgreSQL adapter
+#  - pymysql  # MySQL adapter
+#  - streamlit  # Dashboard support
+#  - pyarrow  # High-performance data processing
+#  - scikit-learn  # Machine learning utilities
+#  - tqdm  # Progress bars for large data processing
+#  - boto3  # AWS SDK for cloud interactions
+#  - pip  # Ensure pip is available for extra installs
+#  - pip:
+#      - gunicorn  # Install gunicorn using pip instead of conda
