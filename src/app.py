@@ -1,8 +1,19 @@
+#!/usr/bin/env python3
 """Streamlit application for the LSU Datastore Dashboard.
 
-Provides a web interface for managing, visualizing, and sharing datasets at LSU,
-with user authentication, data upload, search, and live logging features.
+This module provides a web interface for managing, visualizing, and sharing datasets
+at LSU, with user authentication, data upload, search, and live logging features.
+It relies on environment variables loaded from a .env file (ignored by .gitignore)
+and may load CSV files tracked by Git LFS (per .gitattributes). Logs are written to
+LOG_DIR/LOG_FILE as CSV files.
+
+Environment Variables:
+    LOG_DIR: Directory for log files (e.g., 'logs').
+    LOG_FILE: Base name of the log file (e.g., 'live_feed_log').
+    USERNAME: Admin username for authentication (e.g., 'admin').
+    PASSWORD: Admin password for authentication.
 """
+
 import logging
 import os
 import sys
@@ -12,74 +23,75 @@ from logging.handlers import TimedRotatingFileHandler
 from typing import List
 
 import streamlit as st
-
-# Load environment variables from .env file
 from dotenv import load_dotenv
 
-load_dotenv()
-
 # Add project root to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from src.datastore.database import authenticate_user
 from src.scripts.home import render_home_page
 from src.scripts.data_page import render_data_page
 from src.scripts.search_data import render_search_data_page
 from src.scripts.visualize_data import render_visualize_data_page
-from src.scripts.share_download import render_share_data_page, render_download_data_page
+from src.scripts.share_download import render_share_data_page
+from src.scripts.share_download import render_download_data_page
 from src.utils import get_secret, MemoryHandler, CSVFormatter, CustomTimedRotatingFileHandler
 
+# Load environment variables
+load_dotenv()
+
 # Setup logging
-log_dir = os.path.join(os.path.dirname(__file__), get_secret("LOG_DIR", "logs"))
+log_dir: str = os.path.join(os.path.dirname(__file__), get_secret("LOG_DIR", "logs"))
 os.makedirs(log_dir, exist_ok=True)
 
-logger = logging.getLogger('LiveFeedLogger')
+logger: logging.Logger = logging.getLogger("LiveFeedLogger")
 logger.setLevel(logging.INFO)
 
-log_file = os.path.join(log_dir, get_secret("LOG_FILE", "live_feed_log"))
-file_handler = CustomTimedRotatingFileHandler(
-    log_file, when='midnight', interval=1, backupCount=30, encoding='utf-8'
+log_file: str = os.path.join(log_dir, get_secret("LOG_FILE", "live_feed_log"))
+file_handler: TimedRotatingFileHandler = CustomTimedRotatingFileHandler(
+    log_file, when="midnight", interval=1, backupCount=30, encoding="utf-8"
 )
 file_handler.setFormatter(CSVFormatter())
-file_handler.suffix = '%Y-%m-%d.csv'
+file_handler.suffix = "%Y-%m-%d.csv"
 
-log_file_path = f'{log_file}.{datetime.now().strftime("%Y-%m-%d")}.csv'
+log_file_path: str = f"{log_file}.{datetime.now().strftime('%Y-%m-%d')}.csv"
 if not os.path.exists(log_file_path):
-    with open(log_file_path, 'a') as f:
-        f.write('Timestamp,Username,Action,Details\n')
+    with open(log_file_path, "a") as f:
+        f.write("Timestamp,Username,Action,Details\n")
 
-stream_handler = logging.StreamHandler()
-stream_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+stream_handler: logging.StreamHandler = logging.StreamHandler()
+stream_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
 
-memory_handler = MemoryHandler(capacity=1000)
+memory_handler: MemoryHandler = MemoryHandler(capacity=1000)
 
 logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 logger.addHandler(memory_handler)
 
 # Set page configuration
-st.set_page_config(page_title='📊 LSU Datastore', layout='centered')
+st.set_page_config(page_title="📊 LSU Datastore", layout="centered")
 
-# Color scheme based on login status
-if st.session_state.get('logged_in', False):
-    background_color = '#F5F6F5'
-    main_background = '#FFFFFF'
-    sidebar_background = '#E8ECEF'
-    primary_color = '#0056D2'
-    secondary_color = '#003087'
-    text_color = '#333333'
-    text_light_color = '#666666'
-else:
-    background_color = "url('bck.jpg')"
-    main_background = 'rgba(255, 255, 255, 0.9)'
-    sidebar_background = '#461D7C'
-    primary_color = '#461D7C'
-    secondary_color = '#FABD00'
-    text_color = '#000000'
-    text_light_color = '#461D7C'
 
-# Custom CSS
-st.markdown(
-    f"""
+def apply_custom_css() -> None:
+    """Apply custom CSS styles based on login status."""
+    if st.session_state.get("logged_in", False):
+        background_color = "#F5F6F5"
+        main_background = "#FFFFFF"
+        sidebar_background = "#E8ECEF"
+        primary_color = "#0056D2"
+        secondary_color = "#003087"
+        text_color = "#333333"
+        text_light_color = "#666666"
+    else:
+        background_color = "url('bck.jpg')"
+        main_background = "rgba(255, 255, 255, 0.9)"
+        sidebar_background = "#461D7C"
+        primary_color = "#461D7C"
+        secondary_color = "#FABD00"
+        text_color = "#000000"
+        text_light_color = "#461D7C"
+
+    css = f"""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
@@ -154,6 +166,9 @@ st.markdown(
             font-size: 24px !important;
             margin-top: 30px !important;
             margin-bottom: 15px !important;
+        }}
+        .stMetric * {{
+        color: {text_color} !important;
         }}
         /* Images */
         .ras-image {{
@@ -248,75 +263,85 @@ st.markdown(
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }}
     </style>
-    """,
-    unsafe_allow_html=True,
-)
+    """
+    st.markdown(css, unsafe_allow_html=True)
 
-# Session state initialization
-if 'logged_in' not in st.session_state:
-    st.session_state.logged_in = False
-if 'username' not in st.session_state:
-    st.session_state.username = None
-if 'show_lsu_datastore' not in st.session_state:
-    st.session_state.show_lsu_datastore = False
-if 'page' not in st.session_state:
-    st.session_state.page = 'Home'
+def initialize_session_state() -> None:
+    """Initialize Streamlit session state variables."""
+    defaults = {
+        "logged_in": False,
+        "username": None,
+        "show_lsu_datastore": False,
+        "page": "Home",
+    }
+    for key, value in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
+
 
 def render_sidebar() -> None:
-    """Render the sidebar with navigation and login panel."""
+    """Render the sidebar with navigation links and user authentication controls.
+
+    Displays navigation options for different pages and a login/logout panel.
+    Updates session state based on user actions.
+
+    Raises:
+        KeyError: If required secrets (USERNAME, PASSWORD) are missing.
+    """
     with st.sidebar:
-        st.header('DATABASE-RELATED LINKS')
-        st.markdown('[GitHub Page](https://github.com/CSC-3380-Spring-2025/Team-34)')
+        st.header("DATABASE-RELATED LINKS")
+        st.markdown("[GitHub Page](https://github.com/CSC-3380-Spring-2025/Team-34)")
 
-        st.header('NAVIGATION')
-        pages = ['Home', 'Data Page', '🔍 Search Data', '📊 Visualize Data', '📤 Share Data', '📥 Download Data']
-        
-        # Initialize session state if not already set
-        if 'page' not in st.session_state:
-            st.session_state.page = 'Home'
-
-        # Use selectbox to navigate
-        page = st.selectbox(
-            'Navigate to:',
+        st.header("NAVIGATION")
+        pages: List[str] = [
+            "Home",
+            "Data Page",
+            "🔍 Search Data",
+            "📊 Visualize Data",
+            "📤 Share Data",
+            "📥 Download Data",
+        ]
+        page: str = st.selectbox(
+            "Navigate to:",
             pages,
             index=pages.index(st.session_state.page),
-            key='page_select',
+            key="page_select",
         )
 
-        # Update session state only if the selection changes
         if page != st.session_state.page:
             st.session_state.page = page
-            st.rerun()  # Force rerun to reflect the new page immediately
+            st.rerun()
 
         if st.session_state.logged_in:
-            st.header('SOFTWARE-RELATED LINKS')
-            st.markdown('[BioPython](https://biopython.org/)')
-            st.markdown('[RDKit](https://www.rdkit.org/)')
-            st.markdown('[PDBrenum](https://pdbrenumbering.org/)')
-            st.markdown('[fpocket](https://github.com/Discngine/fpocket)')
-            st.markdown('[PyMOL](https://pymol.org/)')
-            st.markdown('[3dmol](https://3dmol.csb.pitt.edu/)')
-            st.markdown('[pandas](https://pandas.pydata.org/)')
-            st.markdown('[NumPy](https://numpy.org/)')
-            st.markdown('[SciPy](https://scipy.org/)')
-            st.markdown('[sklearn](https://scikit-learn.org/)')
-            st.markdown('[matplotlib](https://matplotlib.org/)')
-            st.markdown('[seaborn](https://seaborn.pydata.org/)')
-            st.markdown('[streamlit](https://streamlit.io/)')
+            st.header("SOFTWARE-RELATED LINKS")
+            st.markdown("[BioPython](https://biopython.org/)")
+            st.markdown("[RDKit](https://www.rdkit.org/)")
+            st.markdown("[PDBrenum](https://pdbrenumbering.org/)")
+            st.markdown("[fpocket](https://github.com/Discngine/fpocket)")
+            st.markdown("[PyMOL](https://pymol.org/)")
+            st.markdown("[3dmol](https://3dmol.csb.pitt.edu/)")
+            st.markdown("[pandas](https://pandas.pydata.org/)")
+            st.markdown("[NumPy](https://numpy.org/)")
+            st.markdown("[SciPy](https://scipy.org/)")
+            st.markdown("[sklearn](https://scikit-learn.org/)")
+            st.markdown("[matplotlib](https://matplotlib.org/)")
+            st.markdown("[seaborn](https://seaborn.pydata.org/)")
+            st.markdown("[streamlit](https://streamlit.io/)")
 
-        st.header('USER LOGIN')
-        username = st.text_input('Username', key='login_username')
-        password = st.text_input('Password', type='password', key='login_password')
-        if st.button('Login'):
-            with st.spinner('Logging in...'):
+        st.header("USER LOGIN")
+        username: str = st.text_input("Username", key="login_username")
+        password: str = st.text_input("Password", type="password", key="login_password")
+        if st.button("Login"):
+            with st.spinner("Logging in..."):
                 time.sleep(3)
             try:
-                toml_username = get_secret("USERNAME", "admin")
-                toml_password = get_secret("PASSWORD", "NewSecurePassword123")
+                toml_username: str = get_secret("USERNAME", "admin")
+                toml_password: str = get_secret("PASSWORD", "NewSecurePassword123")
             except KeyError as e:
-                st.error(f'Missing secret: {str(e)}. Ensure USERNAME and PASSWORD are defined.')
+                st.error(f"Missing secret: {e}. Ensure USERNAME and PASSWORD are defined.")
+                logger.error(f"Login failed: Missing secret {e}")
             else:
-                auth_success = authenticate_user(username, password) or (
+                auth_success: bool = authenticate_user(username, password) or (
                     username == toml_username and password == toml_password
                 )
                 if auth_success:
@@ -325,25 +350,33 @@ def render_sidebar() -> None:
                     st.session_state.show_lsu_datastore = (
                         username == toml_username and password == toml_password
                     )
-                    st.success(f'Logged in as {username}!')
+                    st.success(f"Logged in as {username}!")
+                    logger.info(f"User {username} logged in")
                     st.rerun()
                 else:
-                    st.error('Invalid credentials')
+                    st.error("Invalid credentials")
+                    logger.warning(f"Failed login attempt for username: {username}")
                     st.rerun()
 
         if st.session_state.logged_in:
-            if st.button('Logout'):
-                with st.spinner('Logging out...'):
+            if st.button("Logout"):
+                with st.spinner("Logging out..."):
                     time.sleep(3)
+                logger.info(f"User {st.session_state.username} logged out")
                 st.session_state.logged_in = False
                 st.session_state.username = None
                 st.session_state.show_lsu_datastore = False
-                st.session_state.page = 'Data Page'
+                #Temporarily disable performance metrics to allow page to flush
+                st.session_state.dont_perf = True
                 st.rerun()
 
-# Main rendering
+
 def main() -> None:
-    """Render the main Streamlit application."""
+    """Render the main Streamlit application.
+
+    Displays a demo badge and delegates rendering to page-specific functions based
+    on the selected page in session state.
+    """
     st.markdown(
         """
         <div class="demo-info">
@@ -354,18 +387,22 @@ def main() -> None:
         unsafe_allow_html=True,
     )
     render_sidebar()
-    if st.session_state.page == 'Data Page':
+    page: str = st.session_state.page
+    if page == "Data Page":
         render_data_page()
-    elif st.session_state.page == '🔍 Search Data':
+    elif page == "🔍 Search Data":
         render_search_data_page()
-    elif st.session_state.page == '📊 Visualize Data':
+    elif page == "📊 Visualize Data":
         render_visualize_data_page()
-    elif st.session_state.page == '📤 Share Data':
+    elif page == "📤 Share Data":
         render_share_data_page()
-    elif st.session_state.page == '📥 Download Data':
+    elif page == "📥 Download Data":
         render_download_data_page()
     else:
         render_home_page()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
+    initialize_session_state()
+    apply_custom_css()
     main()

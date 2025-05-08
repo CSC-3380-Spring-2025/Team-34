@@ -1,11 +1,20 @@
-name: dev-env
-channels:
-  - conda-forge
-  - defaults
-dependencies:
-  - python=3.10
-  - streamlit
-  - pandas
-  - sqlite3
-  - sqlalchemy
-  - plotly
+# This is a commented-out Conda environment configuration file (dev-env.yml) for the LSU Datastore Dashboard.
+# It defines dependencies for setting up a development environment tailored for the dashboard's core functionality.
+# While not currently used in the project, this file could be utilized in the future to:
+# - Create a consistent development environment for team members: `conda env create -f dev-env.yml`.
+# - Support local development and testing of the Streamlit app (app.py) and data processing scripts (e.g., data-fetching script).
+# - Enable isolated environments for experimenting with new features, such as additional visualizations using Plotly.
+# - Facilitate integration with CI/CD pipelines (e.g., GitHub Actions) by ensuring consistent dependencies across development and testing stages.
+# - Serve as a base for a Docker container to deploy the Streamlit app, ensuring all necessary libraries are included.
+
+#name: dev-env
+#channels:
+#  - conda-forge
+#  - defaults
+#dependencies:
+#  - python=3.10
+#  - streamlit
+#  - pandas
+#  - sqlite3
+#  - sqlalchemy
+#  - plotly

@@ -1,26 +1,40 @@
-name: test-env
-channels:
-  - conda-forge
-  - defaults
-dependencies:
-  - python=3.10
-  - pandas
-  - numpy
-  - sympy
-  - scipy
-  - matplotlib
-  - seaborn
-  - requests
-  - streamlit
-  - pytest  # Testing framework
-  - coverage  # Code coverage reports
-  - hypothesis  # Property-based testing
-  - black  # Code formatter
-  - pylint  # Linting tool
-  - flake8  # Additional linting
-  - pre-commit  # Automates linting before commits
-  - ipython  # Interactive testing
-  - jupyterlab  # Development support
-  - tqdm  # Progress bars for debugging
-  - pip:
-      - python-dotenv  # Environment variables
+# This is a commented-out Conda environment configuration file (test-env.yml) for the LSU Datastore Dashboard.
+# It defines dependencies for a comprehensive testing and development environment, aimed at improving code quality,
+# testing coverage, and development workflows for the Team-34 project. While not currently used, this file could be
+# leveraged in the future to:
+# - Set up a robust testing environment with pytest, coverage, and hypothesis for unit, integration, and property-based
+#   testing of scripts like fetch_lsu_course_data, database.py, and rendering scripts (data_page.py, home.py, etc.).
+# - Enhance code quality with linting tools (pylint, flake8, black) and pre-commit hooks, integrating with the existing
+#   GitHub Actions workflow (Dev Branch CI/CD Pipeline) for automated checks.
+# - Support interactive development and debugging with ipython and jupyterlab, allowing for exploratory data analysis
+#   (e.g., analyzing course data with pandas, numpy, scipy, sympy) and visualization prototyping (matplotlib, seaborn).
+# - Improve testing performance with tqdm for progress tracking during large-scale tests (e.g., testing parse_course_page).
+# To use this file, create a Conda environment with: `conda env create -f test-env.yml`, then run tests with `pytest`
+# or start a JupyterLab session with `jupyter lab`.
+
+#name: test-env
+#channels:
+#  - conda-forge
+#  - defaults
+#dependencies:
+#  - python=3.10
+#  - pandas
+#  - numpy
+#  - sympy
+#  - scipy
+#  - matplotlib
+#  - seaborn
+#  - requests
+#  - streamlit
+#  - pytest  # Testing framework
+#  - coverage  # Code coverage reports
+#  - hypothesis  # Property-based testing
+#  - black  # Code formatter
+#  - pylint  # Linting tool
+#  - flake8  # Additional linting
+#  - pre-commit  # Automates linting before commits
+#  - ipython  # Interactive testing
+#  - jupyterlab  # Development support
+#  - tqdm  # Progress bars for debugging
+#  - pip:
+#      - python-dotenv  # Environment variables

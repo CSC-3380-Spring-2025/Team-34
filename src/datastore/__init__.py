@@ -1,52 +1,41 @@
-"""Datastore package for Team-34 project.
+"""Datastore package for the LSU Datastore Dashboard.
 
-Initializes logging, environment variables, and imports for database operations
-and data processing. Exports Connector class and clean_dataframe function for use
-in the LSU Datastore Dashboard.
+This module initializes the datastore package for the Team-34 project, configuring
+logging, loading environment variables, and exporting the Connector class and
+clean_dataframe function. It relies on environment variables (e.g., DATABASE_NAME,
+LOG_DIR, LOG_FILE) loaded from a .env file (ignored by .gitignore). CSV files
+handled by the package may be tracked by Git Large File Storage (LFS) per
+.gitattributes.
 
 Attributes:
-    __version__ (str): Package version.
-    __author__ (str): Package author.
-    __all__ (list): Public objects exposed by the package.
+    __version__: Package version.
+    __author__: Package author.
+    __all__: Public objects exposed by the package.
 """
 
 import logging
 import os
-import sys
 from typing import List
 
-try:
-    from dotenv import load_dotenv
-except ImportError:
-    print("Warning: python-dotenv is not installed. Install it using 'pip install python-dotenv'.")
+from dotenv import load_dotenv
 
-# Local imports
-try:
-    from .connector import Connector
-except ImportError as e:
-    logging.warning(f"Could not import Connector from connector: {e}")
+from .connector import Connector
+from .processor import clean_dataframe
 
-try:
-    from .processor import clean_dataframe  # Updated from process_data
-except ImportError as e:
-    logging.warning(f"Could not import clean_dataframe from processor: {e}")
 
-# Configure logging for the package
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-)
-
-# Load environment variables from a .env file (if exists)
+# Load environment variables
 load_dotenv()
 
-# Ensure the correct module path is included
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# Configure logging to align with project setup
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+
+logger = logging.getLogger("LiveFeedLogger")
+logger.info("Datastore package initialized successfully.")
 
 # Package metadata
-__version__: str = '1.0.0'
-__author__: str = 'Your Team'
-__all__: List[str] = ['Connector', 'clean_dataframe']  # Updated from process_data
-
-# Log package initialization
-logging.info('Datastore package initialized successfully.')
+__version__: str = "1.0.0"
+__author__: str = "Team-34"
+__all__: List[str] = ["Connector", "clean_dataframe"]
