@@ -36,37 +36,11 @@ from src.scripts.visualize_data import render_visualize_data_page
 from src.scripts.share_download import render_share_data_page
 from src.scripts.share_download import render_download_data_page
 from src.utils import get_secret, MemoryHandler, CSVFormatter, CustomTimedRotatingFileHandler
+from src.utils import logger
 
 # Load environment variables
 load_dotenv()
 
-# Setup logging
-log_dir: str = os.path.join(os.path.dirname(__file__), get_secret("LOG_DIR", "logs"))
-os.makedirs(log_dir, exist_ok=True)
-
-logger: logging.Logger = logging.getLogger("LiveFeedLogger")
-logger.setLevel(logging.INFO)
-
-log_file: str = os.path.join(log_dir, get_secret("LOG_FILE", "live_feed_log"))
-file_handler: TimedRotatingFileHandler = CustomTimedRotatingFileHandler(
-    log_file, when="midnight", interval=1, backupCount=30, encoding="utf-8"
-)
-file_handler.setFormatter(CSVFormatter())
-file_handler.suffix = "%Y-%m-%d.csv"
-
-log_file_path: str = f"{log_file}.{datetime.now().strftime('%Y-%m-%d')}.csv"
-if not os.path.exists(log_file_path):
-    with open(log_file_path, "a") as f:
-        f.write("Timestamp,Username,Action,Details\n")
-
-stream_handler: logging.StreamHandler = logging.StreamHandler()
-stream_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
-
-memory_handler: MemoryHandler = MemoryHandler(capacity=1000)
-
-logger.addHandler(file_handler)
-logger.addHandler(stream_handler)
-logger.addHandler(memory_handler)
 
 # Set page configuration
 st.set_page_config(page_title="📊 LSU Datastore", layout="centered")
@@ -166,6 +140,10 @@ def apply_custom_css() -> None:
             font-size: 24px !important;
             margin-top: 30px !important;
             margin-bottom: 15px !important;
+        }}
+        /* CPU Usage Metrics */
+        .stMetric * {{
+        color: {text_color} !important;
         }}
         /* Images */
         .ras-image {{
@@ -364,7 +342,9 @@ def render_sidebar() -> None:
                 st.session_state.logged_in = False
                 st.session_state.username = None
                 st.session_state.show_lsu_datastore = False
-                st.session_state.page = "Data Page"
+                #Temporarily disable performance metrics to allow page to flush
+                if st.session_state.page=="Home":
+                    st.session_state.dont_perf = True
                 st.rerun()
 
 
@@ -377,7 +357,7 @@ def main() -> None:
     st.markdown(
         """
         <div class="demo-info">
-            <span class="demo-text">Demo 1.4.5</span>
+            <span class="demo-text">Demo 1.4.6</span>
             <span class="live-demo-badge"><i class="fas fa-rocket"></i> Live Demo</span>
         </div>
         """,

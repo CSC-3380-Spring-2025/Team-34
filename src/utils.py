@@ -125,14 +125,18 @@ def setup_logger(log_dir: str = "logs", log_file: str = "live_feed_log") -> logg
     Raises:
         OSError: If the log directory cannot be created or written to.
     """
-    global memory_handler
+    global memory_handler, logger_is_setup
+    memory_handler = MemoryHandler(capacity=1000)
     os.makedirs(log_dir, exist_ok=True)
-
     logger: logging.Logger = logging.getLogger("LiveFeedLogger")
     logger.setLevel(logging.INFO)
-
+    log_file_path: str = f"{os.path.join(log_dir, log_file)}.{datetime.now().strftime('%Y-%m-%d')}.csv"
+    if not os.path.exists(log_file_path):
+        with open(log_file_path, "a") as f:
+            f.write("Timestamp,Username,Action,Details\n")
+    
     file_handler: TimedRotatingFileHandler = CustomTimedRotatingFileHandler(
-        os.path.join(log_dir, log_file),
+        filename=log_file_path,
         when="midnight",
         interval=1,
         backupCount=30,
@@ -141,23 +145,21 @@ def setup_logger(log_dir: str = "logs", log_file: str = "live_feed_log") -> logg
     file_handler.setFormatter(CSVFormatter())
     file_handler.suffix = "%Y-%m-%d.csv"
 
-    log_file_path: str = f"{os.path.join(log_dir, log_file)}.{datetime.now().strftime('%Y-%m-%d')}.csv"
-    if not os.path.exists(log_file_path):
-        with open(log_file_path, "a") as f:
-            f.write("Timestamp,Username,Action,Details\n")
+    
 
     stream_handler: logging.StreamHandler = logging.StreamHandler()
     stream_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
 
     memory_handler = MemoryHandler(capacity=1000)
-
+    if logger_is_setup:
+        return logger
     logger.addHandler(file_handler)
     logger.addHandler(stream_handler)
     logger.addHandler(memory_handler)
-
+    logger_is_setup=True
     return logger
 
-
+logger_is_setup=False
 logger: logging.Logger = setup_logger()
 
 
@@ -300,7 +302,7 @@ def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
                 extra={
                     "username": st.session_state.username or "Anonymous",
                     "action": "email_share",
-                    "details": f"Sent to: {email}, Dataset: {filename}",
+                    "details": f"Sent to: {email} Dataset: {filename}",
                 },
             )
             return True
@@ -310,7 +312,7 @@ def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
             extra={
                 "username": st.session_state.username or "Anonymous",
                 "action": "email_share",
-                "details": f"Status code: {response.status_code}, Dataset: {filename}",
+                "details": f"Status code: {response.status_code} Dataset: {filename}",
             },
         )
         return False
@@ -325,7 +327,7 @@ def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
             extra={
                 "username": st.session_state.username or "Anonymous",
                 "action": "email_share",
-                "details": f"SSL error: {ssl_err}, retrying without verification",
+                "details": f"SSL error: {ssl_err} retrying without verification",
             },
         )
         try:
@@ -336,7 +338,7 @@ def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
                     extra={
                         "username": st.session_state.username or "Anonymous",
                         "action": "email_share",
-                        "details": f"Sent to: {email}, Dataset: {filename}",
+                        "details": f"Sent to: {email} Dataset: {filename}",
                     },
                 )
                 return True
@@ -346,7 +348,7 @@ def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
                 extra={
                     "username": st.session_state.username or "Anonymous",
                     "action": "email_share",
-                    "details": f"Status code: {response.status_code}, Dataset: {filename}",
+                    "details": f"Status code: {response.status_code} Dataset: {filename}",
                 },
             )
             return False
@@ -357,7 +359,7 @@ def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
                 extra={
                     "username": st.session_state.username or "Anonymous",
                     "action": "email_share",
-                    "details": f"Error: {e}, Dataset: {filename}",
+                    "details": f"Error: {e} Dataset: {filename}",
                 },
             )
             return False
@@ -369,7 +371,7 @@ def send_dataset_email(email: str, filename: str, df: DataFrame) -> bool:
             extra={
                 "username": st.session_state.username or "Anonymous",
                 "action": "email_share",
-                "details": f"Error: {e}, Dataset: {filename}",
+                "details": f"Error: {e} Dataset: {filename}",
             },
         )
         return False
