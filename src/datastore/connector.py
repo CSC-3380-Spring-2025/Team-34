@@ -1,31 +1,46 @@
-"""Connector module for Team-34 project.
+"""Connector module for the LSU Datastore Dashboard.
 
-Provides the Connector class to load CSV data into pandas DataFrames for the
-LSU Datastore Dashboard.
+This module provides the Connector class to load CSV data into pandas DataFrames
+for the Team-34 project. CSV files may be tracked by Git Large File Storage (LFS)
+per .gitattributes.
 """
 
 import pandas as pd
 
+from src.utils import logger
+
 
 class Connector:
-    """Handle loading data from CSV files into pandas DataFrames."""
+    """Utility class for loading data from CSV files into pandas DataFrames.
+
+    Provides a static method to read CSV files, used by the LSU Datastore Dashboard
+    for data processing and analysis.
+    """
 
     @staticmethod
     def load_data(file_path: str) -> pd.DataFrame:
         """Load data from a CSV file into a pandas DataFrame.
 
         Args:
-            file_path (str): Path to the CSV file to load.
+            file_path: Path to the CSV file to load.
 
         Returns:
-            pd.DataFrame: The loaded DataFrame, or an empty DataFrame if loading fails.
+            The loaded DataFrame, or an empty DataFrame if loading fails.
 
         Raises:
-            Exception: If the CSV file cannot be read (e.g., file not found, invalid format).
+            FileNotFoundError: If the CSV file does not exist.
+            pd.errors.ParserError: If the CSV file cannot be parsed.
         """
         try:
-            df = pd.read_csv(file_path)
+            df: pd.DataFrame = pd.read_csv(file_path)
             return df
-        except Exception as e:
-            print(f"Error loading data from {file_path}: {e}")
+        except (FileNotFoundError, pd.errors.ParserError) as e:
+            logger.error(
+                "Data Load Failed",
+                extra={
+                    "username": "System",
+                    "action": "load_data",
+                    "details": f"Error loading {file_path}: {e}",
+                },
+            )
             return pd.DataFrame()
