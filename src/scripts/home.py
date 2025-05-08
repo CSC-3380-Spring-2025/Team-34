@@ -18,6 +18,7 @@ import pandas as pd
 import plotly.express as px
 import psutil
 import streamlit as st
+from streamlit_autorefresh import st_autorefresh
 
 from src.datastore.database import delete_file
 from src.datastore.database import save_csv_to_database
@@ -25,9 +26,9 @@ from src.datastore.database import search_csv_data
 from src.datastore.database import update_csv_data
 from src.utils import cached_get_files
 from src.utils import cached_get_csv_preview
-from src.utils import logger
 from src.utils import memory_handler
 from src.utils import send_dataset_email
+from src.utils import logger
 
 
 def render_home_page() -> None:
@@ -325,7 +326,7 @@ def render_home_page() -> None:
                                         extra={
                                             "username": st.session_state.username or "Anonymous",
                                             "action": "email_share",
-                                            "details": f"Sent to: {email_input}, Dataset: {file_options[selected_file_id]}",
+                                            "details": f"Sent to: {email_input} Dataset: {file_options[selected_file_id]}",
                                         },
                                     )
                                 except ValueError as e:
@@ -444,22 +445,23 @@ def render_home_page() -> None:
                 unsafe_allow_html=True,
             )
             time.sleep(1)
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    st.subheader("System Performance Metrics")
-    placeholder = st.empty()
-    for _ in range(60):
-        cpu_usage: float = psutil.cpu_percent(interval=1)
-        memory_usage: float = psutil.virtual_memory().percent
-        with placeholder.container():
-            cpu_col, memory_col = st.columns(2)
-            with cpu_col:
-                st.metric("CPU Usage", f"{cpu_usage}%")
-            with memory_col:
-                st.metric("Memory Usage", f"{memory_usage}%")
-
+    if 'dont_perf' in st.session_state and st.session_state.dont_perf:
+        st.session_state.dont_perf=False
+        #Schedules page to be rerun in 2 seconds, allowing the script
+        # to terminate and thus allow data to flush, while still rerunning to add the metrics.
+        st_autorefresh(interval=2000, key="refresh")
+    else:
+        st.subheader("System Performance Metrics")
+        placeholder = st.empty()
+        for _ in range(60):
+            cpu_usage: float = psutil.cpu_percent(interval=1)
+            memory_usage: float = psutil.virtual_memory().percent
+            with placeholder.container():
+                cpu_col, memory_col = st.columns(2)
+                with cpu_col:
+                    st.metric("CPU Usage", f"{cpu_usage}%")
+                with memory_col:
+                    st.metric("Memory Usage", f"{memory_usage}%")
     st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("---")
-    st.markdown(
-        "[Link to DAG Grid](https://animated-train-jjvx5x4q9g73p5v5-8080.app.github.dev/dags/fetch_store_dag/grid)"
-    )
