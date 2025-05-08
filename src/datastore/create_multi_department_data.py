@@ -9,7 +9,7 @@ LOG_DIR/LOG_FILE.
 
 from typing import List
 
-import parse_courses
+from . import parse_courses
 
 from src.utils import logger
 
