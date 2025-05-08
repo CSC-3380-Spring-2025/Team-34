@@ -84,7 +84,7 @@ The LSU Datastore Dashboard is a Streamlit-based web application for managing, v
 4. Commit and force-push the updated database file:
      git add ../datastore/datastore.db
      git commit -m "Update datastore.db with new data"
-     git push origin master --force
+     git push origin main --force
 
 ⚠️ Warning: Force pushing will overwrite remote history; use with caution. Consider --force-with-lease to avoid overwriting others' changes:
 
